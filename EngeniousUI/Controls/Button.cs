@@ -11,7 +11,7 @@ namespace EngeniousUI.Controls
         /// <summary>
         /// Erzeugt eine neue Instanz der Klasse Button.
         /// </summary>
-        /// <param name="manager">Der <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
         /// <param name="style">(Optional) der zu verwendende Style</param>
         public Button(BaseScreenComponent manager, string style = "")
             : base(manager, style)
@@ -94,7 +94,7 @@ namespace EngeniousUI.Controls
         /// Initialisiert einen Standard-Button mit Text-Inhalt
         /// </summary>
         /// <param name="text">Enthaltener Text</param>
-        /// <param name="manager">Der <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
         /// <param name="style">(Optional) Der zu verwendende Style</param>
         /// <returns>Button-Instanz</returns>
         public static Button TextButton(BaseScreenComponent manager, string text, string style = "")

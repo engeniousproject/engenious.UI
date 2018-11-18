@@ -70,7 +70,7 @@ namespace EngeniousUI.Controls
         /// <summary>
         /// Erzeugt einen neuen Slider.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
         /// <param name="style">(Optional) Der zu verwendende Style.</param>
         public Slider(BaseScreenComponent manager, string style = "")
             : base(manager, style)

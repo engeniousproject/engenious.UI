@@ -50,7 +50,7 @@ namespace EngeniousUI.Controls
         /// <summary>
         /// Erzeugt eine neue Instanz der Klasse StackPanel.
         /// </summary>
-        /// <param name="manager">Der <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
         public StackPanel(BaseScreenComponent manager) : base(manager)
         {
             ApplySkin(typeof(StackPanel));

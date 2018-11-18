@@ -15,7 +15,7 @@ namespace EngeniousUI.Controls
         /// <summary>
         /// Erzeugt eine neue Instanz der ContainerControl-Klasse.
         /// </summary>
-        /// <param name="manager">Der <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
         /// <param name="style">Der zu verwendende Style</param>
         public ContainerControl(BaseScreenComponent manager, string style = "") :
             base(manager, style)

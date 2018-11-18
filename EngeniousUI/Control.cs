@@ -1181,7 +1181,7 @@ namespace EngeniousUI
         /// <summary>
         /// Wird vom Parent aufgerufen wenn sich die Maus bewegt
         /// </summary>
-        /// <param name="globalPosition">Mausposition relativ zum Control</param>
+        /// <param name="args">Parameter für Mouse-Events</param>
         /// <returns>Event verarbeitet?</returns>
         internal bool InternalMouseMove(MouseEventArgs args)
         {

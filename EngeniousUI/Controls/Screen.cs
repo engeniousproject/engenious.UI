@@ -88,7 +88,7 @@
         /// <summary>
         /// Erzeugt einen neuen Screen.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
         public Screen(BaseScreenComponent manager) : base(manager)
         {
             Manager = manager;

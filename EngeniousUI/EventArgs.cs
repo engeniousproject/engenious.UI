@@ -330,10 +330,19 @@ namespace EngeniousUI
         public T NewItem { get; set; }
     }
 
+    /// <summary>
+    /// Parameter für Collection-Events
+    /// </summary>
     public class CollectionEventArgs : EventArgs
     {
+        /// <summary>
+        /// Das betroffene Control
+        /// </summary>
         public Control Control { get; set; }
 
+        /// <summary>
+        /// Der betroffene Index
+        /// </summary>
         public int Index { get; set; }
     }
 
@@ -370,6 +379,10 @@ namespace EngeniousUI
     /// <param name="args"></param>
     public delegate void EventDelegate(Control sender, EventArgs args);
 
+    /// <summary>
+    /// Event-Delegat für Drag-Events
+    /// </summary>
+    /// <param name="args"></param>
     public delegate void DragEventDelegate(DragEventArgs args);
 
     /// <summary>
@@ -379,6 +392,10 @@ namespace EngeniousUI
     /// <param name="args">Eventargumente</param>
     public delegate void MouseEventDelegate(Control sender, MouseEventArgs args);
 
+    /// <summary>
+    /// Event Delegat für Mouse-Events
+    /// </summary>
+    /// <param name="args"></param>
     public delegate void MouseEventBaseDelegate(MouseEventArgs args);
 
     /// <summary>

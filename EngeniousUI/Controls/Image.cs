@@ -18,7 +18,7 @@ namespace EngeniousUI.Controls
         /// <summary>
         /// Erzeugt eine neue Instanz eines Bildsteuerlements.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
         /// <param name="style">(Optional) Der zu verwendende Style.</param>
         public Image(BaseScreenComponent manager, string style = "") :
             base(manager, style)

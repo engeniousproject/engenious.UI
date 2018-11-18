@@ -51,7 +51,7 @@ namespace EngeniousUI.Controls
         /// <summary>
         /// Erzeugt eine neue Instanz der Klasse Checkbox
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="IScreenManager"/></param>
+        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
         public Checkbox(BaseScreenComponent manager) : base(manager)
         {
             CanFocus = true;
