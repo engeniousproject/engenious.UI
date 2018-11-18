@@ -2,7 +2,7 @@
 using engenious;
 using engenious.Graphics;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// List-Control für jegliche Art von Daten.

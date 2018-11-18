@@ -4,7 +4,7 @@ using System.Text;
 using engenious;
 using engenious.Graphics;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Standard Text-Anzeige Control.

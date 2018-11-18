@@ -4,7 +4,7 @@ using engenious;
 using engenious.Graphics;
 using engenious.Input;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Control für Texteingabe

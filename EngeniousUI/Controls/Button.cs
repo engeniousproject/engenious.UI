@@ -1,7 +1,7 @@
 ﻿using System;
 using engenious.Input;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Standard Schaltfläche

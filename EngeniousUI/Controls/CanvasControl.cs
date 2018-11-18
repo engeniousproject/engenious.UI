@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using engenious;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     public class CanvasControl : Control
     {

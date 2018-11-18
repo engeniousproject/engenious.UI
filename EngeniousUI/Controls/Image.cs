@@ -1,7 +1,7 @@
 ﻿using engenious;
 using engenious.Graphics;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Steuerelement, das ein Bild darstellt.

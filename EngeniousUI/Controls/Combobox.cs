@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using engenious;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Typische Combobox zur Auswahl eines Elements aus einer Liste.

@@ -1,5 +1,6 @@
 ﻿using EngeniousUI;
 using engenious;
+using EngeniousUI.Controls;
 
 namespace SampleClient.Screens
 {

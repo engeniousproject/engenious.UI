@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using engenious.Input;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Basis-Control für Item-Listen

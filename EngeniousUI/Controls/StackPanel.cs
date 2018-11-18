@@ -2,7 +2,7 @@
 using System.Linq;
 using engenious;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Container zur Aufreihung von weiteren Controls in einer bestimmten Ausrichtung.

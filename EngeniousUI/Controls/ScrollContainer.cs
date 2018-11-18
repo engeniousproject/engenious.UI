@@ -3,7 +3,7 @@ using engenious;
 using engenious.Graphics;
 using engenious.Input;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     public class ScrollContainer : ContentControl
     {

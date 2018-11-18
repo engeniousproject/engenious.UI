@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Basisklasse für alle Controls mit mehreren Inhalten

@@ -4,6 +4,7 @@ using System.IO;
 using engenious;
 using engenious.Graphics;
 using engenious.Input;
+using EngeniousUI.Controls;
 
 namespace SampleClient.Screens
 {

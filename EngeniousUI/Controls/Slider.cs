@@ -3,7 +3,7 @@ using engenious;
 using engenious.Graphics;
 using engenious.Input;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Das Slider-Control erlaubt das Verschieben eines Reglers per Maus oder Tastatur.

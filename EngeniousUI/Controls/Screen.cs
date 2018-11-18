@@ -1,4 +1,4 @@
-﻿namespace EngeniousUI
+﻿namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Bildschirmseite zur Aufnahme von Controls.

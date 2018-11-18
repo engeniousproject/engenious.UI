@@ -1,4 +1,4 @@
-﻿namespace EngeniousUI
+﻿namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Ein einfacher Container für Steuerelemente

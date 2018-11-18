@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     public class ContentControl : Control
     {

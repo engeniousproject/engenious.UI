@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     public class TabPage : ContainerControl
     {

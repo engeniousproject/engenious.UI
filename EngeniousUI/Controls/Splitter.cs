@@ -3,7 +3,7 @@ using engenious.Graphics;
 using engenious.Input;
 
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     /// <summary>
     /// Container zur Aufslittung zweier Controls in zwei größenveränderbare Panels.

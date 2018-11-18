@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using engenious;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     public class Grid : Control
     {

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
-namespace EngeniousUI
+namespace EngeniousUI.Controls
 {
     public class TabControl : Control
     {
