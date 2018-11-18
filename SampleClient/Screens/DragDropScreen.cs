@@ -1,6 +1,6 @@
 ﻿using engenious;
 using engenious.Graphics;
-using MonoGameUi;
+using EngeniousUI;
 using System;
 
 namespace SampleClient.Screens

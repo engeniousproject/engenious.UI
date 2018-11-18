@@ -68,10 +68,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\BoldFont.spritefont" />
+    <Content Include="Content\Fonts\BoldFont.spritefont" />
     <Content Include="Content\drag.png" />
-    <Content Include="Content\GameFont.spritefont" />
-    <Content Include="Content\HeadlineFont.spritefont" />
+    <Content Include="Content\Fonts\GameFont.spritefont" />
+    <Content Include="Content\Fonts\HeadlineFont.spritefont" />
     <Content Include="test_texture_round.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -85,7 +85,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MonoGameUi\MonoGameUi.csproj">
+    <ProjectReference Include="..\EngeniousUI\EngeniousUI.csproj">
       <Project>{9E89B217-8424-4FCB-B365-3A01F61CD44F}</Project>
       <Name>MonoGameUi</Name>
     </ProjectReference>
@@ -95,9 +95,9 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\engenious.0.1.32\build\engenious.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\engenious.0.1.32\build\engenious.targets'))" />
+    <Error Condition="!Exists('..\packages\engenious.0.2.0-alpha\build\engenious.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\engenious.0.2.0-alpha\build\engenious.targets'))" />
   </Target>
-  <Import Project="..\packages\engenious.0.1.32\build\engenious.targets" Condition="Exists('..\packages\engenious.0.1.32\build\engenious.targets')" />
+  <Import Project="..\packages\engenious.0.2.0-alpha\build\engenious.targets" Condition="Exists('..\packages\engenious.0.2.0-alpha\build\engenious.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

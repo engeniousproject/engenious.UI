@@ -1,5 +1,5 @@
 ﻿using System;
-using MonoGameUi;
+using EngeniousUI;
 using System.IO;
 using engenious;
 using engenious.Graphics;
@@ -37,6 +37,7 @@ namespace SampleClient.Screens
             StackPanel panel = new StackPanel(manager);                 //Neues Stackpanel erzeugen
             panel.VerticalAlignment = VerticalAlignment.Stretch;        //100% Höhe
             scrollContainer.Content = panel;                            //Ein Scroll Container kann nur ein Control beherbergen
+            panel.ControlSpacing = 20;
 
             //Label
             Label label = new Label(manager) { Text = "Control Showcase" }; //Neues Label erzeugen
