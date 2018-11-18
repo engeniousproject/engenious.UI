@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>OctoAwesome.engeniousUI</id>
+    <version>0.3.0-alpha</version>
+    <title>EngeniousUI</title>
+    <authors>tomwendel, fnawratil, jvbsl</authors>
+    <owners>fnawratil</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/OctoAwesome/engeniousui/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/OctoAwesome/engeniousui</projectUrl>
+    <description>A simple UI framework for the engenious game-engine. This framework is based on monogameui</description>
+    <releaseNotes>Breaking changes in namespaces!</releaseNotes>
+    <copyright>Copyright 2018 Octoawesome Community, Fabian Nawratil</copyright>
+    <tags>ui framework engenious engeniousui gui</tags>
+    <dependencies>
+      <dependency id="engenious" version="0.2.0-alpha" />
+    </dependencies>
+    <packageTypes>
+        <packageType name="Dependency" />
+    </packageTypes>
+  </metadata>
+</package>
