@@ -6,6 +6,13 @@
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
+        <Version>0.3.1.0-alpha</Version>
+        <Authors>fnawratil, jvbsl, tomwendel</Authors>
+        <PackageLicenseUrl>https://github.com/engeniousproject/engenious.UI/blob/develop/LICENSE</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/engeniousproject/engenious.UI</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/engeniousproject/engenious.UI</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Copyright>engeniousproject 2019</Copyright>
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="engenious" Version="0.3.0.12-alpha" />
