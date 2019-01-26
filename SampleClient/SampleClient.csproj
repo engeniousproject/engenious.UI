@@ -24,7 +24,7 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="engenious" Version="0.3.0.12-alpha" />
-      <PackageReference Include="engenious.ContentTool" Version="0.3.0.3-alpha" />
+      <PackageReference Include="engenious.ContentTool" Version="0.3.0.5-alpha" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\engenious.UI\engenious.UI.csproj" />
