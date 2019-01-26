@@ -1,6 +1,6 @@
-﻿using EngeniousUI;
-using engenious;
-using EngeniousUI.Controls;
+﻿using engenious;
+using engenious.UI;
+using engenious.UI.Controls;
 
 namespace SampleClient.Screens
 {

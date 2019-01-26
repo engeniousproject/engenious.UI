@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using EngeniousUI;
-using EngeniousUI.Controls;
+using engenious.UI;
+using engenious.UI.Controls;
 
 namespace SampleClient.Screens
 {

@@ -1,6 +1,6 @@
-﻿using EngeniousUI;
-using System;
+﻿using System;
 using engenious;
+using engenious.UI;
 using SampleClient.Screens;
 
 namespace SampleClient

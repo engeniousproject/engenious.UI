@@ -1,7 +1,8 @@
-﻿using engenious.Audio;
-using EngeniousUI;
+﻿using engenious;
+using engenious.Audio;
 using engenious.Content;
-using EngeniousUI.Controls;
+using engenious.UI;
+using engenious.UI.Controls;
 
 namespace SampleClient
 {

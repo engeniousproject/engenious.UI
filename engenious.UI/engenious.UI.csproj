@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <Description>UI Framework for engenious</Description>
+    </PropertyGroup>
+    <ItemGroup>
+      <PackageReference Include="engenious" Version="0.3.0.11-alpha" />
+      <PackageReference Include="engenious.OpenTK" Version="3.0.1-pre" />
+    </ItemGroup>
+    <ItemGroup>
+      <Reference Include="System.Windows.Forms" />
+    </ItemGroup>
+</Project>

@@ -1,10 +1,10 @@
 ﻿using System;
-using EngeniousUI;
 using System.IO;
 using engenious;
 using engenious.Graphics;
 using engenious.Input;
-using EngeniousUI.Controls;
+using engenious.UI;
+using engenious.UI.Controls;
 
 namespace SampleClient.Screens
 {
