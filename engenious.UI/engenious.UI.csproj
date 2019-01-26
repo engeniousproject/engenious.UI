@@ -8,8 +8,7 @@
         <Description>UI Framework for engenious</Description>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="engenious" Version="0.3.0.11-alpha" />
-      <PackageReference Include="engenious.OpenTK" Version="3.0.1-pre" />
+      <PackageReference Include="engenious" Version="0.3.0.12-alpha" />
     </ItemGroup>
     <ItemGroup>
       <Reference Include="System.Windows.Forms" />
