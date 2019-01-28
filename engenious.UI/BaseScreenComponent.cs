@@ -110,12 +110,19 @@ namespace engenious.UI
                 {
                     mouseMode = value;
                     Game.IsMouseVisible = (mouseMode != MouseMode.Captured);
-                    
+
                     if (mouseMode == MouseMode.Free)
-                        Mouse.SetPosition(GraphicsDevice.Viewport.Width/2,GraphicsDevice.Viewport.Height/2);
+                        Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+                    else
+                        resetMouse = true;
                 }
             }
         }
+
+        /// <summary>
+        /// Reset (ignore) mouse-position. Used to compensate first movement after mouse-capture.
+        /// </summary>
+        private bool resetMouse = false;
 
         /// <summary>
         /// Erzeugt eine neue Instanz der Klasse BaseScreenComponent.
@@ -232,12 +239,10 @@ namespace engenious.UI
 
                 if (MouseEnabled)
                 {
-
-                    
-
+                    // Mausposition anhand des Mouse Modes ermitteln
                     MouseState mouse;
                     Point mousePosition;
-                    if (MouseMode == MouseMode.Captured)
+                    if (MouseMode == MouseMode.Captured && !resetMouse)
                     {
 
                         mouse = Mouse.GetState();
@@ -245,14 +250,19 @@ namespace engenious.UI
                             mouse.X - (lastMousePosition.X),
                             mouse.Y - (lastMousePosition.Y));
                     }
+                    else if(resetMouse)
+                    {
+                        Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+                        lastMousePosition = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+                        mouse = Mouse.GetState();
+                        mousePosition = new Point();
+                        resetMouse = false;
+                    }
                     else
                     {
                         mouse = Mouse.GetCursorState();
                         mousePosition = Game.Window.PointToClient(mouse.Location);
                     }
-
-                    // Mausposition anhand des Mouse Modes ermitteln
-                   
 
 
                     MouseEventArgs mouseEventArgs = MouseEventArgsPool.Instance.Take();
