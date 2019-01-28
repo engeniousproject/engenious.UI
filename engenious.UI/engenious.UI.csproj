@@ -6,7 +6,6 @@
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
-        <Version>0.3.1.0-alpha</Version>
         <Authors>fnawratil, jvbsl, tomwendel</Authors>
         <PackageLicenseUrl>https://github.com/engeniousproject/engenious.UI/blob/develop/LICENSE</PackageLicenseUrl>
         <PackageProjectUrl>https://github.com/engeniousproject/engenious.UI</PackageProjectUrl>
@@ -16,8 +15,19 @@
     </PropertyGroup>
     <ItemGroup>
       <PackageReference Include="engenious" Version="0.3.0.12-alpha" />
+	  <PackageReference Include="LitGit" Version="0.1.0.15-alpha" PrivateAssets="all"/>
     </ItemGroup>
     <ItemGroup>
       <Reference Include="System.Windows.Forms" />
     </ItemGroup>
+	<!-- LitGit -->
+	<ItemGroup>
+        <None Remove="engenious.UI.nuget.props.template"/>
+        <LitGitTemplateReference Include="engenious.UI.nuget.props.template"/>
+        <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
+            <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
+        </None>
+	</ItemGroup>
+	<Import Project="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')"/>
+<!--        -->
 </Project>
