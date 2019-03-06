@@ -16,9 +16,11 @@ namespace SampleClient.Screens
 
         public DragDropScreen(BaseScreenComponent manager) : base(manager)
         {
-            Button backButton = Button.TextButton(manager, "Back");
-            backButton.HorizontalAlignment = HorizontalAlignment.Left;
-            backButton.VerticalAlignment = VerticalAlignment.Top;
+            Button backButton = new TextButton(manager, "Back")
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,
+                VerticalAlignment = VerticalAlignment.Top
+            };
             backButton.LeftMouseClick += (s, e) => { manager.NavigateBack(); };
             Controls.Add(backButton);
 
@@ -44,7 +46,7 @@ namespace SampleClient.Screens
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
 
-            Button button1 = Button.TextButton(manager, "Button 1");
+            Button button1 = new TextButton(manager, "Button 1");
             button1.StartDrag += (args) =>
             {
                 args.Handled = true;
@@ -53,8 +55,8 @@ namespace SampleClient.Screens
                 args.Icon = dragIcon;
                 args.IconSize = new Point(16, 16);
             };
-            Button button2 = Button.TextButton(manager, "Button 2");
-            Button button3 = Button.TextButton(manager, "Button 3");
+            Button button2 = new TextButton(manager, "Button 2");
+            Button button3 = new TextButton(manager, "Button 3");
             button3.StartDrag += (args) =>
             {
                 args.Handled = true;
@@ -62,7 +64,7 @@ namespace SampleClient.Screens
                 args.Sender = button3;
                 args.Icon = dragIcon;
             };
-            Button button4 = Button.TextButton(manager, "Button 4");
+            Button button4 = new TextButton(manager, "Button 4");
             buttons.Controls.Add(button1);
             buttons.Controls.Add(button2);
             buttons.Controls.Add(button3);

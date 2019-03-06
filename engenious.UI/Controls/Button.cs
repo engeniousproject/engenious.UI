@@ -38,7 +38,7 @@ namespace engenious.UI.Controls
                 Executed?.Invoke(this, e);
 
                 EventArgsPool.Instance.Release(e);
-                
+
                 args.Handled = true;
             }
         }
@@ -56,7 +56,7 @@ namespace engenious.UI.Controls
             Executed?.Invoke(this, e);
 
             EventArgsPool.Instance.Release(e);
-            
+
             args.Handled = true;
         }
 
@@ -74,7 +74,7 @@ namespace engenious.UI.Controls
             Executed?.Invoke(this, e);
 
             EventArgsPool.Instance.Release(e);
-            
+
             args.Handled = true;
         }
 
@@ -96,12 +96,12 @@ namespace engenious.UI.Controls
         /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
         /// <param name="style">(Optional) Der zu verwendende Style</param>
         /// <returns>Button-Instanz</returns>
-        public static Button TextButton(BaseScreenComponent manager, string text, string style = "")
-        {
-            return new Button(manager, style)
-            {
-                Content = new Label(manager) { Text = text }
-            };
-        }
+        //public static Button TextButton(BaseScreenComponent manager, string text, string style = "")
+        //{
+        //    return new Button(manager, style)
+        //    {
+        //        Content = new Label(manager) { Text = text }
+        //    };
+        //}
     }
 }

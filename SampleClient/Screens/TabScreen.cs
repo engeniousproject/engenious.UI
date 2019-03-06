@@ -28,7 +28,7 @@ namespace SampleClient.Screens
             tabPage.Controls.Add(new Label(manager) { Text = "Content on Page 1" });
 
             //Add "Create Tab" to page 2
-            Button createPage = Button.TextButton(manager, "Create Tab");
+            Button createPage = new TextButton(manager, "Create Tab");
             createPage.LeftMouseClick += (s, e) =>
             {
                 TabPage page = new TabPage(manager, "NEW TAB");
@@ -38,7 +38,7 @@ namespace SampleClient.Screens
             tabPage2.Controls.Add(createPage);
 
             //Add "Remove this page" to page 3
-            Button removePage3 = Button.TextButton(manager, "Remove this Page");
+            Button removePage3 = new TextButton(manager, "Remove this Page");
             removePage3.LeftMouseClick += (s, e) =>
             {
                 tab.Pages.Remove(tabPage3);
