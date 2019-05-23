@@ -869,7 +869,6 @@ namespace engenious.UI
                 Point size = child.GetExpectedSize(client);
                 result = new Point(Math.Max(result.X, size.X), Math.Max(result.Y, size.Y));
             }
-
             return result + Borders;
         }
 
@@ -878,7 +877,7 @@ namespace engenious.UI
         /// </summary>
         /// <param name="containerSize"></param>
         /// <returns></returns>
-        public Point GetMaxClientSize(Point containerSize)
+        public virtual Point GetMaxClientSize(Point containerSize)
         {
             int x = Width.HasValue ? Width.Value : containerSize.X;
 
@@ -908,7 +907,7 @@ namespace engenious.UI
         /// </summary>
         /// <param name="containerSize"></param>
         /// <returns></returns>
-        public Point GetMinClientSize(Point containerSize)
+        public virtual Point GetMinClientSize(Point containerSize)
         {
             Point size = CalculcateRequiredClientSpace(containerSize) + Borders;
             int x = Width.HasValue ? Width.Value : size.X;

@@ -8,11 +8,17 @@ namespace engenious.UI.Controls
     /// <summary>
     /// Control für Texteingabe
     /// </summary>
-    public class Textbox : Label
+    public class Textbox : ContentControl, ITextControl
     {
         private int cursorPosition;
 
         private int selectionStart;
+
+        private int renderOffsetX;
+
+        private Label label;
+
+        private ScrollContainer scrollContainer;
 
         /// <summary>
         /// Gibt die aktuelle Cursor-Position an oder legt diese fest.
@@ -24,7 +30,9 @@ namespace engenious.UI.Controls
             {
                 if (cursorPosition != value)
                 {
-                    cursorPosition = value;
+                    cursorPosition = Math.Min(label.Text.Length, value);
+                    var textSize = (int)Font.MeasureString(Text.Substring(0, CursorPosition)).X;
+                    scrollContainer.HorizontalScrollPosition = Math.Max(0, textSize - ActualClientArea.Width);
                     InvalidateDrawing();
                 }
             }
@@ -46,6 +54,13 @@ namespace engenious.UI.Controls
             }
         }
 
+        public string Text { get => label.Text; set => label.Text = value; }
+        public SpriteFont Font { get => label.Font; set => label.Font = value; }
+        public Color TextColor { get => label.TextColor; set => label.TextColor = value; }
+        public HorizontalAlignment HorizontalTextAlignment { get => label.HorizontalTextAlignment; set => label.HorizontalTextAlignment = value; }
+        public VerticalAlignment VerticalTextAlignment { get => label.VerticalTextAlignment; set => label.VerticalTextAlignment = value; }
+        public bool WordWrap { get => label.WordWrap; set => label.WordWrap = value; }
+
         /// <summary>
         /// Erzeugt eine neue Instanz der Textbox-Klasse
         /// </summary>
@@ -54,12 +69,37 @@ namespace engenious.UI.Controls
         public Textbox(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
+            label = new Label(manager, style)
+            {
+                HorizontalTextAlignment = HorizontalAlignment.Left,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Padding = Border.All(0)
+            };
+
+            scrollContainer = new ScrollContainer(manager)
+            {
+                HorizontalScrollbarVisible = false,
+                VerticalScrollbarVisible = false,
+                HorizontalScrollbarEnabled = true,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                CanFocus = false,
+                //VerticalAlignment = VerticalAlignment.Stretch,
+                Content = label
+            };
+            Content = scrollContainer;
+
+            Padding = Border.All(5);
             TextColor = Color.Black;
             TabStop = true;
             CanFocus = true;
-            Padding = Border.All(5);
 
             ApplySkin(typeof(Textbox));
+        }
+
+        protected override void OnPreDraw(GameTime gameTime)
+        {
+            base.OnPreDraw(gameTime);
         }
 
         /// <summary>
@@ -76,6 +116,7 @@ namespace engenious.UI.Controls
                 CursorPosition = Text.Length;
             if (SelectionStart > Text.Length)
                 SelectionStart = CursorPosition;
+
             // Selektion
             if (SelectionStart != CursorPosition)
             {
@@ -83,7 +124,7 @@ namespace engenious.UI.Controls
                 int to = Math.Max(SelectionStart, CursorPosition);
                 var selectFrom = Font.MeasureString(Text.Substring(0, from));
                 var selectTo = Font.MeasureString(Text.Substring(from, to - from));
-                batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectFrom.X, area.Y, (int)selectTo.X, (int)selectTo.Y), Color.LightBlue);
+                batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectFrom.X - scrollContainer.HorizontalScrollPosition, area.Y, (int)selectTo.X - scrollContainer.HorizontalScrollPosition, (int)selectTo.Y), Color.LightBlue);
             }
 
             base.OnDrawContent(batch, area, gameTime, alpha);
@@ -94,7 +135,7 @@ namespace engenious.UI.Controls
                 if ((int)gameTime.TotalGameTime.TotalSeconds % 2 == 0)
                 {
                     var selectionSize = Font.MeasureString(Text.Substring(0, CursorPosition));
-                    batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectionSize.X, area.Y, 1, Font.LineSpacing), TextColor);
+                    batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectionSize.X - scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
                 }
             }
         }
@@ -307,6 +348,21 @@ namespace engenious.UI.Controls
                 args.Handled = false;
 
             base.OnKeyPress(args);
+        }
+
+        protected override void OnLeftMouseDown(MouseEventArgs args)
+        {
+            base.OnLeftMouseDown(args);
+            
+            for(int i = 0; i < Text.Length; i++)
+            {
+                //Font.MeasureString
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs args)
+        {
+            base.OnMouseMove(args);
         }
 
         Keys[] ignoreKeys =

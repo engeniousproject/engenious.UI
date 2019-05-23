@@ -8,7 +8,7 @@ namespace engenious.UI.Controls
     /// <summary>
     /// Standard Text-Anzeige Control.
     /// </summary>
-    public class Label : Control
+    public class Label : Control, ITextControl
     {
         private List<string> lines = new List<string>();
 
@@ -51,7 +51,7 @@ namespace engenious.UI.Controls
         /// </summary>
         public SpriteFont Font
         {
-            get { return font; }
+            get { return font; } 
             set
             {
                 if (font != value)
@@ -215,10 +215,11 @@ namespace engenious.UI.Controls
                 }
 
                 Vector2 lineSize = Font.MeasureString(Text);
-                return new Point((int)lineSize.X, (int)lineSize.Y);
+                width = (int)lineSize.X;
+                height = (int)lineSize.Y;
             }
 
-            return new Point(width, height);
+            return new Point(Math.Min(available.X, width), Math.Min(available.Y, height));
         }
 
         private void AnalyzeText(Point available)

@@ -30,8 +30,6 @@ namespace engenious.UI.Controls
 
         private Point virtualSize;
 
-
-        
         private readonly PropertyEventArgs<bool> _horizontalScrollbarEnabledChangedEventArgs = new PropertyEventArgs<bool>();
 
         #region Properties 
@@ -467,7 +465,7 @@ namespace engenious.UI.Controls
         public override Point GetExpectedSize(Point available)
         {
             // Bereich ermitteln, der für die Scrollbars verwendet wird
-            Point scrollCut = new Point(VerticalScrollbarEnabled ? ScrollbarWidth : 0, HorizontalScrollbarEnabled ? ScrollbarWidth : 0);
+            Point scrollCut = new Point(VerticalScrollbarVisible ?? false ? ScrollbarWidth : 0, HorizontalScrollbarVisible ?? false ? ScrollbarWidth : 0);
 
             Point client = GetMaxClientSize(available) - scrollCut;
             Point result = GetMinClientSize(available);
@@ -484,8 +482,12 @@ namespace engenious.UI.Controls
                 result.Y = Math.Max(result.Y, expected.Y);
                 result.X = Math.Max(result.X, expected.X);
             }
+            Content.SetActualSize(result);
+            result += scrollCut + Borders;
 
-            return result + scrollCut + Borders;
+            result = new Point(Math.Min(available.X, result.X), Math.Min(available.Y, result.Y));
+
+            return result;
         }
 
         public override void SetActualSize(Point available)
@@ -505,7 +507,7 @@ namespace engenious.UI.Controls
             // Placement
             if (Content != null)
             {
-                Content.SetActualSize(client);
+                Content.SetActualSize(new Point(Math.Max(Content.ActualSize.X, client.X), Math.Max(Content.ActualSize.Y, client.Y)));
                 VirtualSize = new Point(Math.Max(VirtualSize.X, Content.ActualSize.X), Math.Max(VirtualSize.Y, Content.ActualSize.Y));
                 Content.ActualPosition -= new Point(HorizontalScrollPosition, VerticalScrollPosition);
             }

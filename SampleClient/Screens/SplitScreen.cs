@@ -134,12 +134,12 @@ namespace SampleClient.Screens
             textbox = new Textbox(manager)                      //Neue TextBox erzeugen
             {
                 Background = new BorderBrush(Color.LightGray),          //Festlegen eines Backgrounds für ein Control
-                HorizontalAlignment = HorizontalAlignment.Stretch,          //100% Breite
+                HorizontalAlignment = HorizontalAlignment.Stretch,          //100% Breite,
+                MaxWidth = 200,
                 Text = "TEXTBOX!",                                      //Voreingestellter text
-                MinWidth = 100                                          //Eine Textbox kann ihre Größe automatisch anpassen
             };
 
-            Button clearTextbox = new Button(manager);
+            Button clearTextbox = Button.TextButton(manager, "Clear Textbox");
             clearTextbox.LeftMouseClick += (s, e) =>
             {
                 textbox.SelectionStart = 0;
