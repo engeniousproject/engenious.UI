@@ -4,20 +4,22 @@ namespace engenious.UI.Controls
 {
     public class ContentControl : Control
     {
+        private Control content;
+
         /// <summary>
         /// Das enthaltene Control.
         /// </summary>
         public Control Content
         {
-            get { return Children.FirstOrDefault(); }
+            get => content;
             set
             {
-                if (Content != value)
-                {
-                    Children.Clear();
-                    if (value != null)
-                        Children.Add(value);
-                }
+                if (content != null)
+                    Children.Remove(content);
+                content = value;
+
+                if (value != null)
+                    Children.Add(value);
             }
         }
 

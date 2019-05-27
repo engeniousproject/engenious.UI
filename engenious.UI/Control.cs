@@ -162,6 +162,11 @@ namespace engenious.UI
         }
 
         /// <summary>
+        /// Legt fest ob der Fokus-Rahmen gezeichnet werden soll
+        /// </summary>
+        public bool DrawFocusFrame { get; set; }
+
+        /// <summary>
         /// Platzhalter für jegliche Art der Referenz.
         /// </summary>
         public object Tag { get; set; }
@@ -337,7 +342,7 @@ namespace engenious.UI
         /// <param name="alpha">Die Transparenz des Controls.</param>
         protected virtual void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
-            if (Skin.Current.FocusFrameBrush != null)
+            if (Skin.Current.FocusFrameBrush != null && DrawFocusFrame)
                 Skin.Current.FocusFrameBrush.Draw(batch, contentArea, AbsoluteAlpha);
         }
 

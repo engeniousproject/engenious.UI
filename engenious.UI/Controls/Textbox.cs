@@ -28,11 +28,17 @@ namespace engenious.UI.Controls
             get { return cursorPosition; }
             set
             {
+                if (value < 0 || value > Text.Length)
+                    return;
+
                 if (cursorPosition != value)
                 {
+                    var cursorOffset = (int)Font.MeasureString(Text.Substring(0, value)).X;
+                    if(cursorOffset < scrollContainer.HorizontalScrollPosition)
+                        scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset);
+                    else if(cursorOffset > scrollContainer.HorizontalScrollPosition + scrollContainer.ActualClientArea.Width)
+                        scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset - scrollContainer.ActualClientArea.Width);
                     cursorPosition = Math.Min(label.Text.Length, value);
-                    var textSize = (int)Font.MeasureString(Text.Substring(0, CursorPosition)).X;
-                    scrollContainer.HorizontalScrollPosition = Math.Max(0, textSize - ActualClientArea.Width);
                     InvalidateDrawing();
                 }
             }
@@ -74,17 +80,17 @@ namespace engenious.UI.Controls
                 HorizontalTextAlignment = HorizontalAlignment.Left,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
-                Padding = Border.All(0)
+                Padding = Border.All(0),
+                DrawFocusFrame = false
             };
 
             scrollContainer = new ScrollContainer(manager)
             {
-                HorizontalScrollbarVisible = false,
-                VerticalScrollbarVisible = false,
+                HorizontalScrollbarVisibility = ScrollbarVisibility.Always,
+                VerticalScrollbarVisibility = ScrollbarVisibility.Never,
                 HorizontalScrollbarEnabled = true,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
-                CanFocus = false,
-                //VerticalAlignment = VerticalAlignment.Stretch,
+
                 Content = label
             };
             Content = scrollContainer;
@@ -182,7 +188,7 @@ namespace engenious.UI.Controls
         protected override void OnKeyPress(KeyEventArgs args)
         {
             // Ignorieren, wenn kein Fokus
-            if (Focused != TreeState.Active) return;
+            if (Focused != TreeState.Active && scrollContainer.Focused != TreeState.Active) return;
 
             // Linke Pfeiltaste
             if (args.Key == Keys.Left)
@@ -348,6 +354,11 @@ namespace engenious.UI.Controls
                 args.Handled = false;
 
             base.OnKeyPress(args);
+        }
+
+        private int FindClosestPosition(Point pt)
+        {
+            return 0;
         }
 
         protected override void OnLeftMouseDown(MouseEventArgs args)

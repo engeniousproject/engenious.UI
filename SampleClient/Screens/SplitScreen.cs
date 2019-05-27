@@ -104,6 +104,7 @@ namespace SampleClient.Screens
             {
                 Width = 150,
                 Height = 20,
+                Invert = true
             };
             sliderHorizontal.ValueChanged += (value) => { labelSliderHorizontal.Text = "Value: " + value; }; //Event on Value Changed
             panel.Controls.Add(sliderHorizontal);
@@ -118,8 +119,11 @@ namespace SampleClient.Screens
             {
                 Range = 100,
                 Height = 200,
-                Width = 20,
-                Orientation = Orientation.Vertical
+                Width = 40,
+                Orientation = Orientation.Vertical,
+                //BigStep = 20,
+                KnobSize = 50,
+                Invert = true
             };
             sliderVertical.ValueChanged += (value) => { labelSliderVertical.Text = "Value: " + value; };
             panel.Controls.Add(sliderVertical);
@@ -164,7 +168,7 @@ namespace SampleClient.Screens
             {
                 textbox.Text = "";
             }
-                       base.OnKeyDown(args);
+            base.OnKeyDown(args);
         }
     }
 
