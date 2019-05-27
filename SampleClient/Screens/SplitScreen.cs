@@ -4,6 +4,7 @@ using engenious;
 using engenious.Graphics;
 using engenious.Input;
 using engenious.UI;
+using engenious.UI.Animation;
 using engenious.UI.Controls;
 
 namespace SampleClient.Screens
@@ -11,6 +12,8 @@ namespace SampleClient.Screens
     internal class SplitScreen : Screen
     {
         private Textbox textbox;
+        private ProgressBar springBar;
+        private Spring spring;
 
         public SplitScreen(BaseScreenComponent manager) : base(manager)
         {
@@ -148,7 +151,42 @@ namespace SampleClient.Screens
             panel.Controls.Add(clearTextbox);
             panel.Controls.Add(textbox);                                //Textbox zu Panel hinzufügen
 
+            springBar = new ProgressBar(manager)
+            {
+                Height = 20,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Background = new BorderBrush(Color.Orange),
+                Maximum = 100
+            };
+
+            spring = new Spring()
+            {
+                Tension = 615,
+                Friction = 20,
+                Target = 50,
+                Current = 0,
+                Mass = 15,
+                Locked = true,
+                Precision = 0.1f
+            };
+
+            Button startButton = Button.TextButton(manager, "Start spring");
+            startButton.LeftMouseClick += (s, e) =>
+            {
+                spring.Locked = false;
+            };
+            panel.Controls.Add(springBar);
+            panel.Controls.Add(startButton);
         }
+
+        protected override void OnUpdate(GameTime gameTime)
+        {
+            base.OnUpdate(gameTime);
+            spring.Update(gameTime);
+            springBar.Value = (int)spring.Current;
+        }
+
+
 
         static Texture2D LoadTexture2DFromFile(string path, GraphicsDevice device)
         {
