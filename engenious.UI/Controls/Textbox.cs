@@ -66,6 +66,12 @@ namespace engenious.UI.Controls
         public VerticalAlignment VerticalTextAlignment { get => label.VerticalTextAlignment; set => label.VerticalTextAlignment = value; }
         public bool WordWrap { get => label.WordWrap; set => label.WordWrap = value; }
 
+        public event PropertyChangedDelegate<string> TextChanged
+        {
+            add { label.TextChanged += value; }
+            remove { label.TextChanged -= value; }
+        }
+
         /// <summary>
         /// Erzeugt eine neue Instanz der Textbox-Klasse
         /// </summary>
