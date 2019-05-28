@@ -146,7 +146,7 @@ namespace SampleClient.Screens
                  Text = "TEXTBOX!",                                      //Voreingestellter text
              };
 
-             Button clearTextbox = Button.TextButton(manager, "Clear Textbox");
+             Button clearTextbox = new TextButton(manager, "Clear Textbox");
              clearTextbox.LeftMouseClick += (s, e) =>
              {
                  textbox.SelectionStart = 0;
