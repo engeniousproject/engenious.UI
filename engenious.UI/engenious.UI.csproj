@@ -14,20 +14,18 @@
         <Copyright>engeniousproject 2019</Copyright>
     </PropertyGroup>
     <ItemGroup>
-      <PackageReference Include="engenious" Version="0.3.0.12-alpha" />
-	  <PackageReference Include="LitGit" Version="0.1.0.15-alpha" PrivateAssets="all"/>
-    </ItemGroup>
-    <ItemGroup>
       <Reference Include="System.Windows.Forms" />
     </ItemGroup>
 	<!-- LitGit -->
 	<ItemGroup>
-        <None Remove="engenious.UI.nuget.props.template"/>
-        <LitGitTemplateReference Include="engenious.UI.nuget.props.template"/>
+        <None Remove="engenious.UI.nuget.props.template" />
+        <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
+        <PackageReference Include="engenious" Version="0.3.0.14-alpha" />
+        <PackageReference Include="LitGit" Version="0.1.0.17-alpha" />
         <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
             <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
         </None>
 	</ItemGroup>
-	<Import Project="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')"/>
+	<Import Project="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')" />
 <!--        -->
 </Project>

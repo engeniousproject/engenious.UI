@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using engenious.Content;
 using engenious.Graphics;
 using engenious.UI.Controls;
+using engenious.UI.Interfaces;
 
 namespace engenious.UI
 {
@@ -59,12 +60,14 @@ namespace engenious.UI
 
             VerticalScrollBackgroundBrush = new BorderBrush(Color.White, LineType.Solid, Color.Black, 1);
             HorizontalScrollBackgroundBrush = new BorderBrush(Color.White, LineType.Solid, Color.Black, 1);
-            VerticalScrollForegroundBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.Black, 1);
-            HorizontalScrollForegroundBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.Black, 1);
+            VerticalScrollKnobBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.Black, 1);
+            HorizontalScrollKnobBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.Black, 1);
             HorizontalSplitterBrush = new BorderBrush(Color.White, LineType.Solid, Color.LightGray, 1);
             VerticalSplitterBrush = new BorderBrush(Color.White, LineType.Solid, Color.LightGray, 1);
 
             ProgressBarBrush = new BorderBrush(Color.Blue, LineType.Solid, Color.Black, 1);
+
+            TextboxBackgroundBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.DarkGray);
 
             SelectedItemBrush = new BorderBrush(Color.Red);
 
@@ -104,6 +107,15 @@ namespace engenious.UI
                 button.PressedBackground = Current.ButtonPressedBrush;
             });
 
+            // Textbox
+            ControlSkins.Add(typeof(Textbox), (c) =>
+            {
+                Textbox tb = c as Textbox;
+                tb.Background = TextboxBackgroundBrush;
+                tb.Padding = Border.All(5);
+                tb.TextColor = Color.Black;
+            });
+
             // Splitter
             ControlSkins.Add(typeof(Splitter), (c) =>
             {
@@ -117,16 +129,40 @@ namespace engenious.UI
                 splitter.SplitterBrushVertical = Current.VerticalSplitterBrush;
             });
 
+            // Listbox
+            ControlSkins.Add(typeof(Listbox<>), (c) =>
+            {
+                c.Background = new BorderBrush(Color.LightGray);
+                c.DrawFocusFrame = true;
+
+                var listbox = c as IListControl;
+                listbox.SelectedItemBrush = new BorderBrush(Color.LightSkyBlue);
+            });
+
+            // Combobox
+            ControlSkins.Add(typeof(Combobox<>), (c) =>
+            {
+                c.Background = new BorderBrush(Color.LightGray);
+                c.DrawFocusFrame = true;
+                c.Height = 30;
+                c.Padding = Border.All(5);
+
+                var combobox = c as ICombobox;
+                combobox.SelectedItemBrush = new BorderBrush(Color.LightSkyBlue);
+                combobox.DropdownBackgroundBrush = new BorderBrush(Color.LightSlateGray);
+            });
+
             // Scrollcontainer
             ControlSkins.Add(typeof(ScrollContainer), (c) =>
             {
                 ScrollContainer scrollContainer = c as ScrollContainer;
-                scrollContainer.HorizontalScrollbarBackground = Current.HorizontalScrollBackgroundBrush;
-                scrollContainer.HorizontalScrollbarForeground = Current.HorizontalScrollForegroundBrush;
-                scrollContainer.VerticalScrollbarBackground = Current.VerticalScrollBackgroundBrush;
-                scrollContainer.VerticalScrollbarForeground = Current.VerticalScrollForegroundBrush;
-                scrollContainer.ScrollbarWidth = Current.ScrollbarWidth;
+                scrollContainer.HorizontalScrollbar.Height = Current.ScrollbarWidth;
+                scrollContainer.VerticalScrollbar.Width = Current.ScrollbarWidth;
                 scrollContainer.ScrollerMinSize = Current.ScrollerMinSize;
+                scrollContainer.VerticalScrollbar.Background = Current.VerticalScrollBackgroundBrush;
+                scrollContainer.VerticalScrollbar.KnobBrush = Current.VerticalScrollKnobBrush;
+                scrollContainer.HorizontalScrollbar.Background = Current.HorizontalScrollBackgroundBrush;
+                scrollContainer.HorizontalScrollbar.KnobBrush = Current.HorizontalScrollKnobBrush;
             });
 
             // StackPanel
@@ -135,32 +171,13 @@ namespace engenious.UI
                 StackPanel stackPanel = c as StackPanel;
             });
 
-            // ListControl
-            //ControlSkins.Add(typeof(ListControl<>), (c) =>
-            //{
-            //    dynamic listControl = c;
-            //    listControl.SelectedItemBrush = Current.SelectedItemBrush;
-            //});
-
-            // Listbox
-            ControlSkins.Add(typeof(Listbox<>), (c) =>
-            {
-                dynamic listBox = c;
-            });
-
-            // Combobox
-            //ControlSkins.Add(typeof(Combobox<>), (c) =>
-            //{
-            //    dynamic comboBox = c;
-            //    comboBox.Background = new BorderBrush(Color.White);
-
-            //});
 
             // Progressbar
             ControlSkins.Add(typeof(ProgressBar), (c) =>
             {
                 ProgressBar progressBar = c as ProgressBar;
                 progressBar.BarBrush = Current.ProgressBarBrush;
+                progressBar.Background = new BorderBrush(Current.BackgroundColor);
             });
 
             //Slider
@@ -168,9 +185,9 @@ namespace engenious.UI
             {
                 Slider s = c as Slider;
                 s.Orientation = Orientation.Horizontal;
-                s.SliderBackgroundBrush = new BorderBrush(Color.LightGray);
-                s.SliderForegroundBrush = new BorderBrush(Color.SlateGray);
-                s.SliderWidth = 20;
+                s.Background = new BorderBrush(Color.LightGray);
+                s.KnobBrush = new BorderBrush(Color.SlateGray);
+                s.KnobSize = 20;
             });
 
             ControlSkins.Add(typeof(Checkbox), (c) =>
@@ -274,12 +291,12 @@ namespace engenious.UI
         /// <summary>
         /// Definiert den Brush zum Zeichnen des Scrollbar-Blocks innerhalb einer vertikalen Scrollbar.
         /// </summary>
-        public Brush VerticalScrollForegroundBrush { get; set; }
+        public Brush VerticalScrollKnobBrush { get; set; }
 
         /// <summary>
         /// Definiert den Brush zum Zeichnen des Scrollbar-Blocks innerhalb einer horizontalen Scrollbar.
         /// </summary>
-        public Brush HorizontalScrollForegroundBrush { get; set; }
+        public Brush HorizontalScrollKnobBrush { get; set; }
 
         /// <summary>
         /// Definiert den Brush zum Zeichnen eines horizontalen Splitters.
@@ -305,6 +322,11 @@ namespace engenious.UI
         /// Standard-Brush für die Progress-Bar
         /// </summary>
         public Brush ProgressBarBrush { get; set; }
+
+        /// <summary>
+        /// Background-Brush for Textbox
+        /// </summary>
+        public Brush TextboxBackgroundBrush { get; set; }
 
         #endregion
 

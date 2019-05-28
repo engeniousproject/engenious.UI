@@ -80,14 +80,22 @@ namespace engenious.UI.Controls
             Orientation = Orientation.Vertical;
             ScrollContainer.Content = StackPanel;
 
+            CanFocus = true;
+
             ApplySkin(typeof(Listbox<T>));
         }
 
         protected override void OnInsert(T item, int index)
         {
             Control control = TemplateGenerator(item);
-            control.Tag = item;
-            StackPanel.Controls.Insert(index, control);
+            ContentControl wrapper = new ContentControl(ScreenManager)
+            {
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Content = control
+            };
+       
+            wrapper.Tag = item;
+            StackPanel.Controls.Insert(index, wrapper);
         }
 
         protected override void OnRemove(T item, int index)
@@ -109,17 +117,6 @@ namespace engenious.UI.Controls
             {
                 SelectedItemBrush.Draw(batch,
                     new Rectangle(control.AbsolutePosition, control.ActualSize), alpha);
-            }
-        }
-
-        protected override void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
-        {
-            if (Skin.Current.FocusFrameBrush != null)
-            {
-                Rectangle area = StackPanel.ActualClientArea;
-                area.X = contentArea.X;
-                area.Y = contentArea.Y;
-                Skin.Current.FocusFrameBrush.Draw(batch, area, alpha);
             }
         }
 

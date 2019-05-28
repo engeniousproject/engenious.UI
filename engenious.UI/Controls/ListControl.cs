@@ -6,7 +6,7 @@ namespace engenious.UI.Controls
     /// <summary>
     /// Basis-Control für Item-Listen
     /// </summary>
-    public abstract class ListControl<T> : Control where T : class
+    public abstract class ListControl<T> : Control, IListControl where T : class
     {
         private Brush selectedItemBrush = null;
 
@@ -101,7 +101,7 @@ namespace engenious.UI.Controls
             switch (args.Key)
             {
                 case Keys.Up:
-                    SelectPreview();
+                    SelectPrevious();
                     args.Handled = true;
                     break;
                 case Keys.Down:
@@ -148,7 +148,7 @@ namespace engenious.UI.Controls
             }
         }
 
-        public void SelectPreview()
+        public void SelectPrevious()
         {
             if (SelectedItem == null)
             {

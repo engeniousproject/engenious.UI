@@ -10,6 +10,7 @@
         {
             if (Hovered == TreeState.Active && Children.Count > 0)
                 Children.Clear();
+
             base.OnLeftMouseDown(args);
         }
 
@@ -17,6 +18,7 @@
         {
             if (Hovered == TreeState.Active && Children.Count > 0)
                 Children.Clear();
+
             base.OnRightMouseClick(args);
         }
     }

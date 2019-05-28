@@ -10,7 +10,7 @@ namespace engenious.UI
     /// <summary>
     /// Base-Class for all Controls
     /// </summary>
-    public abstract class Control
+    public abstract class Control : IControl
     {
         private bool invalidDrawing;
 
@@ -160,6 +160,11 @@ namespace engenious.UI
                 }
             }
         }
+
+        /// <summary>
+        /// Legt fest ob der Fokus-Rahmen gezeichnet werden soll
+        /// </summary>
+        public bool DrawFocusFrame { get; set; }
 
         /// <summary>
         /// Platzhalter für jegliche Art der Referenz.
@@ -337,7 +342,7 @@ namespace engenious.UI
         /// <param name="alpha">Die Transparenz des Controls.</param>
         protected virtual void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
-            if (Skin.Current.FocusFrameBrush != null)
+            if (Skin.Current.FocusFrameBrush != null && DrawFocusFrame)
                 Skin.Current.FocusFrameBrush.Draw(batch, contentArea, AbsoluteAlpha);
         }
 
@@ -869,7 +874,6 @@ namespace engenious.UI
                 Point size = child.GetExpectedSize(client);
                 result = new Point(Math.Max(result.X, size.X), Math.Max(result.Y, size.Y));
             }
-
             return result + Borders;
         }
 
@@ -878,7 +882,7 @@ namespace engenious.UI
         /// </summary>
         /// <param name="containerSize"></param>
         /// <returns></returns>
-        public Point GetMaxClientSize(Point containerSize)
+        public virtual Point GetMaxClientSize(Point containerSize)
         {
             int x = Width.HasValue ? Width.Value : containerSize.X;
 
@@ -908,7 +912,7 @@ namespace engenious.UI
         /// </summary>
         /// <param name="containerSize"></param>
         /// <returns></returns>
-        public Point GetMinClientSize(Point containerSize)
+        public virtual Point GetMinClientSize(Point containerSize)
         {
             Point size = CalculcateRequiredClientSpace(containerSize) + Borders;
             int x = Width.HasValue ? Width.Value : size.X;
@@ -957,7 +961,7 @@ namespace engenious.UI
         /// Führt eine automatische Anordnung auf Basis der aktuellen Size und den Alignment-Parametern durch.
         /// </summary>
         /// <param name="containerSize"></param>
-        protected void SetDimension(Point actualSize, Point containerSize)
+        protected virtual void SetDimension(Point actualSize, Point containerSize)
         {
             var size = new Point(
                 Math.Min(containerSize.X, HorizontalAlignment == HorizontalAlignment.Stretch ? containerSize.X : actualSize.X),
@@ -1304,9 +1308,9 @@ namespace engenious.UI
 
             // Ignorieren, falls ausgeschaltet
             if (!Enabled) return true;
-
+            var inZOrder = Children.InZOrder.ToArray();
             // Children first (Order by Z-Order)
-            foreach (var child in Children.InZOrder)
+            foreach (var child in inZOrder)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, child);
                 args.Bubbled = child.InternalLeftMouseClick(args) || args.Bubbled;

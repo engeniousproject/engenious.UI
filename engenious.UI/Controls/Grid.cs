@@ -195,6 +195,48 @@ namespace engenious.UI.Controls
 
             #endregion
         }
+        protected override void SetDimension(Point actualSize, Point containerSize)
+        {
+            var size = new Point(
+                Math.Min(containerSize.X, HorizontalAlignment == HorizontalAlignment.Stretch ? containerSize.X : actualSize.X),
+                Math.Min(containerSize.Y, VerticalAlignment == VerticalAlignment.Stretch ? containerSize.Y : actualSize.Y));
+
+            Point minSize = GetMinClientSize(containerSize) + Borders;
+            Point maxSize = GetMaxClientSize(containerSize) + Borders;
+
+            size.X = Math.Max(minSize.X, Math.Min(maxSize.X, size.X));
+            size.Y = Math.Max(minSize.Y, Math.Min(maxSize.Y, size.Y));
+
+            ActualSize = size;
+
+            var remainingSize = containerSize - actualSize;
+
+            // Anteilige Spalten ermitteln
+            int partsX = Columns.Where(c => c.ResizeMode == ResizeMode.FitParts).Sum(c => c.Width);
+            if (partsX > 0)
+            {
+                int partX = remainingSize.X / partsX;
+                foreach (var column in Columns.Where(c => c.ResizeMode == ResizeMode.FitParts))
+                {
+                    column.ExpectedWidth = partX * column.Width;
+                    size.X += column.ExpectedWidth;
+                }
+            }
+
+            // Anteilige Spalten ermitteln
+            int partsY = Rows.Where(c => c.ResizeMode == ResizeMode.FitParts).Sum(r => r.Height);
+            if (partsY > 0)
+            {
+                int partY = remainingSize.Y / partsY;
+                foreach (var row in Rows.Where(r => r.ResizeMode == ResizeMode.FitParts))
+                {
+                    row.ExpectedHeight = partY * row.Height;
+                    size.Y += row.ExpectedHeight;
+                }
+            }
+
+            base.SetDimension(size, containerSize);
+        }
 
 
         /// <summary>
@@ -269,6 +311,7 @@ namespace engenious.UI.Controls
     {
         Fixed,
         Auto,
-        Parts
+        Parts,
+        FitParts
     }
 }

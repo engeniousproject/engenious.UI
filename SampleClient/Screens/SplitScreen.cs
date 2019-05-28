@@ -46,12 +46,6 @@ namespace SampleClient.Screens
             Label label = new Label(manager) { Text = "Control Showcase" }; //Neues Label erzeugen
             panel.Controls.Add(label);                                      //Label zu Panel hinzufügen
 
-            Button tB = new TextButton(manager, "TEST")
-            {
-                Background = new TextureBrush(LoadTexture2DFromFile("./test_texture_round.png", manager.GraphicsDevice), TextureBrushMode.Stretch)
-            };
-            panel.Controls.Add(tB);
-
             //Button
             Button button = new TextButton(manager, "Dummy Button"); //Neuen TextButton erzeugen
             panel.Controls.Add(button);                                 //Button zu Panel hinzufügen
@@ -59,28 +53,38 @@ namespace SampleClient.Screens
             //Progressbar
             ProgressBar pr = new ProgressBar(manager)                   //Neue ProgressBar erzeugen
             {
-                Value = 99,                                             //Aktueller Wert
+                Value = 80,                                            //Aktueller Wert
                 Height = 20,                                            //Höhe
                 Width = 200                                             //Breite
             };
             panel.Controls.Add(pr);                                     //ProgressBar zu Panel hinzufügen
-
+                        
             //ListBox
-            Listbox<string> list = new Listbox<string>(manager);        //Neue ListBox erstellen
+            Listbox<string> list = new Listbox<string>(manager)
+            {
+                MaxHeight = 100,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
             list.TemplateGenerator = (item) =>                          //Template Generator festlegen
             {
-                return new Label(manager) { Text = item };              //Control (Label) erstellen
+                return new Label(manager) { Text = item, Padding = new Border(15,5,15,5), HorizontalAlignment = HorizontalAlignment.Stretch };              //Control (Label) erstellen
             };
             panel.Controls.Add(list);                                   //Liste zu Panel hinzufügen
 
-            list.Items.Add("Hallo");                                    //Items zur Liste hinzufügen
-            list.Items.Add("Welt");                                     //...
+            list.Items.Add("Item 1");                                    //Items zur Liste hinzufügen
+            list.Items.Add("Item 2");                                     //...
+            list.Items.Add("Item 3");                                     //...
+            list.Items.Add("Item 4");                                     //...
+            list.Items.Add("Item 5");                                     //...
+            list.Items.Add("Item 6");                                     //...
+            list.Items.Add("Item 7");                                     //...
 
             //Combobox
             Combobox<string> combobox = new Combobox<string>(manager)   //Neue Combobox erstellen
             {
-                Height = 20,                                            //Höhe 20
-                Width = 100                                             //Breite 100
+                HorizontalAlignment = HorizontalAlignment.Stretch,       //Breite
+                ButtonBrushOpen = new TextureBrush(Manager.Content.Load<Texture2D>("arrow_down"), TextureBrushMode.Stretch),
+                ButtonBrushClose = new TextureBrush(Manager.Content.Load<Texture2D>("arrow_up"), TextureBrushMode.Stretch),
             };
             combobox.TemplateGenerator = (item) =>                      //Template Generator festlegen
             {
@@ -88,69 +92,68 @@ namespace SampleClient.Screens
             };
             panel.Controls.Add(combobox);                               //Combobox zu Panel  hinzufügen
 
-            combobox.Items.Add("Combobox");                             //Items zu Combobox hinzufügen
-            combobox.Items.Add("Item");
-            combobox.Items.Add("Hallo");
-
-
-            Button clearCombobox = new TextButton(manager, "Clear Combobox");
-            clearCombobox.LeftMouseClick += (s, e) => {
-                combobox.Items.Clear();
-                list.Items.Clear();
-            };
-            panel.Controls.Add(clearCombobox);
+            combobox.Items.Add("Item 1");                                    //Items zur Liste hinzufügen
+            combobox.Items.Add("Item 2");                                     //...
+            combobox.Items.Add("Item 3");                                     //...
+            combobox.Items.Add("Item 4");                                     //...
+            combobox.Items.Add("Item 5");                                     //...
+            combobox.Items.Add("Item 6");                                     //...
+            combobox.Items.Add("Item 7");                                     //...
 
             //Slider Value Label
-            Label labelSliderHorizontal = new Label(manager);
+             Label labelSliderHorizontal = new Label(manager);
 
-            //Horizontaler Slider
-            Slider sliderHorizontal = new Slider(manager)
-            {
-                Width = 150,
-                Height = 20,
-            };
-            sliderHorizontal.ValueChanged += (value) => { labelSliderHorizontal.Text = "Value: " + value; }; //Event on Value Changed
-            panel.Controls.Add(sliderHorizontal);
-            labelSliderHorizontal.Text = "Value: " + sliderHorizontal.Value;                                 //Set Text initially
-            panel.Controls.Add(labelSliderHorizontal);
+             //Horizontaler Slider
+             Slider sliderHorizontal = new Slider(manager)
+             {
+                 Width = 150,
+                 Height = 20,
+                 Invert = true
+             };
+             sliderHorizontal.ValueChanged += (value) => { labelSliderHorizontal.Text = "Value: " + value; }; //Event on Value Changed
+             panel.Controls.Add(sliderHorizontal);
+             labelSliderHorizontal.Text = "Value: " + sliderHorizontal.Value;                                 //Set Text initially
+             panel.Controls.Add(labelSliderHorizontal);
 
-            //Slider Value Label
-            Label labelSliderVertical = new Label(manager);
+             //Slider Value Label
+             Label labelSliderVertical = new Label(manager);
 
-            //Vertikaler Slider
-            Slider sliderVertical = new Slider(manager)
-            {
-                Range = 100,
-                Height = 200,
-                Width = 20,
-                Orientation = Orientation.Vertical
-            };
-            sliderVertical.ValueChanged += (value) => { labelSliderVertical.Text = "Value: " + value; };
-            panel.Controls.Add(sliderVertical);
-            labelSliderVertical.Text = "Value: " + sliderVertical.Value;
-            panel.Controls.Add(labelSliderVertical);
+             //Vertikaler Slider
+             Slider sliderVertical = new Slider(manager)
+             {
+                 Range = 100,
+                 Height = 200,
+                 Width = 20,
+                 Orientation = Orientation.Vertical,
+                 BigStep = 20,
+                 KnobSize = 50,
+                 Invert = true
+             };
+             sliderVertical.ValueChanged += (value) => { labelSliderVertical.Text = "Value: " + value; };
+             panel.Controls.Add(sliderVertical);
+             labelSliderVertical.Text = "Value: " + sliderVertical.Value;
+             panel.Controls.Add(labelSliderVertical);
 
-            Checkbox checkbox = new Checkbox(manager);
-            panel.Controls.Add(checkbox);
+             Checkbox checkbox = new Checkbox(manager);
+             panel.Controls.Add(checkbox);
 
 
-            //Textbox
-            textbox = new Textbox(manager)                      //Neue TextBox erzeugen
-            {
-                Background = new BorderBrush(Color.LightGray),          //Festlegen eines Backgrounds für ein Control
-                HorizontalAlignment = HorizontalAlignment.Stretch,          //100% Breite
-                Text = "TEXTBOX!",                                      //Voreingestellter text
-                MinWidth = 100                                          //Eine Textbox kann ihre Größe automatisch anpassen
-            };
+             //Textbox   
+             textbox = new Textbox(manager)                      //Neue TextBox erzeugen
+             {
+                 HorizontalAlignment = HorizontalAlignment.Stretch,          //100% Breite,
+                 MaxWidth = 200,
+                 Text = "TEXTBOX!",                                      //Voreingestellter text
+             };
 
-            Button clearTextbox = new Button(manager);
-            clearTextbox.LeftMouseClick += (s, e) =>
-            {
-                textbox.SelectionStart = 0;
-                textbox.Text = "";
-            };
-            panel.Controls.Add(clearTextbox);
-            panel.Controls.Add(textbox);                                //Textbox zu Panel hinzufügen
+             Button clearTextbox = Button.TextButton(manager, "Clear Textbox");
+             clearTextbox.LeftMouseClick += (s, e) =>
+             {
+                 textbox.SelectionStart = 0;
+                 textbox.Text = "";
+             };
+             panel.Controls.Add(clearTextbox);
+             panel.Controls.Add(textbox);                                //Textbox zu Panel hinzufügen
 
         }
 
@@ -168,9 +171,9 @@ namespace SampleClient.Screens
             {
                 textbox.Text = "";
             }
-                       base.OnKeyDown(args);
+            base.OnKeyDown(args);
         }
     }
 
-
+        
 }
