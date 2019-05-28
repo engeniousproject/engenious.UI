@@ -16,9 +16,11 @@ namespace SampleClient.Screens
         {
             Background = new BorderBrush(Color.Gray);                       //Hintergrundfarbe festlegen
 
-            Button backButton = Button.TextButton(manager, "Back");             //Neuen TextButton erzeugen
-            backButton.HorizontalAlignment = HorizontalAlignment.Left;          //Links
-            backButton.VerticalAlignment = VerticalAlignment.Top;               //Oben
+            Button backButton = new TextButton(manager, "Back") //Neuen TextButton erzeugen
+            {
+                HorizontalAlignment = HorizontalAlignment.Left,          //Links
+                VerticalAlignment = VerticalAlignment.Top               //Oben
+            };
             backButton.LeftMouseClick += (s, e) => { manager.NavigateBack(); }; //KlickEvent festlegen
             Controls.Add(backButton);                                           //Button zum Screen hinzufügen
 
@@ -44,12 +46,14 @@ namespace SampleClient.Screens
             Label label = new Label(manager) { Text = "Control Showcase" }; //Neues Label erzeugen
             panel.Controls.Add(label);                                      //Label zu Panel hinzufügen
 
-            Button tB = Button.TextButton(manager, "TEST");
-            tB.Background = new TextureBrush(LoadTexture2DFromFile("./test_texture_round.png", manager.GraphicsDevice), TextureBrushMode.Stretch);
+            Button tB = new TextButton(manager, "TEST")
+            {
+                Background = new TextureBrush(LoadTexture2DFromFile("./test_texture_round.png", manager.GraphicsDevice), TextureBrushMode.Stretch)
+            };
             panel.Controls.Add(tB);
 
             //Button
-            Button button = Button.TextButton(manager, "Dummy Button"); //Neuen TextButton erzeugen
+            Button button = new TextButton(manager, "Dummy Button"); //Neuen TextButton erzeugen
             panel.Controls.Add(button);                                 //Button zu Panel hinzufügen
 
             //Progressbar
@@ -58,7 +62,7 @@ namespace SampleClient.Screens
                 Value = 99,                                             //Aktueller Wert
                 Height = 20,                                            //Höhe
                 Width = 200                                             //Breite
-            };      
+            };
             panel.Controls.Add(pr);                                     //ProgressBar zu Panel hinzufügen
 
             //ListBox
@@ -87,9 +91,9 @@ namespace SampleClient.Screens
             combobox.Items.Add("Combobox");                             //Items zu Combobox hinzufügen
             combobox.Items.Add("Item");
             combobox.Items.Add("Hallo");
-           
 
-            Button clearCombobox = Button.TextButton(manager, "Clear Combobox");
+
+            Button clearCombobox = new TextButton(manager, "Clear Combobox");
             clearCombobox.LeftMouseClick += (s, e) => {
                 combobox.Items.Clear();
                 list.Items.Clear();
@@ -130,7 +134,7 @@ namespace SampleClient.Screens
             panel.Controls.Add(checkbox);
 
 
-            //Textbox   
+            //Textbox
             textbox = new Textbox(manager)                      //Neue TextBox erzeugen
             {
                 Background = new BorderBrush(Color.LightGray),          //Festlegen eines Backgrounds für ein Control
@@ -168,5 +172,5 @@ namespace SampleClient.Screens
         }
     }
 
-        
+
 }
