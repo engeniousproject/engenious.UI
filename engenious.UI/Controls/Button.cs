@@ -88,20 +88,5 @@ namespace engenious.UI.Controls
         /// Event, das aufgerufen wird, nachdem der Click-EventHadler (falls vorhanden) ausgeführt wurde.
         /// </summary>
         public event EventDelegate Executed;
-
-        /// <summary>
-        /// Initialisiert einen Standard-Button mit Text-Inhalt
-        /// </summary>
-        /// <param name="text">Enthaltener Text</param>
-        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
-        /// <param name="style">(Optional) Der zu verwendende Style</param>
-        /// <returns>Button-Instanz</returns>
-        //public static Button TextButton(BaseScreenComponent manager, string text, string style = "")
-        //{
-        //    return new Button(manager, style)
-        //    {
-        //        Content = new Label(manager) { Text = text }
-        //    };
-        //}
     }
 }
