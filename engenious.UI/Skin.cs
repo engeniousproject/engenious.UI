@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using engenious.Content;
 using engenious.Graphics;
 using engenious.UI.Controls;
+using engenious.UI.Interfaces;
 
 namespace engenious.UI
 {
@@ -66,6 +67,8 @@ namespace engenious.UI
 
             ProgressBarBrush = new BorderBrush(Color.Blue, LineType.Solid, Color.Black, 1);
 
+            TextboxBackgroundBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.DarkGray);
+
             SelectedItemBrush = new BorderBrush(Color.Red);
 
             // =============
@@ -104,6 +107,15 @@ namespace engenious.UI
                 button.PressedBackground = Current.ButtonPressedBrush;
             });
 
+            // Textbox
+            ControlSkins.Add(typeof(Textbox), (c) =>
+            {
+                Textbox tb = c as Textbox;
+                tb.Background = TextboxBackgroundBrush;
+                tb.Padding = Border.All(5);
+                tb.TextColor = Color.Black;
+            });
+
             // Splitter
             ControlSkins.Add(typeof(Splitter), (c) =>
             {
@@ -115,6 +127,29 @@ namespace engenious.UI
                 splitter.SplitterPosition = 200;
                 splitter.SplitterBrushHorizontal = Current.HorizontalSplitterBrush;
                 splitter.SplitterBrushVertical = Current.VerticalSplitterBrush;
+            });
+
+            // Listbox
+            ControlSkins.Add(typeof(Listbox<>), (c) =>
+            {
+                c.Background = new BorderBrush(Color.LightGray);
+                c.DrawFocusFrame = true;
+
+                var listbox = c as IListControl;
+                listbox.SelectedItemBrush = new BorderBrush(Color.LightSkyBlue);
+            });
+
+            // Combobox
+            ControlSkins.Add(typeof(Combobox<>), (c) =>
+            {
+                c.Background = new BorderBrush(Color.LightGray);
+                c.DrawFocusFrame = true;
+                c.Height = 30;
+                c.Padding = Border.All(5);
+
+                var combobox = c as ICombobox;
+                combobox.SelectedItemBrush = new BorderBrush(Color.LightSkyBlue);
+                combobox.DropdownBackgroundBrush = new BorderBrush(Color.LightSlateGray);
             });
 
             // Scrollcontainer
@@ -136,32 +171,13 @@ namespace engenious.UI
                 StackPanel stackPanel = c as StackPanel;
             });
 
-            // ListControl
-            //ControlSkins.Add(typeof(ListControl<>), (c) =>
-            //{
-            //    dynamic listControl = c;
-            //    listControl.SelectedItemBrush = Current.SelectedItemBrush;
-            //});
-
-            // Listbox
-            ControlSkins.Add(typeof(Listbox<>), (c) =>
-            {
-                dynamic listBox = c;
-            });
-
-            // Combobox
-            //ControlSkins.Add(typeof(Combobox<>), (c) =>
-            //{
-            //    dynamic comboBox = c;
-            //    comboBox.Background = new BorderBrush(Color.White);
-
-            //});
 
             // Progressbar
             ControlSkins.Add(typeof(ProgressBar), (c) =>
             {
                 ProgressBar progressBar = c as ProgressBar;
                 progressBar.BarBrush = Current.ProgressBarBrush;
+                progressBar.Background = new BorderBrush(Current.BackgroundColor);
             });
 
             //Slider
@@ -306,6 +322,11 @@ namespace engenious.UI
         /// Standard-Brush für die Progress-Bar
         /// </summary>
         public Brush ProgressBarBrush { get; set; }
+
+        /// <summary>
+        /// Background-Brush for Textbox
+        /// </summary>
+        public Brush TextboxBackgroundBrush { get; set; }
 
         #endregion
 

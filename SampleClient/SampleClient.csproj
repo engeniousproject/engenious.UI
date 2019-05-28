@@ -33,6 +33,9 @@
         <EngeniousContentReference Include="Content\Content.ecp" />
     </ItemGroup>
 	<ItemGroup>
+	  <Reference Include="Microsoft.CSharp" />
+	</ItemGroup>
+	<ItemGroup>
 	  <None Update="test_texture_round.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

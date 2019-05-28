@@ -2,7 +2,7 @@
 
 namespace engenious.UI.Controls
 {
-    interface ITextControl
+    interface ITextControl: IControl
     {
         string Text { get; set; }
 

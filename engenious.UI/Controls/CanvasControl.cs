@@ -58,5 +58,82 @@ namespace engenious.UI.Controls
             }
 
         }
+
+        private bool FlyoutActive()
+        {
+            foreach (var child in Children)
+            {
+                if (child.Hovered == TreeState.Active || child.Hovered == TreeState.Passive)
+                    return true;
+            }
+
+            return false;
+        }
+
+        protected override void OnLeftMouseDown(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnLeftMouseDown(args);
+        }
+
+        protected override void OnRightMouseDown(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnLeftMouseDown(args);
+        }
+
+        protected override void OnMouseEnter(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnMouseEnter(args);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnMouseMove(args);
+        }
+
+        protected override void OnMouseLeave(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnMouseLeave(args);
+        }
+
+        protected override void OnLeftMouseUp(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnLeftMouseUp(args);
+        }
+
+        protected override void OnLeftMouseDoubleClick(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnLeftMouseDoubleClick(args);
+        }
+
+        protected override void OnLeftMouseClick(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnLeftMouseClick(args);
+        }
+
+        protected override void OnRightMouseUp(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnRightMouseUp(args);
+        }
+
+        protected override void OnRightMouseClick(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnRightMouseClick(args);
+        }
+
+        protected override void OnRightMouseDoubleClick(MouseEventArgs args)
+        {
+            args.Handled |= FlyoutActive();
+            base.OnRightMouseDoubleClick(args);
+        }
     }
 }

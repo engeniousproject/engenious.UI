@@ -10,7 +10,7 @@ namespace engenious.UI
     /// <summary>
     /// Base-Class for all Controls
     /// </summary>
-    public abstract class Control
+    public abstract class Control : IControl
     {
         private bool invalidDrawing;
 
@@ -961,7 +961,7 @@ namespace engenious.UI
         /// Führt eine automatische Anordnung auf Basis der aktuellen Size und den Alignment-Parametern durch.
         /// </summary>
         /// <param name="containerSize"></param>
-        protected void SetDimension(Point actualSize, Point containerSize)
+        protected virtual void SetDimension(Point actualSize, Point containerSize)
         {
             var size = new Point(
                 Math.Min(containerSize.X, HorizontalAlignment == HorizontalAlignment.Stretch ? containerSize.X : actualSize.X),
@@ -1308,9 +1308,9 @@ namespace engenious.UI
 
             // Ignorieren, falls ausgeschaltet
             if (!Enabled) return true;
-
+            var inZOrder = Children.InZOrder.ToArray();
             // Children first (Order by Z-Order)
-            foreach (var child in Children.InZOrder)
+            foreach (var child in inZOrder)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, child);
                 args.Bubbled = child.InternalLeftMouseClick(args) || args.Bubbled;

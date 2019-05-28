@@ -14,11 +14,9 @@ namespace engenious.UI.Controls
 
         private int selectionStart;
 
-        private int renderOffsetX;
+        private readonly Label label;
 
-        private Label label;
-
-        private ScrollContainer scrollContainer;
+        private readonly ScrollContainer scrollContainer;
 
         /// <summary>
         /// Gibt die aktuelle Cursor-Position an oder legt diese fest.
@@ -31,6 +29,7 @@ namespace engenious.UI.Controls
                 if (value < 0 || value > Text.Length)
                     return;
 
+                cursorBlinkTime = 0;
                 if (cursorPosition != value)
                 {
                     var cursorOffset = (int)Font.MeasureString(Text.Substring(0, value)).X;
@@ -86,7 +85,7 @@ namespace engenious.UI.Controls
 
             scrollContainer = new ScrollContainer(manager)
             {
-                HorizontalScrollbarVisibility = ScrollbarVisibility.Always,
+                HorizontalScrollbarVisibility = ScrollbarVisibility.Never,
                 VerticalScrollbarVisibility = ScrollbarVisibility.Never,
                 HorizontalScrollbarEnabled = true,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -95,8 +94,6 @@ namespace engenious.UI.Controls
             };
             Content = scrollContainer;
 
-            Padding = Border.All(5);
-            TextColor = Color.Black;
             TabStop = true;
             CanFocus = true;
 
@@ -107,6 +104,8 @@ namespace engenious.UI.Controls
         {
             base.OnPreDraw(gameTime);
         }
+
+        private int cursorBlinkTime;
 
         /// <summary>
         /// Malt den Content des Controls
@@ -130,7 +129,8 @@ namespace engenious.UI.Controls
                 int to = Math.Max(SelectionStart, CursorPosition);
                 var selectFrom = Font.MeasureString(Text.Substring(0, from));
                 var selectTo = Font.MeasureString(Text.Substring(from, to - from));
-                batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectFrom.X - scrollContainer.HorizontalScrollPosition, area.Y, (int)selectTo.X - scrollContainer.HorizontalScrollPosition, (int)selectTo.Y), Color.LightBlue);
+                var rect = new Rectangle(area.X + (int)selectFrom.X - scrollContainer.HorizontalScrollPosition, area.Y, (int)selectTo.X, (int)selectTo.Y);
+                batch.Draw(Skin.Pix, rect, Color.LightBlue);
             }
 
             base.OnDrawContent(batch, area, gameTime, alpha);
@@ -138,11 +138,12 @@ namespace engenious.UI.Controls
             // Cursor (wenn Fokus)
             if (Focused == TreeState.Active)
             {
-                if ((int)gameTime.TotalGameTime.TotalSeconds % 2 == 0)
+                if (cursorBlinkTime % 1000 < 500)
                 {
                     var selectionSize = Font.MeasureString(Text.Substring(0, CursorPosition));
                     batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectionSize.X - scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
                 }
+                cursorBlinkTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
         }
 
@@ -356,24 +357,53 @@ namespace engenious.UI.Controls
             base.OnKeyPress(args);
         }
 
+        internal static int GetKerningKey(char first, char second)
+        {
+            return first << 16 | second;
+        }
+
         private int FindClosestPosition(Point pt)
         {
-            return 0;
+            float oldWidth = 0;
+            for (int i=1;i<=Text.Length;i++)
+            {
+                var substr = Text.Substring(0, i);
+                var measurement = Font.MeasureString(substr);
+                //oldWidth += (measurement.X - oldWidth) / 2;
+                if (Math.Abs(oldWidth - pt.X) <= Math.Abs(measurement.X - pt.X))
+                    return i - 1;
+
+                oldWidth = measurement.X;
+            }
+            return Text.Length;
         }
+
+        private bool mouseDown;
 
         protected override void OnLeftMouseDown(MouseEventArgs args)
         {
             base.OnLeftMouseDown(args);
             
-            for(int i = 0; i < Text.Length; i++)
-            {
-                //Font.MeasureString
-            }
+            CursorPosition = FindClosestPosition(args.LocalPosition + new Point(scrollContainer.HorizontalScrollPosition - Padding.Left, scrollContainer.VerticalScrollPosition - Padding.Top));
+            SelectionStart = CursorPosition;
+
+            mouseDown = true;
         }
 
         protected override void OnMouseMove(MouseEventArgs args)
         {
             base.OnMouseMove(args);
+            if (mouseDown)
+            {
+                CursorPosition = FindClosestPosition(args.LocalPosition + new Point(scrollContainer.HorizontalScrollPosition - Padding.Left, scrollContainer.VerticalScrollPosition - Padding.Top));
+            }
+        }
+
+        protected override void OnLeftMouseUp(MouseEventArgs args)
+        {
+            base.OnLeftMouseUp(args);
+
+            mouseDown = false;
         }
 
         Keys[] ignoreKeys =
