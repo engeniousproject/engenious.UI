@@ -28,9 +28,11 @@ jobs:
     - name: Install FFMPEG (Windows)
       run: prebuild
       shell: pwsh
+      working-directory: .
       if: matrix.os == 'windows-latest'
     - name: Install FFMPEG (Linux)
       run: prebuild.sh
+      working-directory: .
       if: matrix.os == 'ubuntu-latest'
     - name: Build
       run: dotnet build --configuration Release
