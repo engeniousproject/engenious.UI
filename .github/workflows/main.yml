@@ -35,11 +35,11 @@ jobs:
       working-directory: .
       if: matrix.os == 'ubuntu-latest'
     - name: Build
-      run: dotnet build --configuration Release
+      run: dotnet build engenious.UI/engenious.UI.csproj --configuration Release
     - name: Run tests
-      run: dotnet test --configuration Release
+      run: dotnet test engenious.UI/engenious.UI.csproj --configuration Release
     - name: Create Nuget Package
-      run: dotnet pack -c Release -o ./artifacts
+      run: dotnet pack engenious.UI/engenious.UI.csproj -c Release -o ./artifacts
     - name: Deploy Nuget Package
       run: dotnet nuget push ./artifacts/*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
       shell: bash
