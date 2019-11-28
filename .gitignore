@@ -1,3 +1,4 @@
+tools/
 **/*.nuget.props
 
 ## Ignore Visual Studio temporary files, build results, and

@@ -25,6 +25,13 @@ jobs:
     - name: Set env
       run: echo ::set-env name=FrameworkPathOverride::/usr/lib/mono/4.5/
       if: matrix.os == 'ubuntu-latest'
+    - name: Install FFMPEG (Windows)
+      run: prebuild
+      shell: pwsh
+      if: matrix.os == 'windows-latest'
+    - name: Install FFMPEG (Linux)
+      run: prebuild.sh
+      if: matrix.os == 'ubuntu-latest'
     - name: Build
       run: dotnet build --configuration Release
     - name: Run tests
