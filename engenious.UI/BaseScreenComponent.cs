@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using engenious.Content;
 using engenious.Graphics;
 using engenious.Input;
@@ -26,6 +29,20 @@ namespace engenious.UI
         private SpriteBatch batch;
 
         private MouseMode mouseMode;
+
+        struct InvokeAction
+        {
+            public InvokeAction(Action action, ManualResetEvent resetEvent)
+            {
+                Action = action;
+                ResetEvent = resetEvent;
+            }
+
+            public Action Action { get; }
+            public ManualResetEvent ResetEvent { get; }
+        }
+
+        private ConcurrentQueue<InvokeAction> invokes = new ConcurrentQueue<InvokeAction>();
 
         /// <summary>
         /// Prefix für die Titel-Leiste
@@ -227,11 +244,31 @@ namespace engenious.UI
         private const double UnpressedKeyTimestamp = -1d;
 
         /// <summary>
+        /// Führt einen Delegaten im UI-Thread aus.
+        /// </summary>
+        /// <param name="invokedAction">Ein Delegat, der eine aufzurufende Methode im Threadkontext des Steuerelements enthält.</param>
+        public void Invoke(Action invokedAction)
+        {
+            if (invokedAction == null)
+                throw new ArgumentNullException(nameof(invokedAction));
+            var resetEvent = new ManualResetEvent(false);
+            invokes.Enqueue(new InvokeAction(invokedAction, resetEvent));
+            resetEvent.WaitOne();
+            resetEvent.Dispose();
+        }
+
+        /// <summary>
         /// Handling aller Eingaben, Mausbewegungen und Updaten aller Screens und Controls.
         /// </summary>
         /// <param name="gameTime"></param>
         public override void Update(GameTime gameTime)
         {
+            while(invokes.TryDequeue(out var act))
+            {
+                act.Action.Invoke();
+                act.ResetEvent.Set();
+            }
+
             if (Game.IsActive)
             {
 

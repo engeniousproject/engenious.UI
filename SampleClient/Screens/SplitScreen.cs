@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using engenious;
 using engenious.Graphics;
 using engenious.Input;
@@ -154,6 +155,20 @@ namespace SampleClient.Screens
              };
              panel.Controls.Add(clearTextbox);
              panel.Controls.Add(textbox);                                //Textbox zu Panel hinzufügen
+
+            var but = new TextButton(manager, "Hello World");
+            but.LeftMouseClick += (e, a) =>
+            {
+                var t = new Thread(() => {
+                    manager.Invoke(() =>
+                    {
+                        Background = new BorderBrush(Color.Green);
+
+                    });
+                });
+                t.Start();
+            };
+            panel.Controls.Add(but);
 
         }
 

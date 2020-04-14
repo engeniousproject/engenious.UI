@@ -20,7 +20,7 @@
 	<ItemGroup>
         <None Remove="engenious.UI.nuget.props.template" />
         <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
-        <PackageReference Include="engenious" Version="0.3.0.28-alpha" />
+        <PackageReference Include="engenious" Version="0.3.0.33-alpha" />
         <PackageReference Include="LitGit" Version="0.1.0.18-alpha" />
         <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
             <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
