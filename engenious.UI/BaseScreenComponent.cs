@@ -145,7 +145,7 @@ namespace engenious.UI
         /// Erzeugt eine neue Instanz der Klasse BaseScreenComponent.
         /// </summary>
         /// <param name="game">Die aktuelle Game-Instanz.</param>
-        public BaseScreenComponent(Game game)
+        public BaseScreenComponent(IGame game)
             : base(game)
         {
             Content = game.Content;
@@ -298,7 +298,7 @@ namespace engenious.UI
                     else
                     {
                         mouse = Mouse.GetCursorState();
-                        mousePosition = Game.Window.PointToClient(mouse.Location);
+                        mousePosition = Game.RenderingSurface.PointToClient(mouse.Location);
                     }
 
 
@@ -776,8 +776,10 @@ namespace engenious.UI
                 string screentitle = ActiveScreen?.Title ?? string.Empty;
                 string windowtitle = TitlePrefix + (string.IsNullOrEmpty(screentitle) ? string.Empty : " - " + screentitle);
 
-                if (Game.Window != null && Game.Window.Title != windowtitle)
-                    Game.Window.Title = windowtitle;
+                var window = Game.RenderingSurface as Window;
+
+                if (window != null && window.Title != windowtitle)
+                    window.Title = windowtitle;
 
                 _titleDirty = false;
                 _lastActiveScreenTitle = ActiveScreen?.Title;
