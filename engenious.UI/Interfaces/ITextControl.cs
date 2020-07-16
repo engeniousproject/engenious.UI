@@ -15,5 +15,6 @@ namespace engenious.UI.Controls
         VerticalAlignment VerticalTextAlignment { get; set; }
 
         bool WordWrap { get; set; }
+        bool LineWrap { get; set; }
     }
 }

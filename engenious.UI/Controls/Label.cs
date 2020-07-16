@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
+
 using engenious.Graphics;
 
 namespace engenious.UI.Controls
@@ -10,7 +12,22 @@ namespace engenious.UI.Controls
     /// </summary>
     public class Label : Control, ITextControl
     {
-        private List<string> lines = new List<string>();
+        readonly struct TextLine
+        {
+            public readonly int Begin { get; }
+            public readonly int Length { get; }
+            public readonly Vector2 Size { get; }
+
+            public TextLine(int begin, int length, Vector2 size)
+            {
+                Begin = begin;
+                Length = length;
+                Size = size;
+            }
+
+        }
+
+        private List<TextLine> lines = new List<TextLine>();
 
         private string text = string.Empty;
 
@@ -25,7 +42,7 @@ namespace engenious.UI.Controls
         private VerticalAlignment verticalTextAlignment = VerticalAlignment.Center;
 
         private bool wordWrap = false;
-
+        private bool lineWrap;
         private readonly PropertyEventArgs<string> _textChangedEventArgs = new PropertyEventArgs<string>();
         /// <summary>
         /// Gibt den enthaltenen Text an oder legt diesen fest.
@@ -51,7 +68,7 @@ namespace engenious.UI.Controls
         /// </summary>
         public SpriteFont Font
         {
-            get { return font; } 
+            get { return font; }
             set
             {
                 if (font != value)
@@ -127,6 +144,22 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <summary>
+        /// Gibt an, ob Zeilenumbrüche interpretiert werden sollen.
+        /// </summary>
+        public bool LineWrap
+        {
+            get => lineWrap;
+            set
+            {
+                if (lineWrap != value)
+                {
+                    lineWrap = value;
+                    InvalidateDimensions();
+                }
+            }
+        }
+
         public Label(BaseScreenComponent manager, string style = "") :
             base(manager, style)
         {
@@ -140,13 +173,12 @@ namespace engenious.UI.Controls
 
             Vector2 offset = new Vector2(area.X, area.Y);
 
-            if (WordWrap)
+            if (WordWrap || lineWrap)
             {
                 int totalHeight = 0;
                 foreach (var line in lines)
                 {
-                    Vector2 lineSize = Font.MeasureString(line);
-                    totalHeight += (int)lineSize.Y;
+                    totalHeight += (int)line.Size.Y;
                 }
 
                 switch (VerticalTextAlignment)
@@ -163,23 +195,22 @@ namespace engenious.UI.Controls
 
                 foreach (var line in lines)
                 {
-                    Vector2 lineSize = Font.MeasureString(line);
                     switch (HorizontalTextAlignment)
                     {
                         case HorizontalAlignment.Left:
                             offset.X = area.X;
                             break;
                         case HorizontalAlignment.Center:
-                            offset.X = area.X + (area.Width - lineSize.X) / 2;
+                            offset.X = area.X + (area.Width - line.Size.X) / 2;
                             break;
                         case HorizontalAlignment.Right:
-                            offset.X = area.X + area.Width - lineSize.X;
+                            offset.X = area.X + area.Width - line.Size.X;
                             break;
                     }
 
-                    batch.DrawString(Font, line, offset, TextColor * alpha);
+                    batch.DrawString(Font, Text, line.Begin, line.Length, offset, TextColor * alpha);
 
-                    offset.Y += (int)lineSize.Y;
+                    offset.Y += (int)line.Size.Y;
                 }
             }
             else
@@ -198,13 +229,12 @@ namespace engenious.UI.Controls
             int width = 0;
             int height = 0;
 
-            if (WordWrap)
+            if (WordWrap || lineWrap)
             {
                 foreach (var line in lines)
                 {
-                    Vector2 lineSize = Font.MeasureString(line);
-                    width = Math.Max((int)lineSize.X, width);
-                    height += (int)lineSize.Y;
+                    width = Math.Max((int)line.Size.X, width);
+                    height += (int)line.Size.Y;
                 }
             }
             else
@@ -222,37 +252,153 @@ namespace engenious.UI.Controls
             return new Point(Math.Min(available.X, width), Math.Min(available.Y, height));
         }
 
+        public static void DoStuff(string asdf)
+        {
+            int wordStart = 0, lineStart = 0;
+            for (int i = 0; i < asdf.Length; i++)
+            {
+                bool isNewLine = asdf[i] == '\n';
+                bool isSpace = asdf[i] == ' ';
+                bool isWhitespace = isNewLine || isSpace;
+
+                if (isWhitespace)
+                    Console.WriteLine($"word: {asdf.Substring(wordStart, i - wordStart)}");
+                if (isNewLine)
+                    Console.WriteLine($"line: {asdf.Substring(lineStart, i - lineStart)}");
+
+                if (isWhitespace)
+                    wordStart = i + 1;
+                if (isNewLine)
+                    lineStart = i + 1;
+            }
+            if (wordStart < asdf.Length)
+                Console.WriteLine($"word: {asdf.Substring(wordStart, asdf.Length - wordStart)}");
+            if (lineStart < asdf.Length)
+                Console.WriteLine($"line: {asdf.Substring(lineStart, asdf.Length - lineStart)}");
+        }
+
         private void AnalyzeText(Point available)
         {
             lines.Clear();
             if (Font == null) return;
 
-            StringBuilder sb = new StringBuilder();
-
             if (string.IsNullOrEmpty(Text))
                 return;
 
-            string[] l = Text.Split('\n');
-            foreach (var line in l)
+
+            if (wordWrap)
+                WrapWordsAndLines(available);
+            else if (lineWrap)
             {
-                string[] words = line.Split(' ');
-
-                foreach (var word in words)
+                int iBefore = 0;
+                while (iBefore < Text.Length)
                 {
-                    Vector2 size = Font.MeasureString(word);
-                    Vector2 lineSize = Font.MeasureString(sb.ToString());
+                    int i = Text.IndexOf('\n', iBefore);
+                    if (i < 0)
+                        i = Text.Length;
 
-                    if (lineSize.X + size.X >= available.X)
+                    if (i > 0)
                     {
-                        lines.Add(sb.ToString());
-                        sb.Clear();
+                        var size = Font.MeasureString(Text, iBefore, i - iBefore);
+                        lines.Add(new TextLine(iBefore, i - iBefore, new Vector2(size.X, size.Y)));
+                        iBefore = i + 1;
                     }
-                    sb.Append(word + " ");
                 }
 
-                lines.Add(sb.ToString());
-                sb.Clear();
             }
         }
+
+        private void WrapWordsAndLines(Point available)
+        {
+            int iBefore = 0;
+            bool doBeak = false;
+            while (!doBeak)
+            {
+                int i = Text.IndexOf('\n', iBefore);
+
+                int forUntil = i > 0 ? i : Text.Length;
+                Vector2 sizeSinceBegin = new Vector2();
+                int iBeforeCopy = iBefore;
+                for (int index = iBefore; index < forUntil;)
+                {
+                    index = Text.IndexOf(' ', iBefore, forUntil - iBefore);
+                    if (index < 0)
+                    {
+                        var word = Font.MeasureString(Text, iBefore, forUntil - iBefore);
+                        var res = FitAndAddLine(iBeforeCopy, forUntil - iBeforeCopy, sizeSinceBegin, word, available.X, true);
+                        if (res != default)
+                        {
+                            FitAndAddLine(iBeforeCopy, forUntil - iBeforeCopy - (forUntil - iBefore), sizeSinceBegin, default, available.X, true);
+                            FitAndAddLine(iBefore, forUntil - iBefore, default, word, available.X, true);
+                        }
+                        iBefore = forUntil + 1;
+                        break;
+                    }
+
+                    var wordSize = Font.MeasureString(Text, iBefore, index + 1 - iBefore);
+                    var newLineMade = FitAndAddLine(iBeforeCopy, index - iBeforeCopy, sizeSinceBegin, wordSize, available.X);
+                    if (newLineMade == default)
+                    {
+                        FitAndAddLine(iBeforeCopy, iBefore - iBeforeCopy, sizeSinceBegin, newLineMade, available.X, true);
+                        sizeSinceBegin = wordSize;
+                        iBeforeCopy = iBefore;
+                    }
+                    else
+                        sizeSinceBegin = newLineMade;
+                    iBefore = index + 1;
+                }
+
+                if (i < 0)
+                    break;
+            }
+        }
+
+        private Vector2 FitAndAddLine(int begin, int length, Vector2 lineSize, Vector2 current, float availableWidth, bool newLineWhenFitting = false)
+        {
+            if (newLineWhenFitting && lineSize.X + current.X <= availableWidth)
+            {
+                lines.Add(new TextLine(begin, length, new Vector2(lineSize.X + current.X, Math.Max(lineSize.Y, current.Y))));
+                return new Vector2();
+            }
+            else if (!newLineWhenFitting && lineSize.X + current.X > availableWidth)
+                return new Vector2();
+            else
+                return new Vector2(lineSize.X + current.X, Math.Max(lineSize.Y, current.Y));
+        }
     }
+
+    //TODO: Implement with span in core or net 5
+    //private void AnalyzeText(Point available)
+    //{
+    //    lines.Clear();
+    //    if (Font == null) return;
+
+    //    stringBuilder.Clear();
+
+    //    if (string.IsNullOrEmpty(Text))
+    //        return;
+
+    //    string[] l = Text.Split('\n');
+    //    foreach (var line in l)
+    //    {
+    //        string[] words = line.Split(' ');
+
+    //        foreach (var word in words)
+    //        {
+    //            Vector2 size = Font.MeasureString(word);
+    //            Vector2 lineSize = Font.MeasureString(stringBuilder);
+
+    //            if (lineSize.X + size.X >= available.X)
+    //            {
+    //                lines.Add(stringBuilder.ToString());
+    //                stringBuilder.Clear();
+    //            }
+    //            stringBuilder.Append(word + " ");
+    //        }
+
+    //        lines.Add(stringBuilder.ToString());
+    //        stringBuilder.Clear();
+    //    }
+    //}
 }
+
