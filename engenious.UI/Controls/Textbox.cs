@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+
 using engenious.Graphics;
 using engenious.Input;
 
@@ -33,9 +34,9 @@ namespace engenious.UI.Controls
                 if (cursorPosition != value)
                 {
                     var cursorOffset = (int)Font.MeasureString(Text.Substring(0, value)).X;
-                    if(cursorOffset < scrollContainer.HorizontalScrollPosition)
+                    if (cursorOffset < scrollContainer.HorizontalScrollPosition)
                         scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset);
-                    else if(cursorOffset > scrollContainer.HorizontalScrollPosition + scrollContainer.ActualClientArea.Width)
+                    else if (cursorOffset > scrollContainer.HorizontalScrollPosition + scrollContainer.ActualClientArea.Width)
                         scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset - scrollContainer.ActualClientArea.Width);
                     cursorPosition = Math.Min(label.Text.Length, value);
                     InvalidateDrawing();
@@ -65,6 +66,7 @@ namespace engenious.UI.Controls
         public HorizontalAlignment HorizontalTextAlignment { get => label.HorizontalTextAlignment; set => label.HorizontalTextAlignment = value; }
         public VerticalAlignment VerticalTextAlignment { get => label.VerticalTextAlignment; set => label.VerticalTextAlignment = value; }
         public bool WordWrap { get => label.WordWrap; set => label.WordWrap = value; }
+        public bool LineWrap { get => label.LineWrap; set => label.LineWrap = value; }
 
         public event PropertyChangedDelegate<string> TextChanged
         {
@@ -371,7 +373,7 @@ namespace engenious.UI.Controls
         private int FindClosestPosition(Point pt)
         {
             float oldWidth = 0;
-            for (int i=1;i<=Text.Length;i++)
+            for (int i = 1; i <= Text.Length; i++)
             {
                 var substr = Text.Substring(0, i);
                 var measurement = Font.MeasureString(substr);
@@ -389,7 +391,7 @@ namespace engenious.UI.Controls
         protected override void OnLeftMouseDown(MouseEventArgs args)
         {
             base.OnLeftMouseDown(args);
-            
+
             CursorPosition = FindClosestPosition(args.LocalPosition + new Point(scrollContainer.HorizontalScrollPosition - Padding.Left, scrollContainer.VerticalScrollPosition - Padding.Top));
             SelectionStart = CursorPosition;
 
