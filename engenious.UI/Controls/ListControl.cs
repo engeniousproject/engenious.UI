@@ -15,7 +15,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Liefert eine Liste der enthaltenen Elemente zurück.
         /// </summary>
-        public IList<T> Items { get; private set; }
+        public ItemCollection<T> Items { get; private set; }
 
         /// <summary>
         /// Liefert das aktuell selektierte Element zurück oder legt dieses fest.
@@ -77,7 +77,7 @@ namespace engenious.UI.Controls
             TabStop = true;
 
             ItemCollection<T> collection = new ItemCollection<T>();
-            collection.OnInsert += (item, index) => OnInsert(item, index);
+            collection.OnInserted += (item, index) => OnInsert(item, index);
             collection.OnRemove += (item, index) =>
             {
                 if (SelectedItem == item)

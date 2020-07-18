@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using engenious.Audio;
 using engenious.Graphics;
 
@@ -185,8 +186,11 @@ namespace engenious.UI
             Style = style;
 
             children = new ControlCollection(this);
-            children.OnInsert += ControlCollectionInsert;
+            children.OnInserted += ControlCollectionInsert;
             children.OnRemove += ControlCollectionRemove;
+            _rootPathTemp = new List<Control>();
+            _rootPath = new ReverseEnumerable<Control>();
+            _rootPath.BaseList = _rootPathTemp;
 
             manager.ClientSizeChanged += (s, e) =>
             {
@@ -242,7 +246,7 @@ namespace engenious.UI
 
         protected virtual void OnPreDraw(GameTime gameTime) { }
 
-        private readonly RasterizerState _rasterizerState = new RasterizerState {ScissorTestEnable = true};
+        private readonly RasterizerState _rasterizerState = new RasterizerState { ScissorTestEnable = true };
 
         /// <summary>
         /// Zeichenauruf für das Control (SpriteBatch ist bereits aktiviert)
@@ -374,7 +378,7 @@ namespace engenious.UI
             set
             {
                 if (enabled == value) return;
-                
+
                 _enabledChangedEventArgs.OldValue = enabled;
                 _enabledChangedEventArgs.NewValue = value;
                 _enabledChangedEventArgs.Handled = false;
@@ -395,10 +399,10 @@ namespace engenious.UI
         {
             get
             {
-                bool result = true;
                 foreach (var item in RootPath)
-                    result &= item.Enabled;
-                return result;
+                    if (!item.Enabled)
+                        return false;
+                return true;
             }
         }
 
@@ -420,7 +424,7 @@ namespace engenious.UI
                 _visibleChangedEventArgs.OldValue = visible;
                 _visibleChangedEventArgs.NewValue = value;
                 _visibleChangedEventArgs.Handled = false;
-                
+
                 visible = value;
                 InvalidateDimensions();
                 InvalidateDrawing();
@@ -445,26 +449,23 @@ namespace engenious.UI
             }
         }
 
+
+        private readonly CollectionEventArgs _controlCollectionInsertArgs = new CollectionEventArgs();
         private void ControlCollectionInsert(Control item, int index)
         {
-            CollectionEventArgs args = new CollectionEventArgs
-            {
-                Control = item,
-                Index = index
-            };
+            _controlCollectionInsertArgs.Control = item;
+            _controlCollectionInsertArgs.Index = index;
 
-            OnInsertControl(args);
+            OnInsertControl(_controlCollectionInsertArgs);
         }
 
+        private readonly CollectionEventArgs _controlCollectionRemoveArgs = new CollectionEventArgs();
         private void ControlCollectionRemove(Control item, int index)
         {
-            CollectionEventArgs args = new CollectionEventArgs
-            {
-                Control = item,
-                Index = index
-            };
+            _controlCollectionRemoveArgs.Control = item;
+            _controlCollectionRemoveArgs.Index = index;
 
-            OnRemoveControl(args);
+            OnRemoveControl(_controlCollectionRemoveArgs);
         }
 
         /// <summary>
@@ -481,38 +482,34 @@ namespace engenious.UI
             }
         }
 
-        private Control[] _rootPath;
+        private readonly List<Control> _rootPathTemp;
+        private readonly ReverseEnumerable<Control> _rootPath;
         /// <summary>
         /// Liefert den Control-Path von Root zum aktuellen Control.
         /// </summary>
-        public Control[] RootPath
+        public ReverseEnumerable<Control> RootPath
         {
             get
             {
                 if (PathDirty)
                 {
                     // Collect Path
-                    List<Control> result = new List<Control>();
+                    _rootPathTemp.Clear();
                     Control pointer = this;
                     do
                     {
-                        result.Add(pointer);
+                        _rootPathTemp.Add(pointer);
                         pointer = pointer.Parent;
                     } while (pointer != null);
 
-                    // Invertieren
-                    Control[] path = new Control[result.Count];
-                    for (int i = 0; i < result.Count; i++)
-                        path[i] = result[result.Count - i - 1];
 
-                    _rootPath = path;
                     PathDirty = false;
                 }
                 return _rootPath;
             }
         }
 
-        
+
         private readonly PropertyEventArgs<Control> _parentChangedEventArgs = new PropertyEventArgs<Control>();
         /// <summary>
         /// Gibt das Parent-Element dieses Controls zurück.
@@ -523,7 +520,7 @@ namespace engenious.UI
             internal set
             {
                 if (parent == value) return;
-                
+
                 _parentChangedEventArgs.OldValue = parent;
                 _parentChangedEventArgs.NewValue = value;
                 _parentChangedEventArgs.Handled = false;
@@ -1114,7 +1111,7 @@ namespace engenious.UI
                     transitionMap.Remove(transition.GetType());
                     transitions.RemoveAt(i--);
                 }
-                    //drops.Add(transition);
+                //drops.Add(transition);
             }
 
             // Abgelaufene Transitions wieder entfernen
@@ -1308,9 +1305,8 @@ namespace engenious.UI
 
             // Ignorieren, falls ausgeschaltet
             if (!Enabled) return true;
-            var inZOrder = Children.InZOrder.ToArray();
             // Children first (Order by Z-Order)
-            foreach (var child in inZOrder)
+            foreach (var child in Children.InZOrder)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, child);
                 args.Bubbled = child.InternalLeftMouseClick(args) || args.Bubbled;
@@ -1322,8 +1318,7 @@ namespace engenious.UI
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnLeftMouseClick(args);
-                if (LeftMouseClick != null)
-                    LeftMouseClick(this, args);
+                LeftMouseClick?.Invoke(this, args);
             }
 
             // Click-Sound abspielen
@@ -1904,7 +1899,7 @@ namespace engenious.UI
 
         protected virtual void OnKeyTextPress(KeyTextEventArgs args)
         {
-            
+
         }
 
         /// <summary>
@@ -1939,7 +1934,7 @@ namespace engenious.UI
         private int zOrder = 0;
         public bool PathDirty = true;
 
-        
+
         private readonly PropertyEventArgs<bool> _tabStopChangedEventArgs = new PropertyEventArgs<bool>();
         /// <summary>
         /// Legt fest, ob das Control per Tab zu erreichen ist.
@@ -1972,7 +1967,7 @@ namespace engenious.UI
             set
             {
                 if (canFocus == value) return;
-                
+
                 _canFocusChangedEventArgs.OldValue = canFocus;
                 _canFocusChangedEventArgs.NewValue = value;
                 _canFocusChangedEventArgs.Handled = false;
@@ -2037,7 +2032,7 @@ namespace engenious.UI
             set
             {
                 if (zOrder == value) return;
-                
+
                 _zOrderChangedEventArgs.OldValue = zOrder;
                 _zOrderChangedEventArgs.NewValue = value;
                 _zOrderChangedEventArgs.Handled = false;
@@ -2104,7 +2099,7 @@ namespace engenious.UI
                 }
 
                 EventArgsPool.Instance.Release(args);
-                
+
                 InvalidateDrawing();
             }
         }

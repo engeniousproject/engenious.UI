@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace engenious.UI
 {
@@ -11,6 +12,7 @@ namespace engenious.UI
     /// </summary>
     public class ItemCollection<T> : IList<T> where T : class
     {
+        private readonly ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         public List<T> Items = new List<T>();
 
         public ItemCollection() { }
@@ -19,9 +21,14 @@ namespace engenious.UI
         {
             get
             {
-                lock (Items)
+                lockSlim.EnterReadLock();
+                try
                 {
                     return Items[index];
+                }
+                finally
+                {
+                    lockSlim.ExitReadLock();
                 }
             }
 
@@ -35,9 +42,15 @@ namespace engenious.UI
         {
             get
             {
-                lock (Items)
-                {
+                lockSlim.EnterReadLock();
+                try
+                
+                    {
                     return Items.Count;
+                }
+                finally
+                {
+                    lockSlim.ExitReadLock();
                 }
             }
         }
@@ -46,7 +59,8 @@ namespace engenious.UI
 
         public virtual void Add(T item)
         {
-            lock (Items)
+            lockSlim.EnterWriteLock();
+            try
             {
                 if (item == null)
                     throw new ArgumentNullException("Item cant be null");
@@ -54,42 +68,61 @@ namespace engenious.UI
                 if (Items.Contains(item))
                     throw new ArgumentException("Item is already part of this collection");
 
+                // Event werfen
+                OnInsert?.Invoke(item);
+
                 // Control einfügen
                 Items.Add(item);
+                OnInserted?.Invoke(item, Items.Count-1);
 
-                // Event werfen
-                OnInsert?.Invoke(item, Items.IndexOf(item));
+            }
+            finally
+            {
+                lockSlim.ExitWriteLock();
             }
         }
 
         public virtual void Clear()
         {
-            lock (Items)
+            lockSlim.EnterWriteLock();
+            try
             {
-                var temp = Items.ToArray();
-
-                Items.Clear();
-
-                for (int i = 0; i < temp.Length; i++)
+                for (int i = 0; i < Items.Count; i++)
                 {
-                    OnRemove?.Invoke(temp[i], i);
+                    OnRemove?.Invoke(Items[i], i);
                 }
+                Items.Clear();
+            }
+            finally
+            {
+                lockSlim.ExitWriteLock();
             }
         }
 
         public bool Contains(T item)
         {
-            lock (Items)
+            lockSlim.EnterReadLock();
+            try
             {
                 return Items.Contains(item);
+            }
+            finally
+            {
+                lockSlim.ExitReadLock();
+
             }
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            lock (Items)
+            lockSlim.EnterWriteLock(); 
+            try
             {
                 Items.CopyTo(array, arrayIndex);
+            }
+            finally
+            {
+                lockSlim.ExitWriteLock();
             }
         }
 
@@ -97,15 +130,22 @@ namespace engenious.UI
 
         public int IndexOf(T item)
         {
-            lock (Items)
+            lockSlim.EnterReadLock();
+            try
             {
                 return Items.IndexOf(item);
+            }
+            finally
+            {
+                lockSlim.ExitReadLock();
+
             }
         }
 
         public virtual void Insert(int index, T item)
         {
-            lock (Items)
+            lockSlim.EnterWriteLock();
+            try
             {
                 if (item == null)
                     throw new ArgumentNullException("Item cant be null");
@@ -113,17 +153,24 @@ namespace engenious.UI
                 if (Items.Contains(item))
                     throw new ArgumentException("Item is already part of this collection");
 
+                OnInsert?.Invoke(item);
                 // Control einfügen
                 Items.Insert(index, item);
 
                 // Event werfen
-                OnInsert?.Invoke(item, Items.IndexOf(item));
+                OnInserted?.Invoke(item, index);
+            }
+            finally
+            {
+                lockSlim.ExitWriteLock();
             }
         }
 
         public virtual bool Remove(T item)
         {
-            lock (Items)
+            lockSlim.EnterWriteLock();
+
+            try
             {
                 if (item == null)
                     throw new ArgumentNullException("Item cant be null");
@@ -133,35 +180,89 @@ namespace engenious.UI
 
                 // Control entfernen
                 int index = Items.IndexOf(item);
-                Items.Remove(item);
 
                 // Event
                 OnRemove?.Invoke(item, index);
 
+                Items.Remove(item);
                 return true;
             }
+            finally
+            {
+                lockSlim.ExitWriteLock();
+            }
+
         }
 
         public virtual void RemoveAt(int index)
         {
-            lock (Items)
+            lockSlim.EnterWriteLock();
+
+            try
             {
                 if (index < 0 && index >= Items.Count)
                     throw new ArgumentOutOfRangeException(nameof(index));
 
                 // Control entfernen
                 T c = Items[index];
-                Items.RemoveAt(index);
 
                 // Event werfen
                 OnRemove?.Invoke(c, index);
+
+                Items.RemoveAt(index);
+            }
+            finally
+            {
+                lockSlim.ExitWriteLock();
+            }
+
+        }
+
+        public event ItemCollectionDelegate<T> OnInsert;
+        public event ItemCollectionIndexedDelegate<T> OnInserted;
+
+        public event ItemCollectionIndexedDelegate<T> OnRemove;
+
+        struct LockedEnumerator : IEnumerator<T>
+        {
+            private readonly ItemCollection<T> collection;
+            private T current;
+            private int index;
+            public LockedEnumerator(ItemCollection<T> collection)
+            {
+                this.collection = collection;
+                index = -1;
+                current = default;
+                collection.lockSlim.EnterReadLock();
+            }
+            public T Current => current;
+
+            object IEnumerator.Current => current;
+
+            public void Dispose()
+            {
+                collection.lockSlim.ExitReadLock();
+            }
+
+            public bool MoveNext()
+            {
+                index++;
+                if (index < collection.Count)
+                {
+                    current = collection[index];
+                    return true;
+                }
+                current = default;
+                return false;
+            }
+
+            public void Reset()
+            {
+                index = 0;
             }
         }
 
 
-        public event ItemCollectionDelegate<T> OnInsert;
-
-        public event ItemCollectionDelegate<T> OnRemove;
         public List<T>.Enumerator GetEnumerator()
         {
             lock (Items)
@@ -178,7 +279,22 @@ namespace engenious.UI
         {
             return GetEnumerator();
         }
+
+        public void Sort(IComparer<T> comparer)
+        {
+            lockSlim.EnterWriteLock();
+            try
+            {
+                Items.Sort(comparer);
+            }
+            finally
+            {
+
+                lockSlim.ExitWriteLock();
+            }
+        }
     }
 
-    public delegate void ItemCollectionDelegate<T>(T item, int index);
+    public delegate void ItemCollectionIndexedDelegate<T>(T item, int index);
+    public delegate void ItemCollectionDelegate<T>(T item);
 }

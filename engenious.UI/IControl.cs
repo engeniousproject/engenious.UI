@@ -88,7 +88,7 @@ namespace engenious.UI
         /// <summary>
         /// Liefert den Control-Path von Root zum aktuellen Control.
         /// </summary>
-        Control[] RootPath { get; }
+        ReverseEnumerable<Control> RootPath { get; }
 
         /// <summary>
         /// Gibt das Parent-Element dieses Controls zurück.

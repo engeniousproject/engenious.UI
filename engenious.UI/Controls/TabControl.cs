@@ -37,19 +37,20 @@ namespace engenious.UI.Controls
         /// Die nötigen Brushes
         /// </summary>
         public Brush tabActiveBrush;
-        public Brush tabBrush ;
-        public Brush tabPageBackground ;
-        public Brush tabListBackground ;
+        public Brush tabBrush;
+        public Brush tabPageBackground;
+        public Brush tabListBackground;
 
         /// <summary>
         /// Die Brush für den aktiven Tab
         /// </summary>
-        public Brush TabActiveBrush {
+        public Brush TabActiveBrush
+        {
             get { return tabActiveBrush; }
             set
             {
                 tabActiveBrush = value;
-                if(tabListStack.Controls.Count > 0)
+                if (tabListStack.Controls.Count > 0)
                     tabListStack.Controls.ElementAt(SelectedTabIndex).Background = tabActiveBrush;
             }
         }
@@ -64,8 +65,14 @@ namespace engenious.UI.Controls
             {
                 tabBrush = value;
                 if (tabListStack.Controls.Count > 0)
-                    foreach (Control c in tabListStack.Controls.Where(c => tabListStack.Controls.IndexOf(c) != SelectedTabIndex))
-                        c.Background = TabBrush;
+                {
+                    foreach (Control c in tabListStack.Controls)
+                    {
+                        int index = tabListStack.Controls.IndexOf(c);
+                        if (index != SelectedTabIndex)
+                            c.Background = TabBrush;
+                    }
+                }
             }
         }
 
@@ -100,7 +107,8 @@ namespace engenious.UI.Controls
         /// </summary>
         private int tabSpacing;
 
-        public int TabSpacing {
+        public int TabSpacing
+        {
             get
             {
                 return tabSpacing;
@@ -123,9 +131,9 @@ namespace engenious.UI.Controls
         /// </summary>
         /// <param name="manager">ScreenManager</param>
         public TabControl(BaseScreenComponent manager) : base(manager)
-        { 
+        {
             Pages = new ItemCollection<TabPage>();
-            Pages.OnInsert += OnInsert;
+            Pages.OnInserted += OnInserted;
             Pages.OnRemove += OnRemove;
 
             tabControlGrid = new Grid(manager)
@@ -133,11 +141,11 @@ namespace engenious.UI.Controls
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
-            tabControlGrid.Columns.Add(new ColumnDefinition() {ResizeMode = ResizeMode.Parts, Width = 1});
-            tabControlGrid.Rows.Add(new RowDefinition() {ResizeMode = ResizeMode.Auto});
-            tabControlGrid.Rows.Add(new RowDefinition() {ResizeMode = ResizeMode.Parts, Height =  1});
+            tabControlGrid.Columns.Add(new ColumnDefinition() { ResizeMode = ResizeMode.Parts, Width = 1 });
+            tabControlGrid.Rows.Add(new RowDefinition() { ResizeMode = ResizeMode.Auto });
+            tabControlGrid.Rows.Add(new RowDefinition() { ResizeMode = ResizeMode.Parts, Height = 1 });
             Content = tabControlGrid;
-            
+
 
             tabListStack = new StackPanel(manager);
             tabListStack.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -157,7 +165,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Wird aufgerufen wenn ein neues Element zu "Pages" hinzugefügt wird, erstellt einen neuen Eintrag in der TabList
         /// </summary>
-        private void OnInsert(TabPage item, int index)
+        private void OnInserted(TabPage item, int index)
         {
             Label title = new Label(ScreenManager);
             title.Text = item.Title;
@@ -167,7 +175,8 @@ namespace engenious.UI.Controls
             title.LeftMouseClick += (s, e) => SelectTab(Pages.IndexOf(item));
             title.CanFocus = true;
             title.TabStop = true;
-            title.KeyDown += (s, e) => {
+            title.KeyDown += (s, e) =>
+            {
                 if (e.Key == engenious.Input.Keys.Enter && title.Focused == TreeState.Active)
                     SelectTab(Pages.IndexOf(item));
             };
@@ -204,7 +213,7 @@ namespace engenious.UI.Controls
 
             tabPage.Content = Pages.ElementAt(SelectedTabIndex);
 
-            if(TabIndexChanged != null)
+            if (TabIndexChanged != null)
                 TabIndexChanged.Invoke(this, Pages.ElementAt(index), SelectedTabIndex);
         }
 
