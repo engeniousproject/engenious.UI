@@ -64,7 +64,7 @@ namespace engenious.UI
 
             void IEnumerator.Reset()
             {
-                _index = 0;
+                _index = _list.Count - 1;
                 _current = default(T);
             }
         }

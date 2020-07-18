@@ -203,7 +203,14 @@ namespace engenious.UI.Controls
             }
 
             // Anteilige Spalten ermitteln
-            int partsY = Rows.Where(c => c.ResizeMode == ResizeMode.Parts).Sum(r => r.Height);
+
+            int partsY = 0;
+            foreach (var c in Rows)
+            {
+                if (c.ResizeMode == ResizeMode.Parts)
+                    partsY += c.Height;
+            }
+
             if (partsY > 0)
             {
                 int partY = (client.Y - totalHeight) / partsY;
@@ -253,7 +260,14 @@ namespace engenious.UI.Controls
             foreach (var mapping in cellMapping)
             {
                 Point cellOffset = new Point(mapping.Columns[0].ActualOffset, mapping.Rows[0].ActualOffset);
-                Point cellSize = new Point(mapping.Columns.Sum(c => c.ActualWidth), mapping.Rows.Sum(r => r.ActualHeight));
+
+                Point cellSize = new Point();
+
+                foreach (var c in mapping.Columns)
+                    cellSize.X += c.ActualWidth;
+
+                foreach (var c in mapping.Rows)
+                    cellSize.Y += c.ActualHeight;
 
                 mapping.Control.SetActualSize(cellSize);
                 mapping.Control.ActualPosition += cellOffset;
@@ -278,7 +292,13 @@ namespace engenious.UI.Controls
             var remainingSize = containerSize - actualSize;
 
             // Anteilige Spalten ermitteln
-            int partsX = Columns.Where(c => c.ResizeMode == ResizeMode.FitParts).Sum(c => c.Width);
+            int partsX = 0;
+            foreach (var c in Columns)
+            {
+                if (c.ResizeMode == ResizeMode.FitParts)
+                    partsX += c.Width;
+            }
+
             if (partsX > 0)
             {
                 int partX = remainingSize.X / partsX;
@@ -292,7 +312,12 @@ namespace engenious.UI.Controls
             }
 
             // Anteilige Spalten ermitteln
-            int partsY = Rows.Where(c => c.ResizeMode == ResizeMode.FitParts).Sum(r => r.Height);
+            int partsY = 0;
+            foreach (var c in Rows)
+            {
+                if (c.ResizeMode == ResizeMode.FitParts) 
+                    partsY += c.Height;
+            }
             if (partsY > 0)
             {
                 int partY = remainingSize.Y / partsY;

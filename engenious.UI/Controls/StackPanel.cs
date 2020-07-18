@@ -60,7 +60,7 @@ namespace engenious.UI.Controls
             Point client = GetMaxClientSize(available);
             Point result = GetMinClientSize(available);
 
-            foreach (var control in Controls.ToArray())
+            foreach (var control in Controls.Items)
             {
                 Point expected = control.GetExpectedSize(client);
                 if (Orientation == Orientation.Horizontal)
@@ -85,7 +85,7 @@ namespace engenious.UI.Controls
 
             // Placement
             Point result = Point.Zero;
-            foreach (var control in Controls.ToArray())
+            foreach (var control in Controls.Items)
             {
                 control.SetActualSize(ActualClientSize);
                 if (Orientation == Orientation.Horizontal)

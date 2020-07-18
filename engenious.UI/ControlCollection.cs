@@ -9,7 +9,7 @@ namespace engenious.UI
     /// </summary>
     public class ControlCollection : ItemCollection<Control>
     {
-        internal List<Control> InZOrder = new List<Control>();
+        internal readonly ItemCollection<Control> InZOrder;
         internal readonly ReverseEnumerable<Control> AgainstZOrder = new ReverseEnumerable<Control>();
 
         protected Control Owner { get; private set; }
@@ -18,7 +18,8 @@ namespace engenious.UI
             : base()
         {
             Owner = owner;
-            AgainstZOrder.BaseList = InZOrder;
+            InZOrder = new ItemCollection<Control>();
+            AgainstZOrder.BaseList = InZOrder.Items;
         }
 
         public override void Add(Control item)
@@ -146,11 +147,24 @@ namespace engenious.UI
             }
         }
 
+        private List<Control> tabOrderTempList = new List<Control>();
+
+        private class TabOrderComparer : IComparer<Control>
+        {
+            public int Compare(Control x, Control y) =>x.TabOrder.CompareTo(y.TabOrder);
+        }
+
+        private static IComparer<Control> tabOrderComparer = new TabOrderComparer();
         private void ReorderTab()
         {
             // Taborder neu ermitteln
             int tab = 1;
-            foreach (var control in this.OrderBy(c => c.TabOrder))
+            foreach (var item in tabOrderTempList)
+            {
+                tabOrderTempList.Add(item);
+            }
+            tabOrderTempList.Sort(tabOrderComparer);
+            foreach (var control in tabOrderTempList)
                 control.TabOrder = tab++;
         }
 
@@ -187,7 +201,7 @@ namespace engenious.UI
             foreach (var c in InZOrder)
                 c.TabOrder = index++;
 
-            AgainstZOrder.BaseList = InZOrder;
+            //AgainstZOrder.BaseList = InZOrder;
 
             isDoingUpdate = false;
         }
