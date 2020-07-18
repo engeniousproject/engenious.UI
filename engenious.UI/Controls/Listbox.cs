@@ -62,7 +62,11 @@ namespace engenious.UI.Controls
         private Control GetItemContainer(T item)
         {
             if (item != null)
-                return StackPanel.Controls.FirstOrDefault(c => c.Tag == item);
+                foreach (var c in StackPanel.Controls)
+                {
+                    if (c.Tag == item)
+                        return c;
+                }
             return null;
         }
 

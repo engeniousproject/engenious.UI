@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net48</TargetFramework>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
-        <LangVersion>8.0</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
         <Authors>fnawratil, jvbsl, tomwendel</Authors>

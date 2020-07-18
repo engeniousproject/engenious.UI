@@ -1,9 +1,11 @@
-﻿namespace engenious.UI
+﻿using System;
+
+namespace engenious.UI
 {
     /// <summary>
     /// Struct zur Verwaltung von Rahmen-Informationen für Margins und Paddings.
     /// </summary>
-    public struct Border
+    public struct Border : IEquatable<Border>
     {
         /// <summary>
         /// Linke Seite
@@ -108,14 +110,19 @@
         /// <returns></returns>
         public override bool Equals(object obj)
         {
-            if (!(obj is Border))
-                return false;
+            return obj is Border b && Equals(b);
+        }
 
-            Border other = (Border)obj;
-
-            return other.Left == Left && 
-                other.Right == Right && 
-                other.Top == Top && 
+        /// <summary>
+        /// Überprüft, ob die aktuelle Border-Instanz gleich der gegebenen ist.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(Border other)
+        {
+            return other.Left == Left &&
+                other.Right == Right &&
+                other.Top == Top &&
                 other.Bottom == Bottom;
         }
 

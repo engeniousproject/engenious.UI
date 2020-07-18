@@ -10,7 +10,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Liste aller Controls
         /// </summary>
-        public IList<Control> Controls { get { return Children; } }
+        public ControlCollection Controls { get { return Children; } }
 
         /// <summary>
         /// Erzeugt eine neue Instanz der ContainerControl-Klasse.
