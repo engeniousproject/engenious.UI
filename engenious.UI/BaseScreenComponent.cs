@@ -878,7 +878,7 @@ namespace engenious.UI
 
             _titleDirty = true;
             // Navigation ankündigen und prüfen, ob das ok geht.
-            NavigationEventArgs args = new NavigationEventArgs()
+            var args = new NavigationEventArgs()
             {
                 IsBackNavigation = isBackNavigation,
                 Parameter = parameter,

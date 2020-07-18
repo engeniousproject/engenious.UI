@@ -14,9 +14,9 @@ namespace engenious.UI.Controls
     {
         readonly struct TextLine
         {
-            public readonly int Begin { get; }
-            public readonly int Length { get; }
-            public readonly Vector2 Size { get; }
+            public int Begin { get; }
+            public int Length { get; }
+            public Vector2 Size { get; }
 
             public TextLine(int begin, int length, Vector2 size)
             {

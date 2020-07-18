@@ -66,9 +66,28 @@ namespace engenious.UI.Controls
             // Restliche Controls
             foreach (var mapping in cellMapping)
             {
-                Point cell = new Point(
-                    mapping.Columns.All(c => c.ResizeMode == ResizeMode.Fixed) ? mapping.Columns.Sum(c => c.Width) : client.X,
-                    mapping.Rows.All(r => r.ResizeMode == ResizeMode.Fixed) ? mapping.Rows.Sum(r => r.Height) : client.Y);
+                Point cell = new Point();
+
+                foreach (var column in mapping.Columns)
+                {
+                    if (column.ResizeMode == ResizeMode.Fixed)
+                        cell.X += column.Width;
+                    else
+                    {
+                        cell.X = client.X;
+                        break;
+                    }
+                }
+                foreach (var row in mapping.Rows)
+                {
+                    if (row.ResizeMode == ResizeMode.Fixed)
+                        cell.Y += row.Height;
+                    else
+                    {
+                        cell.Y = client.Y;
+                        break;
+                    }
+                }
                 mapping.ExpectedSize = mapping.Control.GetExpectedSize(cell);
             }
 
@@ -76,20 +95,41 @@ namespace engenious.UI.Controls
 
             // Statische Spalten ermitteln
             int totalWidth = 0;
-            foreach (var column in Columns.Where(c => c.ResizeMode == ResizeMode.Fixed))
+            foreach (var column in Columns)
             {
+                if (column.ResizeMode != ResizeMode.Fixed)
+                    continue;
                 column.ExpectedWidth = column.Width;
                 totalWidth += column.ExpectedWidth;
             }
 
             // Automatische Spalten ermitteln
-            foreach (var column in Columns.Where(c => c.ResizeMode == ResizeMode.Auto))
+            foreach (var column in Columns)
             {
+                if (column.ResizeMode != ResizeMode.Auto)
+                    continue;
+
                 int width = column.MinWidth.HasValue ? column.MinWidth.Value : 0;
-                foreach (var mapping in cellMapping.Where(m => m.Columns.Contains(column)))
+                foreach (var mapping in cellMapping)
                 {
-                    int mapWidth = mapping.Columns.Where(c => c.ResizeMode == ResizeMode.Fixed).Sum(c => c.ExpectedWidth);
-                    int autoCount = mapping.Columns.Count(c => c.ResizeMode == ResizeMode.Auto);
+                    if (!mapping.Columns.Contains(column))
+                        continue;
+                    int mapWidth = 0;
+
+                    foreach (var c in mapping.Columns)
+                    {
+                        if (c.ResizeMode != ResizeMode.Fixed)
+                            continue;
+                        mapWidth += c.ExpectedWidth;
+                    }
+
+                    int autoCount = 0;
+                    foreach (var c in mapping.Columns)
+                    {
+                        if (c.ResizeMode != ResizeMode.Fixed)
+                            continue;
+                        autoCount++;
+                    }
                     width = Math.Max(width, (mapping.ExpectedSize.X - mapWidth) / autoCount);
                 }
                 if (column.MaxWidth.HasValue)
@@ -99,12 +139,19 @@ namespace engenious.UI.Controls
             }
 
             // Anteilige Spalten ermitteln
-            int partsX = Columns.Where(c => c.ResizeMode == ResizeMode.Parts).Sum(c => c.Width);
+            int partsX = 0;
+
+            foreach (var column in Columns)
+                if (column.ResizeMode == ResizeMode.Parts)
+                    partsX += column.Width;
+
             if (partsX > 0)
             {
                 int partX = (client.X - totalWidth) / partsX;
-                foreach (var column in Columns.Where(c => c.ResizeMode == ResizeMode.Parts))
+                foreach (var column in Columns)
                 {
+                    if (column.ResizeMode != ResizeMode.Parts)
+                        continue;
                     column.ExpectedWidth = partX * column.Width;
                     totalWidth += column.ExpectedWidth;
                 }
@@ -116,20 +163,37 @@ namespace engenious.UI.Controls
 
             // Statische Zeilen ermitteln
             int totalHeight = 0;
-            foreach (var row in Rows.Where(r => r.ResizeMode == ResizeMode.Fixed))
+            foreach (var row in Rows)
             {
+                if (row.ResizeMode != ResizeMode.Fixed)
+                    continue;
                 row.ExpectedHeight = row.Height;
                 totalHeight += row.ExpectedHeight;
             }
 
             // Automatische Spalten ermitteln
-            foreach (var row in Rows.Where(r => r.ResizeMode == ResizeMode.Auto))
+            foreach (var row in Rows)
             {
-                int height = row.MinHeight.HasValue ? row.MinHeight.Value : 0;
-                foreach (var mapping in cellMapping.Where(m => m.Rows.Contains(row)))
+                if (row.ResizeMode != ResizeMode.Auto)
+                    continue;
+                int height = row.MinHeight ?? 0;
+                foreach (var mapping in cellMapping)
                 {
-                    int mapHeight = mapping.Rows.Where(r => r.ResizeMode == ResizeMode.Fixed).Sum(r => r.ExpectedHeight);
-                    int autoCount = mapping.Rows.Count(r => r.ResizeMode == ResizeMode.Auto);
+                    if (!mapping.Rows.Contains(row))
+                        continue;
+
+                    int mapHeight = 0;
+                    int autoCount = 0;
+
+                    foreach (var r in mapping.Rows)
+                    {
+                        if (r.ResizeMode == ResizeMode.Auto)
+                            autoCount++;
+                        else if (r.ResizeMode == ResizeMode.Fixed)
+                            mapHeight += r.ExpectedHeight;
+                    }
+
+
                     height = Math.Max(height, (mapping.ExpectedSize.Y - mapHeight) / autoCount);
                 }
                 if (row.MaxHeight.HasValue)
@@ -143,8 +207,10 @@ namespace engenious.UI.Controls
             if (partsY > 0)
             {
                 int partY = (client.Y - totalHeight) / partsY;
-                foreach (var row in Rows.Where(r => r.ResizeMode == ResizeMode.Parts))
+                foreach (var row in Rows)
                 {
+                    if (row.ResizeMode != ResizeMode.Parts)
+                        continue;
                     row.ExpectedHeight = partY * row.Height;
                     totalHeight += row.ExpectedHeight;
                 }
@@ -216,8 +282,10 @@ namespace engenious.UI.Controls
             if (partsX > 0)
             {
                 int partX = remainingSize.X / partsX;
-                foreach (var column in Columns.Where(c => c.ResizeMode == ResizeMode.FitParts))
+                foreach (var column in Columns)
                 {
+                    if (column.ResizeMode != ResizeMode.FitParts)
+                        continue;
                     column.ExpectedWidth = partX * column.Width;
                     size.X += column.ExpectedWidth;
                 }
@@ -228,8 +296,10 @@ namespace engenious.UI.Controls
             if (partsY > 0)
             {
                 int partY = remainingSize.Y / partsY;
-                foreach (var row in Rows.Where(r => r.ResizeMode == ResizeMode.FitParts))
+                foreach (var row in Rows)
                 {
+                    if (row.ResizeMode != ResizeMode.FitParts)
+                        continue;
                     row.ExpectedHeight = partY * row.Height;
                     size.Y += row.ExpectedHeight;
                 }
