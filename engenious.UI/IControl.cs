@@ -36,6 +36,11 @@ namespace engenious.UI
         Brush PressedBackground { get; set; }
 
         /// <summary>
+        /// Optional background when <see cref="Enabled"/> is <see langword="false"/>
+        /// </summary>
+        Brush DisabledBackground { get; set; }
+
+        /// <summary>
         /// Legt den äußeren Abstand des Contro { return zOrder; }ls fest.
         /// </summary> { return zOrder; }
         Border Margin { get; set; }

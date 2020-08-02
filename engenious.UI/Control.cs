@@ -21,6 +21,8 @@ namespace engenious.UI
 
         private Brush pressedBackground = null;
 
+        private Brush disabledBackground = null;
+
         private Border margin = Border.All(0);
 
         private Border padding = Border.All(0);
@@ -119,6 +121,22 @@ namespace engenious.UI
                 if (pressedBackground != value)
                 {
                     pressedBackground = value;
+                    InvalidateDrawing();
+                }
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public Brush DisabledBackground
+        {
+            get => disabledBackground;
+            set
+            {
+                if (disabledBackground != value)
+                {
+                    disabledBackground = value;
                     InvalidateDrawing();
                 }
             }
@@ -318,7 +336,9 @@ namespace engenious.UI
         protected virtual void OnDrawBackground(engenious.Graphics.SpriteBatch batch, Rectangle backgroundArea, GameTime gameTime, float alpha)
         {
             // Standard Background zeichnen
-            if (Pressed && PressedBackground != null)
+            if (!Enabled && DisabledBackground != null)
+                DisabledBackground.Draw(batch, backgroundArea, alpha);
+            else if (Pressed && PressedBackground != null)
                 PressedBackground.Draw(batch, backgroundArea, alpha);
             else if (Hovered != TreeState.None && HoveredBackground != null)
                 HoveredBackground.Draw(batch, backgroundArea, alpha);
