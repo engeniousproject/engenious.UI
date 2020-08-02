@@ -13,7 +13,7 @@
         <Copyright>engeniousproject 2019</Copyright>
     </PropertyGroup>
     <PropertyGroup>
-      <DocumentationFile>engenious.UI.xml</DocumentationFile>
+	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
       <Reference Include="System.Windows.Forms" />

@@ -33,6 +33,10 @@ namespace SampleClient.Screens
             Button dragDropScreen = new TextButton(manager, "Drag & Drop", "special");
             dragDropScreen.LeftMouseClick += (s, e) => manager.NavigateToScreen(new DragDropScreen(manager));
             stack.Controls.Add(dragDropScreen);
+
+            Button disabeldButton = new TextButton(manager, "Disabled", "special");
+            disabeldButton.Enabled = false;
+            stack.Controls.Add(disabeldButton);
         }
     }
 }

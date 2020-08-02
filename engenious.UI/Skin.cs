@@ -56,6 +56,7 @@ namespace engenious.UI
             ButtonBrush = new BorderBrush(Color.White, LineType.Solid, Color.LightGray, 1);
             ButtonHoverBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.LightGray, 1);
             ButtonPressedBrush = new BorderBrush(Color.LightGray, LineType.Solid, Color.Black, 1);
+            ButtonDisabledBrush = new BorderBrush(Color.Gray, LineType.Solid, Color.Gray, 1);
             PanelBrush = new BorderBrush(Color.White, LineType.Solid, Color.Black, 1);
 
             VerticalScrollBackgroundBrush = new BorderBrush(Color.White, LineType.Solid, Color.Black, 1);
@@ -105,6 +106,7 @@ namespace engenious.UI
                 button.Background = Current.ButtonBrush;
                 button.HoveredBackground = Current.ButtonHoverBrush;
                 button.PressedBackground = Current.ButtonPressedBrush;
+                button.DisabledBackground = Current.ButtonDisabledBrush;
             });
 
             // Textbox
@@ -277,6 +279,11 @@ namespace engenious.UI
         /// Hintergrund für Buttons die aktuell gedrückt sind.
         /// </summary>
         public Brush ButtonPressedBrush { get; set; }
+
+        /// <summary>
+        /// Hintergrund für Buttons die aktuell deaktiviert sind.
+        /// </summary>
+        public Brush ButtonDisabledBrush { get; set; }
 
         /// <summary>
         /// Definiert den Brush zum Zeichnen eines vertikalen Scrollbar-Hintergrunds.

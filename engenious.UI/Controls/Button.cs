@@ -60,11 +60,6 @@ namespace engenious.UI.Controls
             args.Handled = true;
         }
 
-        protected override void OnTouchDown(TouchEventArgs args)
-        {
-            base.OnTouchDown(args);
-        }
-
         protected override void OnTouchTap(TouchEventArgs args)
         {
             base.OnTouchTap(args);
