@@ -21,6 +21,7 @@ namespace SampleClient
                     Button button = c as Button;
                     button.ClickSound = click;
                     button.HoverSound = hover;
+                    button.HoveredBackground = SolidColorBrush.Blue;
                 }
             });
         }
