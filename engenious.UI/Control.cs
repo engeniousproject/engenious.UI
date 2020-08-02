@@ -405,7 +405,11 @@ namespace engenious.UI
 
                 enabled = value;
                 InvalidateDrawing();
+
                 if (!enabled) Unfocus();
+
+                foreach (var child in Children)
+                    child.Enabled = enabled;
 
                 OnEnableChanged(_enabledChangedEventArgs);
                 EnableChanged?.Invoke(this, _enabledChangedEventArgs);
