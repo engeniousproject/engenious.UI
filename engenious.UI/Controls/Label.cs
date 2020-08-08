@@ -36,6 +36,7 @@ namespace engenious.UI.Controls
         private SpriteFont font = null;
 
         private Color textColor = Color.Black;
+        private Color disabledTextColor = Color.LightGray;
 
         private HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center;
 
@@ -91,6 +92,25 @@ namespace engenious.UI.Controls
                 {
                     textColor = value;
                     InvalidateDrawing();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gibt die Textfarbe an mit der der Inhalt gezeichnet werden soll, wenn <see cref="Control.Enabled"/> <see langword="false"/> ist, oder legt diese fest.
+        /// </summary>
+        public Color DisabledTextColor
+        {
+            get => disabledTextColor;
+            set
+            {
+                if (disabledTextColor != value)
+                {
+                    disabledTextColor = value;
+
+                    // Only invalidate of its really needed
+                    if (!Enabled)
+                        InvalidateDrawing();
                 }
             }
         }
@@ -170,6 +190,7 @@ namespace engenious.UI.Controls
         {
             // Rahmenbedingungen fürs Rendern checken
             if (Font == null) return;
+            var color = Enabled ? TextColor : DisabledTextColor;
 
             Vector2 offset = new Vector2(area.X, area.Y);
 
@@ -208,7 +229,7 @@ namespace engenious.UI.Controls
                             break;
                     }
 
-                    batch.DrawString(Font, Text, line.Begin, line.Length, offset, TextColor * alpha);
+                    batch.DrawString(Font, Text, line.Begin, line.Length, offset, color * alpha);
 
                     offset.Y += (int)line.Size.Y;
                 }
@@ -216,7 +237,7 @@ namespace engenious.UI.Controls
             else
             {
                 if (!string.IsNullOrEmpty(Text))
-                    batch.DrawString(Font, Text, offset, TextColor * alpha);
+                    batch.DrawString(Font, Text, offset, color * alpha);
             }
         }
 
