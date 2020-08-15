@@ -46,7 +46,7 @@ namespace engenious.UI
             p[1] = new Vector2(rectangle.X + rectangle.Width,rectangle.Y + rectangle.Height);
 
             // Transformieren
-            Vector2.Transform(2, p, ref transform, p);
+            Vector2.Transform(2, ref transform, p, p);
 
             // Rectangle bauen
             return new Rectangle(

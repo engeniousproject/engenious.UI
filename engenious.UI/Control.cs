@@ -5,6 +5,7 @@ using System.Reflection;
 
 using engenious.Audio;
 using engenious.Graphics;
+using engenious.UI.Controls;
 
 namespace engenious.UI
 {
@@ -1293,8 +1294,7 @@ namespace engenious.UI
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnLeftMouseDown(args);
-                if (LeftMouseDown != null)
-                    LeftMouseDown(this, args);
+                LeftMouseDown?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1312,8 +1312,7 @@ namespace engenious.UI
             // Lokales Events
             args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
             OnLeftMouseUp(args);
-            if (LeftMouseUp != null)
-                LeftMouseUp(this, args);
+            LeftMouseUp?.Invoke(this, args);
         }
 
         internal bool InternalLeftMouseClick(MouseEventArgs args)
@@ -1708,8 +1707,8 @@ namespace engenious.UI
         {
             Point absolutePosition = control.AbsolutePosition;
             Vector2 local = Vector2.Transform(
-                new Vector2(global.X - absolutePosition.X, global.Y - absolutePosition.Y),
-                Matrix.Invert(control.AbsoluteTransformation));
+                Matrix.Invert(control.AbsoluteTransformation),
+                new Vector2(global.X - absolutePosition.X, global.Y - absolutePosition.Y));
             return new Point((int)local.X, (int)local.Y);
         }
 
