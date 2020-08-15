@@ -1,4 +1,4 @@
-name: engenious Build
+name: engenious.UI Build
 
 on:
   push:
@@ -21,10 +21,7 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 2.2.108
-    - name: Set env
-      run: echo ::set-env name=FrameworkPathOverride::/usr/lib/mono/4.5/
-      if: matrix.os == 'ubuntu-latest'
+        dotnet-version: 3.1.x
     - name: Install FFMPEG (Windows)
       run: .\prebuild.ps1
       shell: pwsh
