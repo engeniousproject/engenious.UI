@@ -1,8 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
         <Authors>fnawratil, jvbsl, tomwendel</Authors>
@@ -15,15 +16,15 @@
     <PropertyGroup>
 	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
     </PropertyGroup>
-    <ItemGroup>
-      <Reference Include="System.Windows.Forms" />
-    </ItemGroup>
 	<!-- LitGit -->
 	<ItemGroup>
         <None Remove="engenious.UI.nuget.props.template" />
         <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
-        <PackageReference Include="engenious" Version="0.4.0.14-alpha" />
-        <PackageReference Include="LitGit" Version="0.2.0.13-alpha" />
+        <PackageReference Include="TextCopy" Version="4.2.0" />
+        <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
+
+        <PackageReference Include="engenious" Version="*" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+        <PackageReference Include="LitGit" Version="0.2.0.13-alpha" PrivateAssets="all" />
         <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
             <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
         </None>

@@ -127,6 +127,7 @@ namespace engenious.UI
                 {
                     mouseMode = value;
                     Game.IsMouseVisible = (mouseMode != MouseMode.Captured);
+                    Game.IsCursorGrabbed = (mouseMode == MouseMode.Captured);
 
                     if (mouseMode == MouseMode.Free)
                         Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
@@ -156,7 +157,7 @@ namespace engenious.UI
             //TouchEnabled = true;
             DoubleClickDelay = DEFAULTDOUBLECLICKDELAY;
 
-            _pressedKeys = ((Keys[]) Enum.GetValues(typeof(Keys))).Select(k => (int)k).Distinct().Select(idx => UnpressedKeyTimestamp).ToArray();
+            _pressedKeys = ((Keys[]) Enum.GetValues(typeof(Keys))).Where(x => (int)x != 0).Select(k => (int)k).Distinct().Select(idx => UnpressedKeyTimestamp).ToArray();
 
 #if !ANDROID
 
@@ -239,7 +240,7 @@ namespace engenious.UI
 
         //private Dictionary<Keys, double> pressedKeys = new Dictionary<Keys, double>();
 
-        private double[] _pressedKeys;
+        private readonly double[] _pressedKeys;
 
         private const double UnpressedKeyTimestamp = -1d;
 
@@ -298,7 +299,7 @@ namespace engenious.UI
                     else
                     {
                         mouse = Mouse.GetCursorState();
-                        mousePosition = Game.RenderingSurface.PointToClient(mouse.Location);
+                        mousePosition = mouse.Location;
                     }
 
 
@@ -523,7 +524,7 @@ namespace engenious.UI
 
                     for (int i = 0; i < _pressedKeys.Length; i++)
                     {
-                        var key = (Keys) i; 
+                        var key = (Keys) (i + 1); 
                         if (keyboard.IsKeyDown(key))
                         {
                             // ReSharper disable once CompareOfFloatsByEqualityOperator

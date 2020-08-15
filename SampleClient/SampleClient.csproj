@@ -2,7 +2,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -31,9 +31,6 @@
 	<ItemGroup>
         <EngeniousContentReference Include="Content\Content.ecp" />
     </ItemGroup>
-	<ItemGroup>
-	  <Reference Include="Microsoft.CSharp" />
-	</ItemGroup>
 	<ItemGroup>
 	  <None Update="test_texture_round.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
