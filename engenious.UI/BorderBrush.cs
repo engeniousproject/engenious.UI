@@ -116,7 +116,7 @@ namespace engenious.UI
                 case LineType.Solid:
                     buffer = new Color[LineWidth * LineWidth];
                     for (int i = 0; i < buffer.Length; i++)
-                        buffer[i] = LineColor;
+                        buffer[i] = Color.White;
                     tex = new Texture2D(Skin.Pix.GraphicsDevice, LineWidth, LineWidth);
                     tex.SetData(buffer);
                     MinWidth = MinHeight = (LineWidth * 2) + 1;
