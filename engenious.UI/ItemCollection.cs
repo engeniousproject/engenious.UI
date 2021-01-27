@@ -262,13 +262,51 @@ namespace engenious.UI
             }
         }
 
-
-        public List<T>.Enumerator GetEnumerator()
+        /// <summary>
+        /// A locking enumerator for the <see cref="ItemCollection{T}"/> class.
+        /// </summary>
+        public struct Enumerator : IEnumerator<T>
         {
-            lock (Items)
+            private readonly ItemCollection<T> _collection;
+            private List<T>.Enumerator _enumerator;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Enumerator"/> struct used to lock the collection while enumerating.
+            /// </summary>
+            /// <param name="collection">The collection of which to wrap the enumerator of.</param>
+            public Enumerator(ItemCollection<T> collection)
             {
-                return Items.GetEnumerator();
+                _collection = collection;
+                _collection.lockSlim.EnterWriteLock();
+                _enumerator = collection.Items.GetEnumerator();
             }
+
+            /// <inheritdoc />
+            public bool MoveNext() => _enumerator.MoveNext();
+
+            void IEnumerator.Reset() => ((IEnumerator)_enumerator).Reset();
+
+            /// <inheritdoc />
+            public T Current => _enumerator.Current;
+
+            object IEnumerator.Current => Current;
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+                _enumerator.Dispose();
+                _collection.lockSlim.ExitWriteLock();
+            }
+        }
+
+
+        /// <summary>
+        /// Returns a locking enumerator which prevents the collection from being changed.
+        /// </summary>
+        /// <returns>The locking <see cref="Enumerator"/>.</returns>
+        public Enumerator GetEnumerator()
+        {
+            return new Enumerator(this);
         }
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
