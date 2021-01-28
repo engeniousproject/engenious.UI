@@ -10,7 +10,7 @@ namespace engenious.UI
     public class ControlCollection : ItemCollection<Control>
     {
         internal readonly ItemCollection<Control> InZOrder;
-        internal readonly ReverseEnumerable<Control> AgainstZOrder = new ReverseEnumerable<Control>();
+        internal readonly ReverseItemCollectionEnumerable<Control> AgainstZOrder = new ReverseItemCollectionEnumerable<Control>();
 
         protected Control Owner { get; private set; }
 
@@ -19,7 +19,7 @@ namespace engenious.UI
         {
             Owner = owner;
             InZOrder = new ItemCollection<Control>();
-            AgainstZOrder.BaseList = InZOrder.Items;
+            AgainstZOrder.BaseList = InZOrder;
         }
 
         public override void Add(Control item)

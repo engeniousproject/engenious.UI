@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 
 namespace engenious.UI
@@ -12,24 +13,130 @@ namespace engenious.UI
     /// </summary>
     public class ItemCollection<T> : IList<T> where T : class
     {
+        private struct PostponedAction
+        {
+            public enum ActionType
+            {
+                Add,
+                Insert,
+                Clear,
+                RemoveAt,
+                Remove,
+                Sort
+            }
+            public ActionType Type { get; set; }
+            public int Index { get; set; }
+            public T Item { get; set; }
+            public IComparer<T> Comparer { get; set; }
+
+            public void Apply(ItemCollection<T> collection)
+            {
+                switch (Type)
+                {
+                    case ActionType.Add:
+                        collection.AddInternal(Item);
+                        break;
+                    case ActionType.Insert:
+                        collection.InsertInternal(Index, Item);
+                        break;
+                    case ActionType.Clear:
+                        collection.ClearInternal();
+                        break;
+                    case ActionType.RemoveAt:
+                        collection.RemoveAtInternal(Index);
+                        break;
+                    case ActionType.Remove:
+                        collection.RemoveInternal(Item);
+                        break;
+                    case ActionType.Sort:
+                        collection.SortInternal(Comparer);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
         private readonly ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        public List<T> Items = new List<T>();
+        protected readonly List<T> _items = new List<T>();
+        private readonly Queue<PostponedAction> _postponedActions = new Queue<PostponedAction>();
 
         public ItemCollection() { }
 
+        private struct ReadLockWrapper : IDisposable
+        {
+            private readonly ItemCollection<T> _collection;
+
+            public ReadLockWrapper(ItemCollection<T> collection)
+            {
+                _collection = collection;
+                _collection.lockSlim.EnterReadLock();
+            }
+            public void Dispose()
+            {
+                _collection.lockSlim.ExitReadLock();
+                _collection.TryApplyPostponedActions();
+            }
+        }
+
+        private ReadLockWrapper ReadLock() => new ReadLockWrapper(this);
+        private struct WriteLockOrPostponeWrapper : IDisposable
+        {
+            private readonly ItemCollection<T> _collection;
+
+            public bool WasPostponed { get; }
+
+            public WriteLockOrPostponeWrapper(ItemCollection<T> collection)
+            {
+                _collection = collection;
+                var toPostpone = false;
+                try
+                {
+                    if (_collection.lockSlim.IsReadLockHeld)
+                        toPostpone = true;
+                    else
+                        _collection.lockSlim.EnterWriteLock();
+                }
+                catch (LockRecursionException)
+                {
+                    toPostpone = true;
+                }
+
+                WasPostponed = toPostpone;
+            }
+            public void Dispose()
+            {
+                if (!WasPostponed)
+                    _collection.lockSlim.ExitWriteLock();
+            }
+        }
+
+        private WriteLockOrPostponeWrapper WriteLockOrPostpone() => new WriteLockOrPostponeWrapper(this);
+
+        private void TryApplyPostponedActions()
+        {
+            using (var writeOrPostpone = WriteLockOrPostpone())
+            {
+                if (writeOrPostpone.WasPostponed)
+                {
+                    if (_postponedActions.Count > 0)
+                        ;
+                    return;
+                }
+
+                while (_postponedActions.TryDequeue(out var action))
+                    action.Apply(this);
+            }
+        }
+        
         public T this[int index]
         {
             get
             {
-                lockSlim.EnterReadLock();
-                try
+                using (ReadLock())
                 {
-                    return Items[index];
+                    return _items[index];
                 }
-                finally
-                {
-                    lockSlim.ExitReadLock();
-                }
+                
             }
 
             set
@@ -42,16 +149,11 @@ namespace engenious.UI
         {
             get
             {
-                lockSlim.EnterReadLock();
-                try
-                
-                    {
-                    return Items.Count;
-                }
-                finally
+                using (ReadLock())
                 {
-                    lockSlim.ExitReadLock();
+                    return _items.Count;
                 }
+                
             }
         }
 
@@ -59,208 +161,166 @@ namespace engenious.UI
 
         public virtual void Add(T item)
         {
-            lockSlim.EnterWriteLock();
-            try
-            {
-                if (item == null)
-                    throw new ArgumentNullException("Item cant be null");
-
-                if (Items.Contains(item))
+            if (item == null)
+                throw new ArgumentNullException("Item cant be null");
+            using (ReadLock())
+                if (_items.Contains(item))
                     throw new ArgumentException("Item is already part of this collection");
-
-                // Event werfen
-                OnInsert?.Invoke(item);
-
-                // Control einfügen
-                Items.Add(item);
-                OnInserted?.Invoke(item, Items.Count-1);
-
-            }
-            finally
+            using (var writeOrPostpone = WriteLockOrPostpone() )
             {
-                lockSlim.ExitWriteLock();
+                if (writeOrPostpone.WasPostponed)
+                    _postponedActions.Enqueue(new PostponedAction(){Type = PostponedAction.ActionType.Add,Item = item});
+                else
+                    AddInternal(item);
             }
+        }
+
+        private void AddInternal(T item)
+        {
+            // Event werfen
+            OnInsert?.Invoke(item);
+
+            // Control einfügen
+            _items.Add(item);
+            OnInserted?.Invoke(item, _items.Count-1);
         }
 
         public virtual void Clear()
         {
-            lockSlim.EnterWriteLock();
-            try
+            using (var writeOrPostpone = WriteLockOrPostpone())
             {
-                for (int i = 0; i < Items.Count; i++)
-                {
-                    OnRemove?.Invoke(Items[i], i);
-                }
-                Items.Clear();
+                if (writeOrPostpone.WasPostponed)
+                    _postponedActions.Enqueue(new PostponedAction() {Type = PostponedAction.ActionType.Clear});
+                else
+                    ClearInternal();
             }
-            finally
+        }
+
+        private void ClearInternal()
+        {
+            for (int i = 0; i < _items.Count; i++)
             {
-                lockSlim.ExitWriteLock();
+                OnRemove?.Invoke(_items[i], i);
             }
+            _items.Clear();
         }
 
         public bool Contains(T item)
         {
-            lockSlim.EnterReadLock();
-            try
+            using (ReadLock())
             {
-                return Items.Contains(item);
+                return _items.Contains(item);
             }
-            finally
-            {
-                lockSlim.ExitReadLock();
-
-            }
+            
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            lockSlim.EnterWriteLock(); 
-            try
+            using (ReadLock())
             {
-                Items.CopyTo(array, arrayIndex);
+                _items.CopyTo(array, arrayIndex);
             }
-            finally
-            {
-                lockSlim.ExitWriteLock();
-            }
+            
         }
 
 
 
         public int IndexOf(T item)
         {
-            lockSlim.EnterReadLock();
-            try
+            using (ReadLock())
             {
-                return Items.IndexOf(item);
+                return _items.IndexOf(item);
             }
-            finally
-            {
-                lockSlim.ExitReadLock();
-
-            }
+            
         }
 
         public virtual void Insert(int index, T item)
         {
-            lockSlim.EnterWriteLock();
-            try
+            if (item == null)
+                throw new ArgumentNullException("Item cant be null");
+            using (var writeOrPostpone = WriteLockOrPostpone())
             {
-                if (item == null)
-                    throw new ArgumentNullException("Item cant be null");
-
-                if (Items.Contains(item))
-                    throw new ArgumentException("Item is already part of this collection");
-
-                OnInsert?.Invoke(item);
-                // Control einfügen
-                Items.Insert(index, item);
-
-                // Event werfen
-                OnInserted?.Invoke(item, index);
+                if (writeOrPostpone.WasPostponed)
+                    _postponedActions.Enqueue(new PostponedAction(){Type = PostponedAction.ActionType.Insert, Index = index, Item = item});
+                else
+                    InsertInternal(index, item);
             }
-            finally
-            {
-                lockSlim.ExitWriteLock();
-            }
+        }
+
+        private void InsertInternal(int index, T item)
+        {
+            if (_items.Contains(item))
+                throw new ArgumentException("Item is already part of this collection");
+            OnInsert?.Invoke(item);
+            // Control einfügen
+            _items.Insert(index, item);
+
+            // Event werfen
+            OnInserted?.Invoke(item, index);
         }
 
         public virtual bool Remove(T item)
         {
-            lockSlim.EnterWriteLock();
+            if (item == null)
+                throw new ArgumentNullException("Item cant be null");
 
-            try
+            using (ReadLock())
             {
-                if (item == null)
-                    throw new ArgumentNullException("Item cant be null");
-
-                if (!Items.Contains(item))
+                if (!_items.Contains(item))
                     return false;
-
-                // Control entfernen
-                int index = Items.IndexOf(item);
-
-                // Event
-                OnRemove?.Invoke(item, index);
-
-                Items.Remove(item);
-                return true;
             }
-            finally
+            
+            using (var writeOrPostpone = WriteLockOrPostpone())
             {
-                lockSlim.ExitWriteLock();
+                if (writeOrPostpone.WasPostponed)
+                    _postponedActions.Enqueue(new PostponedAction(){Type=PostponedAction.ActionType.Remove, Item =item});
+                else
+                    RemoveInternal(item);
             }
 
+            return true;
+        }
+
+        private bool RemoveInternal(T item)
+        {
+            // Control entfernen
+            int index = _items.IndexOf(item);
+
+            // Event
+            OnRemove?.Invoke(item, index);
+
+            return _items.Remove(item);
         }
 
         public virtual void RemoveAt(int index)
         {
-            lockSlim.EnterWriteLock();
-
-            try
+            if (index < 0 && index >= _items.Count)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            using (var writeOrPostpone = WriteLockOrPostpone())
             {
-                if (index < 0 && index >= Items.Count)
-                    throw new ArgumentOutOfRangeException(nameof(index));
-
-                // Control entfernen
-                T c = Items[index];
-
-                // Event werfen
-                OnRemove?.Invoke(c, index);
-
-                Items.RemoveAt(index);
-            }
-            finally
-            {
-                lockSlim.ExitWriteLock();
+                if (writeOrPostpone.WasPostponed)
+                    _postponedActions.Enqueue(new PostponedAction(){Type=PostponedAction.ActionType.RemoveAt, Index = index});
+                else
+                    RemoveAtInternal(index);
             }
 
+        }
+
+        private void RemoveAtInternal(int index)
+        {
+            // Control entfernen
+            T c = _items[index];
+
+            // Event werfen
+            OnRemove?.Invoke(c, index);
+
+            _items.RemoveAt(index);
         }
 
         public event ItemCollectionDelegate<T> OnInsert;
         public event ItemCollectionIndexedDelegate<T> OnInserted;
 
         public event ItemCollectionIndexedDelegate<T> OnRemove;
-
-        struct LockedEnumerator : IEnumerator<T>
-        {
-            private readonly ItemCollection<T> collection;
-            private T current;
-            private int index;
-            public LockedEnumerator(ItemCollection<T> collection)
-            {
-                this.collection = collection;
-                index = -1;
-                current = default;
-                collection.lockSlim.EnterReadLock();
-            }
-            public T Current => current;
-
-            object IEnumerator.Current => current;
-
-            public void Dispose()
-            {
-                collection.lockSlim.ExitReadLock();
-            }
-
-            public bool MoveNext()
-            {
-                index++;
-                if (index < collection.Count)
-                {
-                    current = collection[index];
-                    return true;
-                }
-                current = default;
-                return false;
-            }
-
-            public void Reset()
-            {
-                index = 0;
-            }
-        }
 
         /// <summary>
         /// A locking enumerator for the <see cref="ItemCollection{T}"/> class.
@@ -269,6 +329,7 @@ namespace engenious.UI
         {
             private readonly ItemCollection<T> _collection;
             private List<T>.Enumerator _enumerator;
+            private ReadLockWrapper _readLock;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Enumerator"/> struct used to lock the collection while enumerating.
@@ -277,8 +338,8 @@ namespace engenious.UI
             public Enumerator(ItemCollection<T> collection)
             {
                 _collection = collection;
-                _collection.lockSlim.EnterWriteLock();
-                _enumerator = collection.Items.GetEnumerator();
+                _readLock = _collection.ReadLock();
+                _enumerator = collection._items.GetEnumerator();
             }
 
             /// <inheritdoc />
@@ -295,7 +356,7 @@ namespace engenious.UI
             public void Dispose()
             {
                 _enumerator.Dispose();
-                _collection.lockSlim.ExitWriteLock();
+                _readLock.Dispose();
             }
         }
 
@@ -320,16 +381,18 @@ namespace engenious.UI
 
         public void Sort(IComparer<T> comparer)
         {
-            lockSlim.EnterWriteLock();
-            try
+            using (var writeOrPostpone = WriteLockOrPostpone())
             {
-                Items.Sort(comparer);
+                if (writeOrPostpone.WasPostponed)
+                    _postponedActions.Enqueue(new PostponedAction() {Type = PostponedAction.ActionType.Sort,Comparer = comparer});
+                else
+                    SortInternal(comparer);
             }
-            finally
-            {
+        }
 
-                lockSlim.ExitWriteLock();
-            }
+        private void SortInternal(IComparer<T> comparer)
+        {
+            _items.Sort(comparer);
         }
     }
 

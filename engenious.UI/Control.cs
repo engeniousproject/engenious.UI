@@ -891,7 +891,7 @@ namespace engenious.UI
             Point client = GetMaxClientSize(available);
 
             // Restliche Controls
-            foreach (var child in Children.Items)
+            foreach (var child in Children)
             {
                 Point size = child.GetExpectedSize(client);
                 result = new Point(Math.Max(result.X, size.X), Math.Max(result.Y, size.Y));
@@ -975,7 +975,7 @@ namespace engenious.UI
             SetDimension(minSize, available);
 
             // Auf andere Controls anwenden
-            foreach (var child in Children.Items)
+            foreach (var child in Children)
                 child.SetActualSize(ActualClientSize);
         }
 
@@ -1030,7 +1030,7 @@ namespace engenious.UI
         public bool HasInvalidDimensions()
         {
             bool result = invalidDimensions;
-            foreach (var child in Children.Items)
+            foreach (var child in Children)
                 result |= child.HasInvalidDimensions();
             return result;
         }
