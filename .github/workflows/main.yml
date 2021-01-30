@@ -18,10 +18,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Setup .NET Core
+    - name: Setup .NET 5
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.x
+        dotnet-version: 5.0.x
     - name: Install FFMPEG (Windows)
       run: .\prebuild.ps1
       shell: pwsh
