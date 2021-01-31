@@ -186,7 +186,7 @@ namespace engenious.UI
         protected override void LoadContent()
         {
             Skin.Pix = new Texture2D(GraphicsDevice, 1, 1);
-            Skin.Pix.SetData(new[] { Color.White });
+            Skin.Pix.SetData<Color>(stackalloc [] { Color.White });
 
             Skin.Current = new Skin(Content);
             batch = new SpriteBatch(GraphicsDevice);
