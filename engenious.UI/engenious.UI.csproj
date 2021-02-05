@@ -20,10 +20,10 @@
 	<ItemGroup>
         <None Remove="engenious.UI.nuget.props.template" />
         <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
-        <PackageReference Include="TextCopy" Version="4.2.0" />
+        <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-        <PackageReference Include="engenious" Version="0.5.0.29-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+        <PackageReference Include="engenious" Version="0.5.0.32-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
         <PackageReference Include="LitGit" Version="0.2.0.18-alpha" PrivateAssets="all" />
         <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
             <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
