@@ -8,7 +8,7 @@ namespace SampleClient
 {
     internal class CustomSkin : Skin
     {
-        public CustomSkin(ContentManager content) : base(content)
+        public CustomSkin(ContentManagerBase content) : base(content)
         {
             SoundEffect click = content.Load<SoundEffect>("click1");
             SoundEffect hover = content.Load<SoundEffect>("rollover5");

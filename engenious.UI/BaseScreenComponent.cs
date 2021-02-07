@@ -80,7 +80,7 @@ namespace engenious.UI
         /// <summary>
         /// Referenz zum MonoGame Content Manager.
         /// </summary>
-        public ContentManager Content { get; private set; }
+        public ContentManagerBase Content { get; private set; }
 
         /// <summary>
         /// Gibt an, ob gerade ein Drag-Vorgang im Gange ist.

@@ -23,7 +23,7 @@ namespace engenious.UI
 
         #endregion
 
-        public Skin(ContentManager content)
+        public Skin(ContentManagerBase content)
         {
             ControlSkins = new Dictionary<Type, Action<Control>>();
             StyleSkins = new Dictionary<string, Action<Control>>();
@@ -42,9 +42,9 @@ namespace engenious.UI
 
             try
             {
-                HeadlineFont = content.Load<SpriteFont>("Fonts/HeadlineFont");
-                TextFont = content.Load<SpriteFont>("Fonts/GameFont");
-                BoldFont = content.Load<SpriteFont>("Fonts/BoldFont");
+                HeadlineFont = content.Load<SpriteFont>("engenious.UI:///Fonts/HeadlineFont");
+                TextFont = content.Load<SpriteFont>("engenious.UI:///Fonts/GameFont");
+                BoldFont = content.Load<SpriteFont>("engenious.UI:///Fonts/BoldFont");
             }
             catch(Exception e)
             {

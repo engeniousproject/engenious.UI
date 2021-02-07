@@ -23,11 +23,19 @@
         <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-        <PackageReference Include="engenious" Version="0.5.0.32-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+        <PackageReference Include="engenious" Version="0.5.0.34-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
         <PackageReference Include="LitGit" Version="0.2.0.18-alpha" PrivateAssets="all" />
         <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
             <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
         </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Remove="Fonts\HeadlineFont.ego" />
+	  <EmbeddedResource Include="Fonts\HeadlineFont.ego" />
+	  <None Remove="Fonts\GameFont.ego" />
+	  <EmbeddedResource Include="Fonts\GameFont.ego" />
+	  <None Remove="Fonts\BoldFont.ego" />
+	  <EmbeddedResource Include="Fonts\BoldFont.ego" />
 	</ItemGroup>
 	<Import Project="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')" />
 <!--        -->
