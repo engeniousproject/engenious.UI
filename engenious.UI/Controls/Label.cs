@@ -8,11 +8,11 @@ using engenious.Graphics;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Standard Text-Anzeige Control.
+    /// Ui control for displaying text.
     /// </summary>
     public class Label : Control, ITextControl
     {
-        readonly struct TextLine
+        private readonly struct TextLine
         {
             public int Begin { get; }
             public int Length { get; }
@@ -27,86 +27,84 @@ namespace engenious.UI.Controls
 
         }
 
-        private List<TextLine> lines = new List<TextLine>();
+        private readonly List<TextLine> _lines = new();
 
-        private string text = string.Empty;
+        private string _text = string.Empty;
 
-        public event PropertyChangedDelegate<String> TextChanged;
-
-        private SpriteFont font = null;
-
-        private Color textColor = Color.Black;
-        private Color disabledTextColor = Color.LightGray;
-
-        private HorizontalAlignment horizontalTextAlignment = HorizontalAlignment.Center;
-
-        private VerticalAlignment verticalTextAlignment = VerticalAlignment.Center;
-
-        private bool wordWrap = false;
-        private bool lineWrap;
-        private readonly PropertyEventArgs<string> _textChangedEventArgs = new PropertyEventArgs<string>();
         /// <summary>
-        /// Gibt den enthaltenen Text an oder legt diesen fest.
+        /// Occurs when the <see cref="Text"/> got changed.
         /// </summary>
+        public event PropertyChangedDelegate<string> TextChanged;
+
+        private SpriteFont _font = null;
+
+        private Color _textColor = Color.Black;
+        private Color _disabledTextColor = Color.LightGray;
+
+        private HorizontalAlignment _horizontalTextAlignment = HorizontalAlignment.Center;
+
+        private VerticalAlignment _verticalTextAlignment = VerticalAlignment.Center;
+
+        private bool _wordWrap = false;
+        private bool _lineWrap;
+        private readonly PropertyEventArgs<string> _textChangedEventArgs = new PropertyEventArgs<string>();
+
+        /// <inheritdoc />
         public string Text
         {
-            get { return text ?? string.Empty; }
+            get => _text ?? string.Empty;
             set
             {
-                if (text == value) return;
+                if (_text == value) return;
 
-                _textChangedEventArgs.OldValue = text;
+                _textChangedEventArgs.OldValue = _text;
                 _textChangedEventArgs.NewValue = value;
                 _textChangedEventArgs.Handled = false;
                 TextChanged?.Invoke(this, _textChangedEventArgs);
-                text = value;
+                _text = value;
                 InvalidateDimensions();
             }
         }
 
-        /// <summary>
-        /// Gibt die Schriftart an mit der der Inhalt gezeichnet werden soll oder legt diese fest.
-        /// </summary>
+        /// <inheritdoc />
         public SpriteFont Font
         {
-            get { return font; }
+            get => _font;
             set
             {
-                if (font != value)
+                if (_font != value)
                 {
-                    font = value;
+                    _font = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Gibt die Textfarbe an mit der der Inhalt gezeichnet werden soll oder legt diese fest.
-        /// </summary>
+        /// <inheritdoc />
         public Color TextColor
         {
-            get { return textColor; }
+            get => _textColor;
             set
             {
-                if (textColor != value)
+                if (_textColor != value)
                 {
-                    textColor = value;
+                    _textColor = value;
                     InvalidateDrawing();
                 }
             }
         }
 
         /// <summary>
-        /// Gibt die Textfarbe an mit der der Inhalt gezeichnet werden soll, wenn <see cref="Control.Enabled"/> <see langword="false"/> ist, oder legt diese fest.
+        /// Gets or sets the color used to render the <see cref="Text"/> when the <see cref="Label"/> is disabled.
         /// </summary>
         public Color DisabledTextColor
         {
-            get => disabledTextColor;
+            get => _disabledTextColor;
             set
             {
-                if (disabledTextColor != value)
+                if (_disabledTextColor != value)
                 {
-                    disabledTextColor = value;
+                    _disabledTextColor = value;
 
                     // Only invalidate of its really needed
                     if (!Enabled)
@@ -115,89 +113,86 @@ namespace engenious.UI.Controls
             }
         }
 
-        /// <summary>
-        /// Gibt die Ausrichtung des Textes innerhalb des Controls auf horizontaler Ebene an.
-        /// </summary>
+        /// <inheritdoc />
         public HorizontalAlignment HorizontalTextAlignment
         {
-            get { return horizontalTextAlignment; }
+            get => _horizontalTextAlignment;
             set
             {
-                if (horizontalTextAlignment != value)
+                if (_horizontalTextAlignment != value)
                 {
-                    horizontalTextAlignment = value;
+                    _horizontalTextAlignment = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Gibt die Ausrichtung des Textes innerhalb des Controls auf vertikaler Ebene an.
-        /// </summary>
+        /// <inheritdoc />
         public VerticalAlignment VerticalTextAlignment
         {
-            get { return verticalTextAlignment; }
+            get => _verticalTextAlignment;
             set
             {
-                if (verticalTextAlignment != value)
+                if (_verticalTextAlignment != value)
                 {
-                    verticalTextAlignment = value;
+                    _verticalTextAlignment = value;
                     InvalidateDimensions();
                 }
             }
         }
-
-        /// <summary>
-        /// Gibt an, ob das Control automatisch den Text an geeigneter Stelle 
-        /// umbrechen soll, falls er nicht in eine Zeile passt.
-        /// </summary>
+        
+        /// <inheritdoc />
         public bool WordWrap
         {
-            get { return wordWrap; }
+            get => _wordWrap;
             set
             {
-                if (wordWrap != value)
+                if (_wordWrap != value)
                 {
-                    wordWrap = value;
+                    _wordWrap = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Gibt an, ob Zeilenumbrüche interpretiert werden sollen.
-        /// </summary>
+        /// <inheritdoc />
         public bool LineWrap
         {
-            get => lineWrap;
+            get => _lineWrap;
             set
             {
-                if (lineWrap != value)
+                if (_lineWrap != value)
                 {
-                    lineWrap = value;
+                    _lineWrap = value;
                     InvalidateDimensions();
                 }
             }
         }
-
-        public Label(BaseScreenComponent manager, string style = "") :
-            base(manager, style)
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Label"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Label(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
             ApplySkin(typeof(Label));
         }
 
+        /// <inheritdoc />
         protected override void OnDrawContent(SpriteBatch batch, Rectangle area, GameTime gameTime, float alpha)
         {
-            // Rahmenbedingungen fürs Rendern checken
+            // check necessary constraints for rendering
             if (Font == null) return;
             var color = Enabled ? TextColor : DisabledTextColor;
 
             Vector2 offset = new Vector2(area.X, area.Y);
 
-            if (WordWrap || lineWrap)
+            if (WordWrap || _lineWrap)
             {
                 int totalHeight = 0;
-                foreach (var line in lines)
+                foreach (var line in _lines)
                 {
                     totalHeight += (int)line.Size.Y;
                 }
@@ -214,7 +209,7 @@ namespace engenious.UI.Controls
                         break;
                 }
 
-                foreach (var line in lines)
+                foreach (var line in _lines)
                 {
                     switch (HorizontalTextAlignment)
                     {
@@ -241,7 +236,8 @@ namespace engenious.UI.Controls
             }
         }
 
-        public override Point CalculcateRequiredClientSpace(Point available)
+        /// <inheritdoc />
+        public override Point CalculateRequiredClientSpace(Point available)
         {
             if (Font == null) return Point.Zero;
 
@@ -250,9 +246,9 @@ namespace engenious.UI.Controls
             int width = 0;
             int height = 0;
 
-            if (WordWrap || lineWrap)
+            if (WordWrap || _lineWrap)
             {
-                foreach (var line in lines)
+                foreach (var line in _lines)
                 {
                     width = Math.Max((int)line.Size.X, width);
                     height += (int)line.Size.Y;
@@ -273,43 +269,18 @@ namespace engenious.UI.Controls
             return new Point(Math.Min(available.X, width), Math.Min(available.Y, height));
         }
 
-        public static void DoStuff(string asdf)
-        {
-            int wordStart = 0, lineStart = 0;
-            for (int i = 0; i < asdf.Length; i++)
-            {
-                bool isNewLine = asdf[i] == '\n';
-                bool isSpace = asdf[i] == ' ';
-                bool isWhitespace = isNewLine || isSpace;
-
-                if (isWhitespace)
-                    Console.WriteLine($"word: {asdf.Substring(wordStart, i - wordStart)}");
-                if (isNewLine)
-                    Console.WriteLine($"line: {asdf.Substring(lineStart, i - lineStart)}");
-
-                if (isWhitespace)
-                    wordStart = i + 1;
-                if (isNewLine)
-                    lineStart = i + 1;
-            }
-            if (wordStart < asdf.Length)
-                Console.WriteLine($"word: {asdf.Substring(wordStart, asdf.Length - wordStart)}");
-            if (lineStart < asdf.Length)
-                Console.WriteLine($"line: {asdf.Substring(lineStart, asdf.Length - lineStart)}");
-        }
-
         private void AnalyzeText(Point available)
         {
-            lines.Clear();
+            _lines.Clear();
             if (Font == null) return;
 
             if (string.IsNullOrEmpty(Text))
                 return;
 
 
-            if (wordWrap)
+            if (_wordWrap)
                 WrapWordsAndLines(available);
-            else if (lineWrap)
+            else if (_lineWrap)
             {
                 int iBefore = 0;
                 while (iBefore < Text.Length)
@@ -321,7 +292,7 @@ namespace engenious.UI.Controls
                     if (i > 0)
                     {
                         var size = Font.MeasureString(Text, iBefore, i - iBefore);
-                        lines.Add(new TextLine(iBefore, i - iBefore, new Vector2(size.X, size.Y)));
+                        _lines.Add(new TextLine(iBefore, i - iBefore, new Vector2(size.X, size.Y)));
                         iBefore = i + 1;
                     }
                 }
@@ -332,8 +303,7 @@ namespace engenious.UI.Controls
         private void WrapWordsAndLines(Point available)
         {
             int iBefore = 0;
-            bool doBeak = false;
-            while (!doBeak)
+            do
             {
                 int i = Text.IndexOf('\n', iBefore);
 
@@ -346,39 +316,45 @@ namespace engenious.UI.Controls
                     if (index < 0)
                     {
                         var word = Font.MeasureString(Text, iBefore, forUntil - iBefore);
-                        var res = FitAndAddLine(iBeforeCopy, forUntil - iBeforeCopy, sizeSinceBegin, word, available.X, true);
+                        var res = FitAndAddLine(iBeforeCopy, forUntil - iBeforeCopy, sizeSinceBegin, word, available.X,
+                            true);
                         if (res != default)
                         {
-                            FitAndAddLine(iBeforeCopy, forUntil - iBeforeCopy - (forUntil - iBefore), sizeSinceBegin, default, available.X, true);
+                            FitAndAddLine(iBeforeCopy, forUntil - iBeforeCopy - (forUntil - iBefore), sizeSinceBegin,
+                                default, available.X, true);
                             FitAndAddLine(iBefore, forUntil - iBefore, default, word, available.X, true);
                         }
+
                         iBefore = forUntil + 1;
                         break;
                     }
 
                     var wordSize = Font.MeasureString(Text, iBefore, index + 1 - iBefore);
-                    var newLineMade = FitAndAddLine(iBeforeCopy, index - iBeforeCopy, sizeSinceBegin, wordSize, available.X);
+                    var newLineMade = FitAndAddLine(iBeforeCopy, index - iBeforeCopy, sizeSinceBegin, wordSize,
+                        available.X);
                     if (newLineMade == default)
                     {
-                        FitAndAddLine(iBeforeCopy, iBefore - iBeforeCopy, sizeSinceBegin, newLineMade, available.X, true);
+                        FitAndAddLine(iBeforeCopy, iBefore - iBeforeCopy, sizeSinceBegin, newLineMade, available.X,
+                            true);
                         sizeSinceBegin = wordSize;
                         iBeforeCopy = iBefore;
                     }
                     else
                         sizeSinceBegin = newLineMade;
+
                     iBefore = index + 1;
                 }
 
                 if (i < 0)
                     break;
-            }
+            } while (true);
         }
 
         private Vector2 FitAndAddLine(int begin, int length, Vector2 lineSize, Vector2 current, float availableWidth, bool newLineWhenFitting = false)
         {
             if (newLineWhenFitting && lineSize.X + current.X <= availableWidth)
             {
-                lines.Add(new TextLine(begin, length, new Vector2(lineSize.X + current.X, Math.Max(lineSize.Y, current.Y))));
+                _lines.Add(new TextLine(begin, length, new Vector2(lineSize.X + current.X, Math.Max(lineSize.Y, current.Y))));
                 return new Vector2();
             }
             else if (!newLineWhenFitting && lineSize.X + current.X > availableWidth)
@@ -387,6 +363,7 @@ namespace engenious.UI.Controls
                 return new Vector2(lineSize.X + current.X, Math.Max(lineSize.Y, current.Y));
         }
     }
+
 
     //TODO: Implement with span in core or net 5
     //private void AnalyzeText(Point available)

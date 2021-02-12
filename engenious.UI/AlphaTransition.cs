@@ -3,57 +3,50 @@
 namespace engenious.UI
 {
     /// <summary>
-    /// Transition zur Veränderung der Transparenz eines Steuerelements.
+    /// Transition for alpha fading of controls.
     /// </summary>
     public sealed class AlphaTransition : Transition
     {
-        private float from;
-        private float to;
+        private readonly float _from;
+        private readonly float _to;
 
         /// <summary>
-        /// Erzeugt eine neue AlphaTransition für das angegebene Control.
+        /// Initializes a new instance of the <see cref="AlphaTransition"/> class.
         /// </summary>
-        /// <param name="control">Zielcontrol.</param>
-        /// <param name="curve">Bewegungskurve.</param>
-        /// <param name="duration">Animationslänge.</param>
-        /// <param name="to">Zieltransparenz des Controls.</param>
-        public AlphaTransition(Control control, Func<float, float> curve, TimeSpan duration, float to)
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <param name="curve">The transition curve.</param>
+        /// <param name="duration">The time duration of the transition.</param>
+        /// <param name="to">The desired transparency value at the end of the transition.</param>
+        public AlphaTransition(Control control, TransitionCurveDelegate curve, TimeSpan duration, float to)
             : this(control, curve, duration, TimeSpan.Zero, to) { }
 
         /// <summary>
-        /// Erzeugt eine neue AlphaTransition für das angegebene Control.
+        /// Initializes a new instance of the <see cref="AlphaTransition"/> class.
         /// </summary>
-        /// <param name="control">Zielcontrol.</param>
-        /// <param name="curve">Bewegungskurve.</param>
-        /// <param name="duration">Animationslänge.</param>
-        /// <param name="delay">Wartezeit bis zum Start der Animation.</param>
-        /// <param name="to">Zieltransparenz des Controls.</param>
-        public AlphaTransition(Control control, Func<float, float> curve, TimeSpan duration, TimeSpan delay, float to) 
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <param name="curve">The transition curve.</param>
+        /// <param name="duration">The time duration of the transition.</param>
+        /// <param name="delay">The time delay to wait before starting the transition.</param>
+        /// <param name="to">The desired transparency value at the end of the transition.</param>
+        public AlphaTransition(Control control, TransitionCurveDelegate curve, TimeSpan duration, TimeSpan delay, float to) 
             : base(control, curve, duration, delay)
         {
-            from = control.Alpha;
-            this.to = to;
+            _from = control.Alpha;
+            _to = to;
         }
 
-        /// <summary>
-        /// Wendet die Transition auf das Steuerelement an.
-        /// </summary>
-        /// <param name="control">Zielcontrol der Transition.</param>
-        /// <param name="position">Wert im zeitlichen Ablauf der Transition.</param>
+
+        /// <inheritdoc />
         protected override void ApplyValue(Control control, float position)
         {
-            float value = (to - from) * position;
-            control.Alpha = from + value;
+            float value = (_to - _from) * position;
+            control.Alpha = _from + value;
         }
 
-        /// <summary>
-        /// Fertigt eine Kopie dieser Transition an, ersetzt aber das Zielcontrol.
-        /// </summary>
-        /// <param name="control">Das neue Zielcontrol.</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override Transition Clone(Control control)
         {
-            return new AlphaTransition(control, Curve, Duration, Delay, to);
+            return new AlphaTransition(control, Curve, Duration, Delay, _to);
         }
     }
 }

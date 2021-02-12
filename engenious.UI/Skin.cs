@@ -7,22 +7,30 @@ using engenious.UI.Interfaces;
 
 namespace engenious.UI
 {
+    /// <summary>
+    /// Class used for setting ui elements default properties.
+    /// </summary>
     public class Skin
     {
         #region Singleton
 
         /// <summary>
-        /// Basis-Pixel
+        /// Gets a simple <see cref="Color.White"/> pixel used for drawing plain colored regions.
         /// </summary>
         public static Texture2D Pix { get; internal set; }
 
         /// <summary>
-        /// Aktueller Skin
+        /// Gets or sets the current <see cref="Skin"/>.
         /// </summary>
         public static Skin Current { get; set; }
 
         #endregion
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Skin"/> class.
+        /// </summary>
+        /// <param name="content">The content manager used to load fonts and other dependencies for this skin.</param>
+        /// <exception cref="Exception">Thrown when the needed content could not be loaded.</exception>
         public Skin(ContentManagerBase content)
         {
             ControlSkins = new Dictionary<Type, Action<Control>>();
@@ -33,8 +41,6 @@ namespace engenious.UI
             ScrollerMinSize = 10;
 
             BackgroundColor = new Color(20, 147, 73);
-            LogoColorOrange = new Color(241, 145, 11);
-            LogoColorRed = new Color(225, 7, 22);
 
             TextColorBlack = new Color(0, 0, 0);
             TextColorGray = new Color(86, 86, 86);
@@ -73,7 +79,7 @@ namespace engenious.UI
             SelectedItemBrush = new BorderBrush(Color.Red);
 
             // =============
-            // Skin-Methoden
+            // Skin methods
             // =============
 
             // Control
@@ -210,22 +216,28 @@ namespace engenious.UI
                 tabControl.TabPageBackground = new BorderBrush(Color.Gray);
                 tabControl.TabSpacing = 1;
             });
+            
+            ControlSkins.Add(typeof(Panel), (c) =>
+            {
+                Panel panel = c as Panel;
+                panel.Background = PanelBrush;
+            });
         }
 
         #region Basic Values
 
         /// <summary>
-        /// Gibt die Standard-Breite für den Splitter innerhalb eines Split-Containers an.
+        /// Gets or sets the default width of splitters in a <see cref="Splitter"/> control.
         /// </summary>
         public int SplitterWidth { get; set; }
 
         /// <summary>
-        /// Gibt die Standard-Breite einer Scrollbar an.
+        /// Gets or sets the default width of scroll bars.
         /// </summary>
         public int ScrollbarWidth { get; set; }
 
         /// <summary>
-        /// Gibt die mindestgröße des greifbaren Scrollers innerhalb einer Scrollbar an.
+        /// Gets or sets the default minimum scrollbar knob size.
         /// </summary>
         public int ScrollerMinSize { get; set; }
 
@@ -233,26 +245,43 @@ namespace engenious.UI
 
         #region Basic Colors
 
-        public Color LogoColorOrange { get; set; }
-
-        public Color LogoColorRed { get; set; }
-
+        /// <summary>
+        /// Gets or sets the default background color.
+        /// </summary>
         public Color BackgroundColor { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default black text color.
+        /// </summary>
         public Color TextColorBlack { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default gray text color.
+        /// </summary>
         public Color TextColorGray { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default white text color.
+        /// </summary>
         public Color TextColorWhite { get; set; }
 
         #endregion
 
         #region Fonts
 
+        /// <summary>
+        /// Gets or sets the default <see cref="SpriteFont"/> used for rendering headlines.
+        /// </summary>
         public SpriteFont HeadlineFont { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default <see cref="SpriteFont"/> used for rendering normal text.
+        /// </summary>
         public SpriteFont TextFont { get; set; }
 
+        /// <summary>
+        /// Gets or sets the default <see cref="SpriteFont"/> used for rendering bold text.
+        /// </summary>
         public SpriteFont BoldFont { get; set; }
 
         #endregion
@@ -263,88 +292,91 @@ namespace engenious.UI
 
         #region Brushes
 
+        /// <summary>
+        /// Gets or sets the default background <see cref="Brush"/> for <see cref="Panel"/> controls.
+        /// </summary>
         public Brush PanelBrush { get; set; }
 
         /// <summary>
-        /// Default Hintergrund für Buttons.
+        /// Gets or sets the default background <see cref="Brush"/> for <see cref="Button"/> controls.
         /// </summary>
         public Brush ButtonBrush { get; set; }
 
         /// <summary>
-        /// Hintergrund für Buttons im Hover-State.
+        /// Gets or sets the default hover background <see cref="Brush"/> for <see cref="Button"/> controls.
         /// </summary>
         public Brush ButtonHoverBrush { get; set; }
 
         /// <summary>
-        /// Hintergrund für Buttons die aktuell gedrückt sind.
+        /// Gets or sets the default pressed background <see cref="Brush"/> for <see cref="Button"/> controls.
         /// </summary>
         public Brush ButtonPressedBrush { get; set; }
 
         /// <summary>
-        /// Hintergrund für Buttons die aktuell deaktiviert sind.
+        /// Gets or sets the default disabled background <see cref="Brush"/> for <see cref="Button"/> controls.
         /// </summary>
         public Brush ButtonDisabledBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Brush zum Zeichnen eines vertikalen Scrollbar-Hintergrunds.
+        /// Gets or sets the default background <see cref="Brush"/> for vertical scroll bars.
         /// </summary>
         public Brush VerticalScrollBackgroundBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Brush zum Zeichnen eines horizontalen Scrollbar-Hintergrunds.
+        /// Gets or sets the default background <see cref="Brush"/> for horizontal scroll bars.
         /// </summary>
         public Brush HorizontalScrollBackgroundBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Brush zum Zeichnen des Scrollbar-Blocks innerhalb einer vertikalen Scrollbar.
+        /// Gets or sets the default knob <see cref="Brush"/> for vertical scroll bars.
         /// </summary>
         public Brush VerticalScrollKnobBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Brush zum Zeichnen des Scrollbar-Blocks innerhalb einer horizontalen Scrollbar.
+        /// Gets or sets the default knob <see cref="Brush"/> for horizontal scroll bars.
         /// </summary>
         public Brush HorizontalScrollKnobBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Brush zum Zeichnen eines horizontalen Splitters.
+        /// Gets or sets the default background <see cref="Brush"/> for horizontal <see cref="Splitter"/> controls.
         /// </summary>
         public Brush HorizontalSplitterBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Brush zum Zeichnen eines vertikalen Splitters.
+        /// Gets or sets the default background <see cref="Brush"/> for vertical <see cref="Splitter"/> controls.
         /// </summary>
         public Brush VerticalSplitterBrush { get; set; }
 
         /// <summary>
-        /// Definiert den Standard-Brush zur Markierung des fokusierten Controls.
+        /// Gets or sets the default <see cref="Brush"/> for for the focus frame of controls.
         /// </summary>
         public Brush FocusFrameBrush { get; set; }
 
         /// <summary>
-        /// Standard-Brush für selektierte Elemente innerhalb von Listboxen.
+        /// Gets or sets the default <see cref="Brush"/> for selected items in list controls.
         /// </summary>
         public Brush SelectedItemBrush { get; set; }
 
         /// <summary>
-        /// Standard-Brush für die Progress-Bar
+        /// Gets or sets the default <see cref="Brush"/> for progress in a <see cref="ProgressBar"/>.
         /// </summary>
         public Brush ProgressBarBrush { get; set; }
 
         /// <summary>
-        /// Background-Brush for Textbox
+        /// Gets or sets the default background <see cref="Brush"/> for <see cref="Textbox"/> controls.
         /// </summary>
         public Brush TextboxBackgroundBrush { get; set; }
 
         #endregion
 
         /// <summary>
-        /// Dictionary für das Skinning gezielter Control-Types
+        /// Gets a dictionary containing delegates that apply a skin to a control of a specific type.
         /// </summary>
-        public Dictionary<Type, Action<Control>> ControlSkins { get; set; }
+        public Dictionary<Type, Action<Control>> ControlSkins { get; }
 
         /// <summary>
-        /// Dictionary für das Skinning gezielter Style-Klassen.
+        /// Gets a dictionary containing delegates that apply a skin to a control of a specific style.
         /// </summary>
-        public Dictionary<string, Action<Control>> StyleSkins { get; set; }
+        public Dictionary<string, Action<Control>> StyleSkins { get; }
     }
 }

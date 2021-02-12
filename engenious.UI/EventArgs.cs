@@ -1,449 +1,311 @@
-﻿using System.Collections.Generic;
-using engenious.Graphics;
+﻿using engenious.Graphics;
 using engenious.Input;
 using engenious.UI.Controls;
 
 namespace engenious.UI
 {
-    internal abstract class EventArgsPool<T> where T : EventArgs,new()
-    {
-
-        private readonly Stack<T> _freeList = new Stack<T>(16);
-        private readonly object _lockObj = new object();
-
-        public T Take()
-        {
-            if (_freeList.Count <= 0) return new T();
-            lock (_lockObj)
-            {
-                if (_freeList.Count > 0)
-                {
-                    return _freeList.Pop();
-                }
-            }
-
-            return new T();
-        }
-
-        public void Release(T arr)
-        {
-            if (arr == null) return;
-            ResetVariable(arr);
-
-            lock (_lockObj)
-            {
-                _freeList.Push(arr);
-            }
-        }
-
-        protected abstract void ResetVariable(T arr);
-    }
-
     /// <summary>
-    /// Basisklasse für alle Arten von Event Args innerhalb des UI Frameworks
+    /// Base class for all event data of UI events.
     /// </summary>
     public class EventArgs
     {
         /// <summary>
-        /// Gibt an ob das Event bereits verarbeitet wurde oder legt dies fest.
+        /// Gets or sets a value indicating whether the event was already handled.
         /// </summary>
         public bool Handled { get; set; }
     }
-    internal class EventArgsPool : EventArgsPool<EventArgs>
-    {
-        private static EventArgsPool _instance;
-        public static EventArgsPool Instance
-        {
-            get {return _instance = _instance ?? new EventArgsPool(); }
-        }
-        protected override void ResetVariable(EventArgs arr)
-        {
-            arr.Handled = false;
-        }
-    }
 
     /// <summary>
-    /// Basisklasse für alle DragDrop Events
+    /// Event data for DragDrop events
     /// </summary>
     public class DragEventArgs : PointerEventArgs
     {
         /// <summary>
-        /// Optionales Feld um das sendende Control einzufügen.
+        /// Gets or sets the control which raised the event containing the event data.
         /// </summary>
         public Control Sender { get; set; }
 
         /// <summary>
-        /// Optionales Icon, das während des Drag-Vorgangs angezeigt werden soll.
+        /// Gets or sets a optional <see cref="Texture2D"/> containing the texture that should be rendered while dragging.
         /// </summary>
         public Texture2D Icon { get; set; }
 
         /// <summary>
-        /// Angabe der Größe des Icons, das beim Drag-Vorgang angezeigt wird.
+        /// Gets or sets the size of the <see cref="Icon"/> to show while dragging.
         /// </summary>
         public Point IconSize { get; set; }
 
         /// <summary>
-        /// Content, der gedraggt wird.
+        /// Gets or sets the content that is dragged.
         /// </summary>
         public object Content { get; set; }
     }
-    internal class DragEventArgsPool : EventArgsPool<DragEventArgs>
-    {
-        private static DragEventArgsPool _instance;
-        public static DragEventArgsPool Instance
-        {
-            get {return _instance = _instance ?? new DragEventArgsPool(); }
-        }
-        protected override void ResetVariable(DragEventArgs arr)
-        {
-            arr.Handled = false;
-            arr.Sender = null;
-            arr.Icon = null;
-            arr.IconSize = Point.Zero;
-            arr.Content = null;
-        }
-    }
+
     /// <summary>
-    /// Basisklasse für alle Positionsbasierten Events (Maus, Touch)
+    /// Base class for position based events (Mouse, Touch)
     /// </summary>
     public abstract class PointerEventArgs : EventArgs
     {
         /// <summary>
-        /// Gibt an, ob das Event 
+        /// Gets or sets a value indicating whether the event bubbled up from a child control.
         /// </summary>
         public bool Bubbled { get; set; }
 
         /// <summary>
-        /// Position des Mauspointers bezogen auf den Ursprung des aktuellen Controls
+        /// Gets or sets the position of the mouse pointer relative to the current control.
         /// </summary>
         public Point LocalPosition { get; set; }
 
         /// <summary>
-        /// Position des Mauspointers in globaler Screen-Koordinate
+        /// Gets or sets the position of the mouse pointer in global screen-space.
         /// </summary>
         public Point GlobalPosition { get; set; }
     }
 
     /// <summary>
-    /// Standard Event Args bei Property Changed Events.
+    /// Event data for property changed events.
     /// </summary>
-    /// <typeparam name="T">Typ des Properties</typeparam>
+    /// <typeparam name="T">The type of the changed property.</typeparam>
     public class PropertyEventArgs<T> : EventArgs
     {
         /// <summary>
-        /// Der alte Wert der Property
+        /// Gets or sets the old value of the changed property.
         /// </summary>
         public T OldValue { get; set; }
 
         /// <summary>
-        /// Der neue Wert der Property
+        /// Gets or sets the new value of the changed property.
         /// </summary>
         public T NewValue { get; set; }
-
-        /// <summary>
-        /// Erzeugt eine neue Instaz der PropertyEventArgs-Klasse
-        /// </summary>
-        public PropertyEventArgs() { }
-
-        /// <summary>
-        /// Erzeugt eine neue Instaz der PropertyEventArgs-Klasse
-        /// </summary>
-        /// <param name="oldValue">Der alte Wert</param>
-        /// <param name="newValue">Der neue Wert</param>
-        public PropertyEventArgs(T oldValue, T newValue)
-        {
-            OldValue = oldValue;
-            NewValue = newValue;
-        }
     }
-
-
-    internal class MouseEventArgsPool : EventArgsPool<MouseEventArgs>
-    {
-        private static MouseEventArgsPool _instance;
-        public static MouseEventArgsPool Instance
-        {
-            get {return _instance = _instance ?? new MouseEventArgsPool(); }
-        }
-        protected override void ResetVariable(MouseEventArgs arr)
-        {
-            arr.Handled = false;
-            arr.MouseMode = MouseMode.Captured;
-            arr.Bubbled = false;
-            arr.GlobalPosition = Point.Zero;
-            arr.LocalPosition = Point.Zero;
-        }
-    }
+    
     /// <summary>
-    /// Event Arguments für alle Mouse Events.
+    /// Event data for mouse events.
     /// </summary>
     public class MouseEventArgs : PointerEventArgs
     {
         /// <summary>
-        /// Gibt den aktuellen Modus der Maus an.
+        /// Gets or sets the current <see cref="UI.MouseMode"/> of the mouse.
         /// </summary>
         public MouseMode MouseMode { get; set; }
-
-        /// <summary>
-        /// Erzeugt eine neue Instanz der MouseEventArgs-Klasse
-        /// </summary>
-        public MouseEventArgs() { }
-
-        /// <summary>
-        /// Erzeugt eine neue Instanz der MouseEventArgs-Klasse
-        /// </summary>
-        /// <param name="mouseMode">Der aktuelle Modus der Maus</param>
-        /// <param name="localPosition">Position des Mauspointers bezogen auf den Ursprung des aktuellen Controls</param>
-        /// <param name="globalPosition">Position des Mauspointers in globaler Screen-Koordinate</param>
-        public MouseEventArgs(MouseMode mouseMode, Point localPosition, Point globalPosition)
-        {
-            MouseMode = mouseMode;
-            LocalPosition = localPosition;
-            GlobalPosition = globalPosition;
-        }
     }
 
     /// <summary>
-    /// Event Arguments für Maus Scroll Events
+    /// Event data for mouse scroll events.
     /// </summary>
     public class MouseScrollEventArgs : MouseEventArgs
     {
         /// <summary>
-        /// Gibt die  Anzahl der gescrollte Einheiten an.
+        /// Gets or sets a value indicating the number of steps that where scrolled.
         /// </summary>
         public int Steps { get; set; }
-
-        /// <summary>
-        /// Erzeugt eine neue Instanz der MouseScrollEventArgs-Klasse.
-        /// </summary>
-        public MouseScrollEventArgs() { }
-
-        /// <summary>
-        /// Erzeugt eine neue Instanz der MouseScrollEventArgs-Klasse.
-        /// </summary>
-        /// <param name="steps">Anzahl der gescrollten Einheiten</param>
-        public MouseScrollEventArgs(int steps)
-        {
-            Steps = steps;
-        }
     }
 
     /// <summary>
-    /// Event Args für alle Touch-basierten Events.
+    /// Event data for touch events.
     /// </summary>
     public class TouchEventArgs : PointerEventArgs
     {
         /// <summary>
-        /// ID des Touch Points.
+        /// Gets or sets a value indicating the ID of the touch point.
         /// </summary>
         public int TouchId { get; set; }
     }
 
-    internal static class KeyEventArgsPool
-    {
-        private static readonly Stack<KeyEventArgs> FreeList = new Stack<KeyEventArgs>(16);
-        private static readonly object LockObj = new object();
-        
-        public static KeyEventArgs Take()
-        {
-            if (FreeList.Count > 0)
-            {
-                lock (LockObj)
-                {
-                    if (FreeList.Count > 0)
-                    {
-                        return FreeList.Pop();
-                    }
-                }
-                
-            }
-
-            return new KeyEventArgs();
-        }
-
-        public static void Release(KeyEventArgs arr)
-        {
-            arr.Key = Keys.Unknown;
-            arr.Alt = false;
-            arr.Shift = false;
-            arr.Ctrl = false;
-            arr.Handled = false;
-
-            lock (LockObj)
-            {
-                FreeList.Push(arr);
-            }
-        }
-    }
-
     /// <summary>
-    /// Event Arguemnts für Tastatur-Events.
+    /// Event data for key events.
     /// </summary>
     public class KeyEventArgs : EventArgs
     {
         /// <summary>
-        /// Gibt an ob eine der Shift-Tasten gedrückt wurde.
+        /// Gets or sets a value indicating whether a shift key is pressed.
         /// </summary>
         public bool Shift { get; set; }
 
         /// <summary>
-        /// Gibt an ob die Steuerungstaste gedrückt wurde.
+        /// Gets or sets a value indicating whether a control key is pressed.
         /// </summary>
         public bool Ctrl { get; set; }
 
         /// <summary>
-        /// Gibts an ob eine der Alt-Tasten gedrückt wurde.
+        /// Gets or sets a value indicating whether a alt key is pressed.
         /// </summary>
         public bool Alt { get; set; }
 
         /// <summary>
-        /// Gibt die Taste an, für die das Event gefeuert wurde.
+        /// Gets or sets the key that raised the event.
         /// </summary>
         public Keys Key { get; set; }
     }
 
     /// <summary>
-    /// Event Arguments für Text-Eingabe
+    /// Event data for text input events.
     /// </summary>
     public class KeyTextEventArgs : EventArgs
     {
         /// <summary>
-        /// Der eingegebene Buchstabe.
+        /// Gets or sets the typed character.
         /// </summary>
         public char Character { get; set; }
     }
 
     /// <summary>
-    /// Event Argumgents für Selektionsänderungen
+    /// Event data for selection change events.
     /// </summary>
     public class SelectionEventArgs<T> : EventArgs
     {
         /// <summary>
-        /// Das bisher selektiertes Item
+        /// Gets or sets the previously selected element.
         /// </summary>
         public T OldItem { get; set; }
 
         /// <summary>
-        /// Das neu selektierte Item
+        /// Gets or sets the newly selected element.
         /// </summary>
         public T NewItem { get; set; }
     }
 
     /// <summary>
-    /// Parameter für Collection-Events
+    /// Event data for collection change events.
     /// </summary>
     public class CollectionEventArgs : EventArgs
     {
         /// <summary>
-        /// Das betroffene Control
+        /// Gets or sets the control that was affected.
         /// </summary>
         public Control Control { get; set; }
 
         /// <summary>
-        /// Der betroffene Index
+        /// Gets or sets the index of the element that was affected.
         /// </summary>
         public int Index { get; set; }
     }
 
     /// <summary>
-    /// Parameter für Screen-Navigationsevents
+    /// Event data for navigation events.
     /// </summary>
     public class NavigationEventArgs : EventArgs
     {
         /// <summary>
-        /// Soll die Navigation an dieser Stelle abgebrochen werden?
+        /// Gets or sets a value indicating whether the navigation should be canceled.
         /// </summary>
         public bool Cancel { get; set; }
 
         /// <summary>
-        /// Übergabe-Parameter aus dem anderen Screen.
+        /// Gets or sets the parameter given by the previous screen.
         /// </summary>
         public object Parameter { get; set; }
 
         /// <summary>
-        /// Gibt den zweiten an der Navigation beteiligten Screen hat.
+        /// Gets or sets the secondary <see cref="UI.Controls.Screen"/> that takes part in the navigation.
         /// </summary>
         public Screen Screen { get; set; }
 
         /// <summary>
-        /// Gibt an ob es sich dabei um eine Back-Navigation handelt oder nicht.
+        /// Gets or sets a value indicating whether it is a navigation backwards.
         /// </summary>
         public bool IsBackNavigation { get; set; }
     }
 
     /// <summary>
-    /// Standard Event-Delegate ohne größeren Parameter.
+    /// Represents the method that will handle generic events without additional parameters.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args"></param>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void EventDelegate(Control sender, EventArgs args);
 
     /// <summary>
-    /// Event-Delegat für Drag-Events
+    /// Represents the method that will handle drag events for the <see cref="BaseScreenComponent"/>.
     /// </summary>
-    /// <param name="args"></param>
-    public delegate void DragEventDelegate(DragEventArgs args);
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
+    public delegate void DragEventDelegate(Control sender, DragEventArgs args);
 
     /// <summary>
-    /// Event Delegat für Maus-Events.
+    /// Represents the method that will handle drag events for the <see cref="BaseScreenComponent"/>.
     /// </summary>
-    /// <param name="sender">Aufrufendes Control</param>
-    /// <param name="args">Eventargumente</param>
+    /// <param name="args">The event data for the event.</param>
+    public delegate void DragEventBaseDelegate(DragEventArgs args);
+
+    /// <summary>
+    /// Represents the method that will handle mouse events.
+    /// </summary>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void MouseEventDelegate(Control sender, MouseEventArgs args);
 
     /// <summary>
-    /// Event Delegat für Mouse-Events
+    /// Represents the method that will handle mouse events for the <see cref="BaseScreenComponent"/>.
     /// </summary>
-    /// <param name="args"></param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void MouseEventBaseDelegate(MouseEventArgs args);
 
     /// <summary>
-    /// Event-Delegat für Maus-Scroll-Events.
+    /// Represents the method that will handle mouse scroll events.
     /// </summary>
-    /// <param name="sender">Aufrufendes Control</param>
-    /// <param name="args">Eventargumente</param>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void MouseScrollEventDelegate(Control sender, MouseScrollEventArgs args);
 
+    /// <summary>
+    /// Represents the method that will handle mouse scroll events for the <see cref="BaseScreenComponent"/>.
+    /// </summary>
+    /// <param name="args">The event data for the event.</param>
     public delegate void MouseScrollEventBaseDelegate(MouseScrollEventArgs args);
 
-    public delegate void TouchEventDelegate(Control control, TouchEventArgs args);
+    /// <summary>
+    /// Represents the method that will handle touch events.
+    /// </summary>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
+    public delegate void TouchEventDelegate(Control sender, TouchEventArgs args);
 
+    /// <summary>
+    /// Represents the method that will handle touch events for the <see cref="BaseScreenComponent"/>.
+    /// </summary>
+    /// <param name="args">The event data for the event.</param>
     public delegate void TouchEventBaseDelegate(TouchEventArgs args);
 
     /// <summary>
-    /// Event Delegat für Keyboard-Events.
+    /// Represents the method that will handle key events.
     /// </summary>
-    /// <param name="sender">Aufrufendes Control</param>
-    /// <param name="args">Eventargumente</param>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void KeyEventDelegate(Control sender, KeyEventArgs args);
 
     /// <summary>
-    /// Event Delegat für KeyDown im ScreenManager
+    /// Represents the method that will handle key events for the <see cref="BaseScreenComponent"/>.
     /// </summary>
-    /// <param name="args">Eventargumente</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void KeyEventBaseDelegate(KeyEventArgs args);
 
     /// <summary>
-    /// Event Delegat für Texteingabe-Events
+    /// Represents the method that will handle text input events.
     /// </summary>
-    /// <param name="sender">Aufrufendes Control</param>
-    /// <param name="args">Eventargumente</param>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void KeyTextEventDelegate(Control sender, KeyTextEventArgs args);
 
     /// <summary>
-    /// Delegat für Events rum um Selektionsänderungen
+    /// Represents the method that will handle selection changed events.
     /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="args">Eventargumente</param>
+    /// <typeparam name="T">The type of the items in the collection.</typeparam>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void SelectionDelegate<T>(Control sender, SelectionEventArgs<T> args);
 
+    /// <summary>
+    /// Represents the method that will handle collection changed events.
+    /// </summary>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void CollectionDelegate(Control sender, CollectionEventArgs args);
 
     /// <summary>
-    /// Event Delegat für PropertyChanged-Events
+    /// Represents the method that will handle property changed events.
     /// </summary>
-    /// <typeparam name="T">Typ der Property</typeparam>
-    /// <param name="sender">Aufrufendes Control</param>
-    /// <param name="args">Eventargumente</param>
+    /// <typeparam name="T">The type of the changed property.</typeparam>
+    /// <param name="sender">The control that raised the event.</param>
+    /// <param name="args">The event data for the event.</param>
     public delegate void PropertyChangedDelegate<T>(Control sender, PropertyEventArgs<T> args);
 }

@@ -10,203 +10,163 @@ using engenious.UI.Controls;
 namespace engenious.UI
 {
     /// <summary>
-    /// Base-Class for all Controls
+    /// Base class for all ui controls.
     /// </summary>
     public abstract class Control : IControl
     {
-        private bool invalidDrawing;
+        private bool _invalidDrawing;
 
-        private Brush background = null;
+        private Brush _background = null;
 
-        private Brush hoveredBackground = null;
+        private Brush _hoveredBackground = null;
 
-        private Brush pressedBackground = null;
+        private Brush _pressedBackground = null;
 
-        private Brush disabledBackground = null;
+        private Brush _disabledBackground = null;
 
-        private Border margin = Border.All(0);
+        private Border _margin = Border.All(0);
 
-        private Border padding = Border.All(0);
+        private Border _padding = Border.All(0);
 
-        private SoundEffect clickSound = null;
+        private SoundEffect _clickSound = null;
 
-        private SoundEffect hoverSound = null;
+        private SoundEffect _hoverSound = null;
+        
+        /// <inheritdoc />
+        public BaseScreenComponent ScreenManager { get; }
 
-        /// <summary>
-        /// Reference to the current screen manager
-        /// </summary>
-        public BaseScreenComponent ScreenManager { get; private set; }
-
-        /// <summary>
-        /// Sound to be played on click
-        /// </summary>
+        /// <inheritdoc />
         public SoundEffect ClickSound
         {
-            get
-            {
-                return clickSound;
-            }
+            get => _clickSound;
             set
             {
-                if (clickSound != value)
+                if (_clickSound != value)
                 {
-                    clickSound = value;
+                    _clickSound = value;
                 }
             }
         }
 
-        /// <summary>
-        /// Sound to be played on hover
-        /// </summary>
+        /// <inheritdoc />
         public SoundEffect HoverSound
         {
-            get
-            {
-                return hoverSound;
-            }
+            get => _hoverSound;
             set
             {
-                if (hoverSound != value)
+                if (_hoverSound != value)
                 {
-                    hoverSound = value;
+                    _hoverSound = value;
                 }
             }
         }
 
-        /// <summary>
-        /// Default background
-        /// </summary>
+        /// <inheritdoc />
         public Brush Background
         {
-            get
-            {
-                return background;
-            }
+            get => _background;
             set
             {
-                if (background != value)
+                if (_background != value)
                 {
-                    background = value;
+                    _background = value;
                     InvalidateDrawing();
                 }
             }
         }
-
-        /// <summary>
-        /// Optional background on hover
-        /// </summary>
+        
+        /// <inheritdoc />
         public Brush HoveredBackground
         {
-            get
-            {
-                return hoveredBackground;
-            }
+            get => _hoveredBackground;
             set
             {
-                if (hoveredBackground != value)
+                if (_hoveredBackground != value)
                 {
-                    hoveredBackground = value;
+                    _hoveredBackground = value;
                     InvalidateDrawing();
                 }
             }
         }
 
-        /// <summary>
-        /// Optional background on pressed
-        /// </summary>
+        /// <inheritdoc />
         public Brush PressedBackground
         {
-            get { return pressedBackground; }
+            get => _pressedBackground;
             set
             {
-                if (pressedBackground != value)
+                if (_pressedBackground != value)
                 {
-                    pressedBackground = value;
+                    _pressedBackground = value;
                     InvalidateDrawing();
                 }
             }
         }
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
+        /// <inheritdoc />
         public Brush DisabledBackground
         {
-            get => disabledBackground;
+            get => _disabledBackground;
             set
             {
-                if (disabledBackground != value)
+                if (_disabledBackground != value)
                 {
-                    disabledBackground = value;
+                    _disabledBackground = value;
                     InvalidateDrawing();
                 }
             }
         }
 
-        /// <summary>
-        /// Legt den äußeren Abstand des Controls fest.
-        /// </summary>
+        /// <inheritdoc />
         public Border Margin
         {
-            get
-            {
-                return margin;
-            }
+            get => _margin;
             set
             {
-                if (!margin.Equals(value))
+                if (!_margin.Equals(value))
                 {
-                    margin = value;
+                    _margin = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Legt den inneren Abstand des Controls fest.
-        /// </summary>
+        /// <inheritdoc />
         public Border Padding
         {
-            get
-            {
-                return padding;
-            }
+            get => _padding;
             set
             {
-                if (!padding.Equals(value))
+                if (!_padding.Equals(value))
                 {
-                    padding = value;
+                    _padding = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Legt fest ob der Fokus-Rahmen gezeichnet werden soll
-        /// </summary>
+        /// <inheritdoc />
         public bool DrawFocusFrame { get; set; }
 
-        /// <summary>
-        /// Platzhalter für jegliche Art der Referenz.
-        /// </summary>
+        /// <inheritdoc />
         public object Tag { get; set; }
 
-        /// <summary>
-        /// Gibt den Style-Namen des Controls zurück oder legt diesen fest.
-        /// </summary>
-        public string Style { get; private set; }
+        /// <inheritdoc />
+        public string Style { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Control"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public Control(BaseScreenComponent manager, string style = "")
         {
-            if (manager == null)
-                throw new ArgumentNullException("manager");
-
-            ScreenManager = manager;
+            ScreenManager = manager ?? throw new ArgumentNullException(nameof(manager));
             Style = style;
 
-            children = new ControlCollection(this);
-            children.OnInserted += ControlCollectionInsert;
-            children.OnRemove += ControlCollectionRemove;
+            _children = new ControlCollection(this);
+            _children.OnInserted += ControlCollectionInsert;
+            _children.OnRemove += ControlCollectionRemove;
             _rootPathTemp = new List<Control>();
             _rootPath = new ReverseEnumerable<Control>();
             _rootPath.BaseList = _rootPathTemp;
@@ -219,33 +179,35 @@ namespace engenious.UI
             ApplySkin(typeof(Control));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
         protected void ApplySkin(Type type)
         {
-            // ControlSkin-Loader
+            // ControlSkin loader
             if (Skin.Current != null &&
                 Skin.Current.ControlSkins != null)
             {
-                // Generische Datentypen
                 TypeInfo info = type.GetTypeInfo();
-                if (info.IsGenericType && Skin.Current.ControlSkins.ContainsKey(type.GetGenericTypeDefinition()))
+                if (info.IsGenericType && Skin.Current.ControlSkins.ContainsKey(type.GetGenericTypeDefinition())) // For generic types
                     Skin.Current.ControlSkins[type.GetGenericTypeDefinition()](this);
-
-                // Konkrete Datentypen
-                if (Skin.Current.ControlSkins.ContainsKey(type))
+                else if (Skin.Current.ControlSkins.ContainsKey(type)) // For non generic types
                     Skin.Current.ControlSkins[type](this);
             }
 
-            // StyleSkin-Loader
-            if (!string.IsNullOrEmpty(Style) && // Nur wenn der Style gesetzt ist
-                type == GetType() &&            // Nur wenn der Type == dem Type des Controls entspricht (bedeutet der letzte Aufruf auf ApplySkin)
+            // StyleSkin loader
+            if (!string.IsNullOrEmpty(Style) && // Only when the style is set
+                type == GetType() &&            // Only when type == type of the control (in this case the control that calls this method)
                 Skin.Current != null &&
                 Skin.Current.StyleSkins != null &&
-                Skin.Current.StyleSkins.ContainsKey(Style))
+                Skin.Current.StyleSkins.TryGetValue(Style, out var styleSkin))
             {
-                Skin.Current.StyleSkins[Style](this);
+                styleSkin(this);
             }
         }
 
+        /// <inheritdoc />
         public void Update(GameTime gameTime)
         {
             HandleTransitions(gameTime);
@@ -254,33 +216,37 @@ namespace engenious.UI
                 child.Update(gameTime);
         }
 
+        /// <summary>
+        /// Gets called when the control is to be updated.
+        /// </summary>
+        /// <param name="gameTime">Contains the elapsed time since the last update, as well as total elapsed time.</param>
         protected virtual void OnUpdate(GameTime gameTime) { }
 
+        /// <inheritdoc />
         public void PreDraw(GameTime gameTime)
         {
             OnPreDraw(gameTime);
             foreach (var child in Children.AgainstZOrder)
                 child.PreDraw(gameTime);
         }
-
+        /// <summary>
+        /// Gets called before the control gets drawn as well as before the <see cref="Children"/> get their own <see cref="OnPreDraw"/> called.
+        /// </summary>
+        /// <param name="gameTime">Contains the elapsed time since the last pre draw, as well as total elapsed time.</param>
         protected virtual void OnPreDraw(GameTime gameTime) { }
 
         private readonly RasterizerState _rasterizerState = new RasterizerState { ScissorTestEnable = true };
 
-        /// <summary>
-        /// Zeichenauruf für das Control (SpriteBatch ist bereits aktiviert)
-        /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="gameTime">Vergangene Spielzeit</param>
+        /// <inheritdoc />
         public void Draw(SpriteBatch batch, Rectangle renderMask, GameTime gameTime)
         {
             if (!Visible) return;
 
-            // Controlgröße ermitteln
+            // Determine control size
             Rectangle controlArea = new Rectangle(AbsolutePosition, ActualSize);
             Rectangle localRenderMask = controlArea.Intersection(renderMask);
 
-            // Scissor-Filter aktivieren
+            // Set scissor region
             batch.GraphicsDevice.ScissorRectangle = localRenderMask.Transform(AbsoluteTransformation);
             batch.Begin(rasterizerState: _rasterizerState, samplerState: SamplerState.LinearWrap, transformMatrix: AbsoluteTransformation);
             OnDraw(batch, controlArea, gameTime);
@@ -295,18 +261,24 @@ namespace engenious.UI
                 child.Draw(batch, clientRenderMask, gameTime);
             }
 
-            invalidDrawing = false;
+            _invalidDrawing = false;
         }
 
         /// <summary>
-        /// Malt das komplette Control
+        /// Gets called to draw the control and all its content.
         /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="controlArea">Bereich für das Control in absoluten Koordinaten</param>
+        /// <param name="batch">
+        /// The spritebatch to draw to.
+        /// <remarks>
+        /// The spritebatch needs to be in drawing mode. Meaning <see cref="SpriteBatch.Begin"/> was called but
+        /// <see cref="SpriteBatch.End"/> was not yet called (again) after the <see cref="SpriteBatch.Begin"/>.
+        /// </remarks>
+        /// </param>
+        /// <param name="controlArea">The available area for the control. (In absolute coordinated)</param>
+        /// <param name="gameTime">Contains the elapsed time since the last pre draw, as well as total elapsed time.</param>
         protected virtual void OnDraw(SpriteBatch batch, Rectangle controlArea, GameTime gameTime)
         {
-            // Background-Bereich ermitteln und zeichnen
+            // Determine background region and draw it.
             Rectangle controlWithMargin = new Rectangle(
                controlArea.X + Margin.Left,
                controlArea.Y + Margin.Top,
@@ -314,7 +286,7 @@ namespace engenious.UI
                controlArea.Height - Margin.Bottom - Margin.Top);
             OnDrawBackground(batch, controlWithMargin, gameTime, AbsoluteAlpha);
 
-            // Content-Bereich ermitteln und zeichnen
+            // Determine content region and draw it.
             Rectangle controlWithPadding = new Rectangle(
                 controlWithMargin.X + Padding.Left,
                 controlWithMargin.Y + Padding.Top,
@@ -322,104 +294,119 @@ namespace engenious.UI
                 controlWithMargin.Height - Padding.Bottom - Padding.Top);
             OnDrawContent(batch, controlWithPadding, gameTime, AbsoluteAlpha);
 
-            // Fokus-Frame
+            // Draw a focus frame when the control is focused.
             if (Focused == TreeState.Active)
                 OnDrawFocusFrame(batch, controlWithMargin, gameTime, AbsoluteAlpha);
         }
 
         /// <summary>
-        /// Malt den Hintergrund des Controls
+        /// Gets called to draw the background of the control.
         /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="backgroundArea">Bereich für den Background in absoluten Koordinaten</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
-        protected virtual void OnDrawBackground(engenious.Graphics.SpriteBatch batch, Rectangle backgroundArea, GameTime gameTime, float alpha)
+        /// <param name="batch">
+        /// The spritebatch to draw to.
+        /// <remarks>
+        /// The spritebatch needs to be in drawing mode. Meaning <see cref="SpriteBatch.Begin"/> was called but
+        /// <see cref="SpriteBatch.End"/> was not yet called (again) after the <see cref="SpriteBatch.Begin"/>.
+        /// </remarks>
+        /// </param>
+        /// <param name="backgroundArea">The available area for the background. (In absolute coordinated)</param>
+        /// <param name="gameTime">Contains the elapsed time since the last pre draw, as well as total elapsed time.</param>
+        /// <param name="alpha">The transparency value to draw the background with.</param>
+        protected virtual void OnDrawBackground(SpriteBatch batch, Rectangle backgroundArea, GameTime gameTime, float alpha)
         {
-            // Standard Background zeichnen
+            // Draw the background brush
             if (!Enabled && DisabledBackground != null)
                 DisabledBackground.Draw(batch, backgroundArea, alpha);
             else if (Pressed && PressedBackground != null)
                 PressedBackground.Draw(batch, backgroundArea, alpha);
             else if (Hovered != TreeState.None && HoveredBackground != null)
                 HoveredBackground.Draw(batch, backgroundArea, alpha);
-            else if (Background != null)
-                Background.Draw(batch, backgroundArea, alpha);
+            else
+            {
+                Background?.Draw(batch, backgroundArea, alpha);
+            }
         }
 
         /// <summary>
-        /// Malt den Content des Controls
+        /// Gets called to draw the content of the control.
         /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="contentArea">Bereich für den Content in absoluten Koordinaten</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
+        /// <param name="batch">
+        /// The spritebatch to draw to.
+        /// <remarks>
+        /// The spritebatch needs to be in drawing mode. Meaning <see cref="SpriteBatch.Begin"/> was called but
+        /// <see cref="SpriteBatch.End"/> was not yet called (again) after the <see cref="SpriteBatch.Begin"/>.
+        /// </remarks>
+        /// </param>
+        /// <param name="contentArea">The available area for the content. (In absolute coordinated)</param>
+        /// <param name="gameTime">Contains the elapsed time since the last pre draw, as well as total elapsed time.</param>
+        /// <param name="alpha">The transparency value to draw the background with.</param>
         protected virtual void OnDrawContent(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
         }
-
+        
         /// <summary>
-        /// Malt den Fokusrahmen des Controls
+        /// Gets called to draw the focus frame of the control.
         /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="contentArea">Bereich für den Content in absoluten Koordinaten</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
-        protected virtual void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
+        /// <param name="batch">
+        /// The spritebatch to draw to.
+        /// <remarks>
+        /// The spritebatch needs to be in drawing mode. Meaning <see cref="SpriteBatch.Begin"/> was called but
+        /// <see cref="SpriteBatch.End"/> was not yet called (again) after the <see cref="SpriteBatch.Begin"/>.
+        /// </remarks>
+        /// </param>
+        /// <param name="frameArea">The available area for the focus frame. (In absolute coordinated)</param>
+        /// <param name="gameTime">Contains the elapsed time since the last pre draw, as well as total elapsed time.</param>
+        /// <param name="alpha">The transparency value to draw the background with.</param>
+        protected virtual void OnDrawFocusFrame(SpriteBatch batch, Rectangle frameArea, GameTime gameTime, float alpha)
         {
             if (Skin.Current.FocusFrameBrush != null && DrawFocusFrame)
-                Skin.Current.FocusFrameBrush.Draw(batch, contentArea, AbsoluteAlpha);
+                Skin.Current.FocusFrameBrush.Draw(batch, frameArea, AbsoluteAlpha);
         }
 
+        /// <inheritdoc />
         public void InvalidateDrawing()
         {
-            invalidDrawing = true;
+            _invalidDrawing = true;
         }
 
         #region Visual Tree Handling
 
-        private bool enabled = true;
+        private bool _enabled = true;
 
-        private bool visible = true;
+        private bool _visible = true;
 
-        private Control parent = null;
+        private Control _parent = null;
 
-        private ControlCollection children;
+        private readonly ControlCollection _children;
 
         private readonly PropertyEventArgs<bool> _enabledChangedEventArgs = new PropertyEventArgs<bool>();
-        /// <summary>
-        /// Gibt an, ob das Control aktiv ist.
-        /// </summary>
+
+        /// <inheritdoc />
         public bool Enabled
         {
-            get
-            {
-                return enabled;
-            }
+            get => _enabled;
             set
             {
-                if (enabled == value) return;
+                if (_enabled == value) return;
 
-                _enabledChangedEventArgs.OldValue = enabled;
+                _enabledChangedEventArgs.OldValue = _enabled;
                 _enabledChangedEventArgs.NewValue = value;
                 _enabledChangedEventArgs.Handled = false;
 
-                enabled = value;
+                _enabled = value;
                 InvalidateDrawing();
 
-                if (!enabled) Unfocus();
+                if (!_enabled) Unfocus();
 
                 foreach (var child in Children)
-                    child.Enabled = enabled;
+                    child.Enabled = _enabled;
 
                 OnEnableChanged(_enabledChangedEventArgs);
                 EnableChanged?.Invoke(this, _enabledChangedEventArgs);
             }
         }
 
-        /// <summary>
-        /// Ermittelt den absoluten Aktivierungsstatus von Root bis zu diesem Control.
-        /// </summary>
+        /// <inheritdoc />
         public bool AbsoluteEnabled
         {
             get
@@ -432,37 +419,30 @@ namespace engenious.UI
         }
 
         private readonly PropertyEventArgs<bool> _visibleChangedEventArgs = new PropertyEventArgs<bool>();
-        /// <summary>
-        /// Gibt an, ob das Control gerendert werden soll.
-        /// </summary>
+        /// <inheritdoc />
         public bool Visible
         {
-            get
-            {
-                return visible;
-            }
+            get => _visible;
             set
             {
-                if (visible == value) return;
+                if (_visible == value) return;
 
 
-                _visibleChangedEventArgs.OldValue = visible;
+                _visibleChangedEventArgs.OldValue = _visible;
                 _visibleChangedEventArgs.NewValue = value;
                 _visibleChangedEventArgs.Handled = false;
 
-                visible = value;
+                _visible = value;
                 InvalidateDimensions();
                 InvalidateDrawing();
-                if (!visible) Unfocus();
+                if (!_visible) Unfocus();
 
                 OnVisibleChanged(_visibleChangedEventArgs);
                 VisibleChanged?.Invoke(this, _visibleChangedEventArgs);
             }
         }
 
-        /// <summary>
-        /// Ermittelt den absoluten Sichtbarkeitsstatus von Root bis zu diesem Control.
-        /// </summary>
+        /// <inheritdoc />
         public bool AbsoluteVisible
         {
             get
@@ -493,9 +473,7 @@ namespace engenious.UI
             OnRemoveControl(_controlCollectionRemoveArgs);
         }
 
-        /// <summary>
-        /// Gibt das Root-Element des zugehörigen Visual Tree zurück.
-        /// </summary>
+        /// <inheritdoc />
         public Control Root
         {
             get
@@ -509,9 +487,7 @@ namespace engenious.UI
 
         private readonly List<Control> _rootPathTemp;
         private readonly ReverseEnumerable<Control> _rootPath;
-        /// <summary>
-        /// Liefert den Control-Path von Root zum aktuellen Control.
-        /// </summary>
+        /// <inheritdoc />
         public ReverseEnumerable<Control> RootPath
         {
             get
@@ -536,131 +512,131 @@ namespace engenious.UI
 
 
         private readonly PropertyEventArgs<Control> _parentChangedEventArgs = new PropertyEventArgs<Control>();
-        /// <summary>
-        /// Gibt das Parent-Element dieses Controls zurück.
-        /// </summary>
+        /// <inheritdoc />
         public Control Parent
         {
-            get { return parent; }
+            get => _parent;
             internal set
             {
-                if (parent == value) return;
+                if (_parent == value) return;
 
-                _parentChangedEventArgs.OldValue = parent;
+                _parentChangedEventArgs.OldValue = _parent;
                 _parentChangedEventArgs.NewValue = value;
                 _parentChangedEventArgs.Handled = false;
 
-                parent = value;
+                _parent = value;
 
                 OnParentChanged(_parentChangedEventArgs);
                 ParentChanged?.Invoke(this, _parentChangedEventArgs);
             }
         }
-
+        
         /// <summary>
-        /// Die Liste der enthaltenen Controls.
+        /// Gets the children of this control.
         /// </summary>
-        protected ControlCollection Children { get { return children; } }
+        protected ControlCollection Children => _children;
 
         /// <summary>
-        /// Ein neues Control wurde in die Children-Liste eingefügt.
+        /// Gets called when a control was inserted into the <see cref="Children"/> collection.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnInsertControl(CollectionEventArgs args) { }
 
         /// <summary>
-        /// Ein Control wurde aus der Children-Liste entfernt.
+        /// Gets called when a control was removed from the <see cref="Children"/> collection.
         /// </summary>
         /// <param name="args"></param>
         protected virtual void OnRemoveControl(CollectionEventArgs args) { }
 
         /// <summary>
-        /// Der Parent dieses Controls hat sich geändert.
+        /// Raises the <see cref="ParentChanged"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">A <see cref="PropertyEventArgs{Control}"/> that contains the event data.</param>
         protected virtual void OnParentChanged(PropertyEventArgs<Control> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="EnableChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnEnableChanged(PropertyEventArgs<bool> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="VisibleChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnVisibleChanged(PropertyEventArgs<bool> args) { }
 
         /// <summary>
-        /// Event das die Änderung des Parents signalisiert.
+        /// Occurs when the controls <see cref="Parent"/> was changed.
         /// </summary>
         public event PropertyChangedDelegate<Control> ParentChanged;
 
+        /// <summary>
+        /// Occurs when the controls <see cref="Enabled"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<bool> EnableChanged;
 
+        /// <summary>
+        /// Occurs when the controls <see cref="Visible"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<bool> VisibleChanged;
 
         #endregion
 
         #region Resize- und Position-Management
 
-        private bool invalidDimensions = true;
+        private bool _invalidDimensions = true;
 
-        private HorizontalAlignment horizontalAlignment = HorizontalAlignment.Center;
+        private HorizontalAlignment _horizontalAlignment = HorizontalAlignment.Center;
 
-        private VerticalAlignment verticalAlignment = VerticalAlignment.Center;
+        private VerticalAlignment _verticalAlignment = VerticalAlignment.Center;
 
-        private Point actualPosition = Point.Zero;
+        private Point _actualPosition = Point.Zero;
 
-        private Point actualSize = Point.Zero;
+        private Point _actualSize = Point.Zero;
 
-        private int? minWidth = null;
+        private int? _minWidth = null;
 
-        private int? width = null;
+        private int? _width = null;
 
-        private int? maxWidth = null;
+        private int? _maxWidth = null;
 
-        private int? minHeight = null;
+        private int? _minHeight = null;
 
-        private int? height = null;
+        private int? _height = null;
 
-        private int? maxHeight = null;
+        private int? _maxHeight = null;
 
-        private Matrix transformation = Matrix.Identity;
+        private Matrix _transformation = Matrix.Identity;
 
-        private float alpha = 1f;
+        private float _alpha = 1f;
 
-        /// <summary>
-        /// Horizontale Ausrichtung im Dynamic-Mode.
-        /// </summary>
+        /// <inheritdoc />
         public HorizontalAlignment HorizontalAlignment
         {
-            get
-            {
-                return horizontalAlignment;
-            }
+            get => _horizontalAlignment;
             set
             {
-                horizontalAlignment = value;
+                _horizontalAlignment = value;
                 InvalidateDimensions();
             }
         }
 
-        /// <summary>
-        /// Gibt eine zusätzliche Render-Transformation an.
-        /// </summary>
+        /// <inheritdoc />
         public Matrix Transformation
         {
-            get
-            {
-                return transformation;
-            }
+            get => _transformation;
             set
             {
-                if (transformation != value)
+                if (_transformation != value)
                 {
-                    transformation = value;
+                    _transformation = value;
                     InvalidateDrawing();
                 }
             }
         }
 
-        /// <summary>
-        /// Gibt die absolute Transformation für dieses Control zurück.
-        /// </summary>
+        /// <inheritdoc />
         public Matrix AbsoluteTransformation
         {
             get
@@ -672,28 +648,21 @@ namespace engenious.UI
             }
         }
 
-        /// <summary>
-        /// Gibt den Alpha-Wert dieses Controls an.
-        /// </summary>
+        /// <inheritdoc />
         public float Alpha
         {
-            get
-            {
-                return alpha;
-            }
+            get => _alpha;
             set
             {
-                if (alpha != value)
+                if (_alpha != value)
                 {
-                    alpha = value;
+                    _alpha = value;
                     InvalidateDrawing();
                 }
             }
         }
 
-        /// <summary>
-        /// Gibt den absoluten Alpha-Wert für dieses Control zurück.
-        /// </summary>
+        /// <inheritdoc />
         public float AbsoluteAlpha
         {
             get
@@ -705,144 +674,117 @@ namespace engenious.UI
             }
         }
 
-        /// <summary>
-        /// Vertikale Ausrichtung im Dynamic-Mode.
-        /// </summary>
+        /// <inheritdoc />
         public VerticalAlignment VerticalAlignment
         {
-            get
-            {
-                return verticalAlignment;
-            }
+            get => _verticalAlignment;
             set
             {
-                verticalAlignment = value;
+                _verticalAlignment = value;
                 InvalidateDimensions();
             }
         }
 
-        /// <summary>
-        /// Legt optional eine Mindestbreite für dieses Control fest.
-        /// </summary>
+        /// <inheritdoc />
         public int? MinWidth
         {
-            get { return minWidth; }
+            get => _minWidth;
             set
             {
-                if (minWidth != value)
+                if (_minWidth != value)
                 {
-                    minWidth = value;
+                    _minWidth = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Legt optional eine definierte Breite für dieses Control fest.
-        /// </summary>
+        /// <inheritdoc />
         public int? Width
         {
-            get { return width; }
+            get => _width;
             set
             {
-                if (width != value)
+                if (_width != value)
                 {
-                    width = value;
+                    _width = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Legt optional eine Maximalbreite für dieses Control fest.
-        /// </summary>
+        /// <inheritdoc />
         public int? MaxWidth
         {
-            get { return maxWidth; }
+            get => _maxWidth;
             set
             {
-                if (maxWidth != value)
+                if (_maxWidth != value)
                 {
-                    maxWidth = value;
+                    _maxWidth = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-
-        /// <summary>
-        /// Legt optional eine Mindesthöhe für dieses Control fest.
-        /// </summary>
+        /// <inheritdoc />
         public int? MinHeight
         {
-            get { return minHeight; }
+            get => _minHeight;
             set
             {
-                if (minHeight != value)
+                if (_minHeight != value)
                 {
-                    minHeight = value;
+                    _minHeight = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-
-        /// <summary>
-        /// Legt optional eine definierte Höhe für dieses Control fest. 
-        /// </summary>
+        /// <inheritdoc />
         public int? Height
         {
-            get { return height; }
+            get => _height;
             set
             {
-                if (height != value)
+                if (_height != value)
                 {
-                    height = value;
+                    _height = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-        /// <summary>
-        /// Legt optional eine Maximalbreite für dieses Control fest.
-        /// </summary>
+        /// <inheritdoc />
         public int? MaxHeight
         {
-            get { return maxHeight; }
+            get => _maxHeight;
             set
             {
-                if (maxHeight != value)
+                if (_maxHeight != value)
                 {
-                    maxHeight = value;
+                    _maxHeight = value;
                     InvalidateDimensions();
                 }
             }
         }
 
-
-        /// <summary>
-        /// Gibt die tatsächliche Renderposition (exkl. Parent Offset) zurück.
-        /// </summary>
+        /// <inheritdoc />
         public Point ActualPosition
         {
-            get
-            {
-                return actualPosition;
-            }
+            get => _actualPosition;
             set
             {
-                if (actualPosition != value)
+                if (_actualPosition != value)
                 {
-                    actualPosition = value;
+                    _actualPosition = value;
                     InvalidateDrawing();
                 }
-                invalidDimensions = false;
+                _invalidDimensions = false;
             }
         }
 
-        /// <summary>
-        /// Gibt die absolute Position (global) dieses Controls zurück.
-        /// </summary>
+        /// <inheritdoc />
         public Point AbsolutePosition
         {
             get
@@ -851,38 +793,29 @@ namespace engenious.UI
                 if (Parent != null)
                 {
                     result += Parent.AbsolutePosition;
-                    result += parent.ActualClientArea.Location;
+                    result += _parent.ActualClientArea.Location;
                 }
                 result += ActualPosition;
                 return result;
             }
         }
 
-        /// <summary>
-        /// Gibt die tatsächliche Rendergröße zurück.
-        /// </summary>
+        /// <inheritdoc />
         public Point ActualSize
         {
-            get
-            {
-                return actualSize;
-            }
+            get => _actualSize;
             set
             {
-                if (actualSize != value)
+                if (_actualSize != value)
                 {
-                    actualSize = value;
+                    _actualSize = value;
                     InvalidateDrawing();
                 }
-                invalidDimensions = false;
+                _invalidDimensions = false;
             }
         }
 
-        /// <summary>
-        /// Methode zur Ermittlung des notwendigen Platzes.
-        /// </summary>
-        /// <param name="available">Verfügbarer Platz für dieses Control</param>
-        /// <returns>Benötigte Platz inklusive allen Rändern</returns>
+        /// <inheritdoc />
         public virtual Point GetExpectedSize(Point available)
         {
             if (!Visible) return Point.Zero;
@@ -890,7 +823,7 @@ namespace engenious.UI
             Point result = GetMinClientSize(available);
             Point client = GetMaxClientSize(available);
 
-            // Restliche Controls
+            // Child controls
             foreach (var child in Children)
             {
                 Point size = child.GetExpectedSize(client);
@@ -899,14 +832,10 @@ namespace engenious.UI
             return result + Borders;
         }
 
-        /// <summary>
-        /// Ermittelt die maximale Größe des Client Bereichs für dieses Control.
-        /// </summary>
-        /// <param name="containerSize"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual Point GetMaxClientSize(Point containerSize)
         {
-            int x = Width.HasValue ? Width.Value : containerSize.X;
+            int x = Width ?? containerSize.X;
 
             // Max Limiter
             if (MaxWidth.HasValue)
@@ -916,7 +845,7 @@ namespace engenious.UI
             if (MinWidth.HasValue)
                 x = Math.Max(MinWidth.Value, x);
 
-            int y = Height.HasValue ? Height.Value : containerSize.Y;
+            int y = Height ?? containerSize.Y;
 
             // Max Limiter
             if (MaxHeight.HasValue)
@@ -929,16 +858,12 @@ namespace engenious.UI
             return new Point(x, y) - Borders;
         }
 
-        /// <summary>
-        /// Ermittelt die minimale Größe des Client Bereichs für dieses Control.
-        /// </summary>
-        /// <param name="containerSize"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public virtual Point GetMinClientSize(Point containerSize)
         {
-            Point size = CalculcateRequiredClientSpace(containerSize) + Borders;
-            int x = Width.HasValue ? Width.Value : size.X;
-            int y = Height.HasValue ? Height.Value : size.Y;
+            Point size = CalculateRequiredClientSpace(containerSize) + Borders;
+            int x = Width ?? size.X;
+            int y = Height ?? size.Y;
 
             // Max Limiter
             if (MaxWidth.HasValue)
@@ -959,10 +884,7 @@ namespace engenious.UI
             return new Point(x, y) - Borders;
         }
 
-        /// <summary>
-        /// Legt die tatsächliche Größe für dieses Control fest.
-        /// </summary>
-        /// <param name="available">Erwartete Größe des Controls (inkl. Borders)</param>
+        /// <inheritdoc />
         public virtual void SetActualSize(Point available)
         {
             if (!Visible)
@@ -974,15 +896,16 @@ namespace engenious.UI
             Point minSize = GetExpectedSize(available);
             SetDimension(minSize, available);
 
-            // Auf andere Controls anwenden
+            // Apply to child controls
             foreach (var child in Children)
                 child.SetActualSize(ActualClientSize);
         }
 
         /// <summary>
-        /// Führt eine automatische Anordnung auf Basis der aktuellen Size und den Alignment-Parametern durch.
+        /// Applies automatic layout on basis of the current size and current alignments.
         /// </summary>
-        /// <param name="containerSize"></param>
+        /// <param name="actualSize">The actual available size of the control.</param>
+        /// <param name="containerSize">The size of the container. E.g. some containers can grow indefinitely.</param>
         protected virtual void SetDimension(Point actualSize, Point containerSize)
         {
             var size = new Point(
@@ -1023,191 +946,145 @@ namespace engenious.UI
             ActualPosition = new Point(x, y);
         }
 
-        /// <summary>
-        /// Gibt zurück, ob die Größenangaben nicht mehr aktuell sind.
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool HasInvalidDimensions()
         {
-            bool result = invalidDimensions;
+            bool result = _invalidDimensions;
             foreach (var child in Children)
                 result |= child.HasInvalidDimensions();
             return result;
         }
 
-        /// <summary>
-        /// Ist für die Berechnung des Client-Contents zuständig und erleichtert das automatische Alignment.
-        /// </summary>
-        /// <returns></returns>
-        public virtual Point CalculcateRequiredClientSpace(Point available)
+        /// <inheritdoc />
+        public virtual Point CalculateRequiredClientSpace(Point available)
         {
             return new Point();
         }
 
-        /// <summary>
-        /// Teilt dem Steuerelement mit, dass seine Größe neu berechnet werden muss.
-        /// </summary>
+        /// <inheritdoc />
         public void InvalidateDimensions()
         {
-            invalidDimensions = true;
+            _invalidDimensions = true;
             InvalidateDrawing();
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn die Auflösung des Fensters geändert wird.
-        /// </summary>
+        /// <inheritdoc />
         public virtual void OnResolutionChanged()
         {
             InvalidateDimensions();
         }
 
-        /// <summary>
-        /// Berechnet den Client-Bereich auf Basis der aktuellen 
-        /// Position/Größe/Margin/Padding in lokalen Koordinaten.
-        /// </summary>
-        public Rectangle ActualClientArea
-        {
-            get
-            {
-                return new Rectangle(
-                    Margin.Left + Padding.Left,
-                    Margin.Top + Padding.Top,
-                    ActualSize.X - Margin.Left - Padding.Left - Margin.Right - Padding.Right,
-                    ActualSize.Y - Margin.Top - Padding.Top - Margin.Bottom - Padding.Bottom);
-            }
-        }
+        /// <inheritdoc />
+        public Rectangle ActualClientArea =>
+            new Rectangle(
+                Margin.Left + Padding.Left,
+                Margin.Top + Padding.Top,
+                ActualSize.X - Margin.Left - Padding.Left - Margin.Right - Padding.Right,
+                ActualSize.Y - Margin.Top - Padding.Top - Margin.Bottom - Padding.Bottom);
 
-        /// <summary>
-        /// Berechnet den Verfügbaren Client-Bereich unter Berücksichtigung der 
-        /// ActualSize und den eingestellten Margins und Paddings.
-        /// </summary>
-        public Point ActualClientSize
-        {
-            get
-            {
-                return ActualSize - Borders;
-            }
-        }
+        /// <inheritdoc />
+        public Point ActualClientSize => ActualSize - Borders;
 
-        /// <summary>
-        /// Ermittelt den gesamten Rand durch Margin und Padding.
-        /// </summary>
-        public Point Borders
-        {
-            get
-            {
-                return new Point(
-                    Margin.Left + Margin.Right + Padding.Left + Padding.Right,
-                    Margin.Top + Margin.Bottom + Padding.Top + Padding.Bottom);
-            }
-        }
+        /// <inheritdoc />
+        public Point Borders =>
+            new Point(
+                Margin.Left + Margin.Right + Padding.Left + Padding.Right,
+                Margin.Top + Margin.Bottom + Padding.Top + Padding.Bottom);
 
         #endregion
 
         #region Transitions
 
-        private Dictionary<Type, Transition> transitionMap = new Dictionary<Type, Transition>();
-        private List<Transition> transitions = new List<Transition>();
+        private readonly Dictionary<Type, Transition> _transitionMap = new Dictionary<Type, Transition>();
+        private readonly List<Transition> _transitions = new List<Transition>();
 
+        /// <inheritdoc />
         public void StartTransition(Transition transition)
         {
-            if (transitionMap.ContainsKey(transition.GetType()))
+            if (_transitionMap.ContainsKey(transition.GetType()))
             {
-                // Alte Transition des selben Typs entfernen
-                Transition t = transitionMap[transition.GetType()];
-                transitionMap.Remove(transition.GetType());
-                transitions.Remove(t);
+                // Remove old transition of same type.
+                Transition t = _transitionMap[transition.GetType()];
+                _transitionMap.Remove(transition.GetType());
+                _transitions.Remove(t);
             }
 
-            // Neue Transition einfügen
-            transitionMap.Add(transition.GetType(), transition);
-            transitions.Add(transition);
+            // Add new transition
+            _transitionMap.Add(transition.GetType(), transition);
+            _transitions.Add(transition);
         }
 
         private void HandleTransitions(GameTime gameTime)
         {
-            // Transitions durchlaufen
+            // Iterate through transitions
             //List<Transition> drops = new List<Transition>();
-            for (var i = 0; i < transitions.Count; i++)
+            for (var i = 0; i < _transitions.Count; i++)
             {
-                var transition = transitions[i];
+                var transition = _transitions[i];
                 if (!transition.Update(gameTime))
                 {
-                    transitionMap.Remove(transition.GetType());
-                    transitions.RemoveAt(i--);
+                    _transitionMap.Remove(transition.GetType());
+                    _transitions.RemoveAt(i--);
                 }
                 //drops.Add(transition);
             }
-
-            // Abgelaufene Transitions wieder entfernen
-            //foreach (var drop in drops)
-            //{
-            //    transitions.Remove(drop);
-            //    transitionMap.Remove(drop.GetType());
-            //}
         }
 
         #endregion
 
         #region Pointer Management
 
-        private TreeState hovered = TreeState.None;
+        private TreeState _hovered = TreeState.None;
 
-        private bool dropHovered = false;
+        private bool _dropHovered = false;
 
-        private bool pressed = false;
+        private bool _pressed = false;
 
         private readonly PropertyEventArgs<TreeState> _hoveredChangedEventArgs = new PropertyEventArgs<TreeState>();
-        /// <summary>
-        /// Gibt an, ob das Control unter der Maus ist.
-        /// </summary>
+
+        /// <inheritdoc />
         public TreeState Hovered
         {
-            get
-            {
-                return hovered;
-            }
+            get => _hovered;
             private set
             {
-                if (hovered == value) return;
+                if (_hovered == value) return;
 
-                _hoveredChangedEventArgs.OldValue = hovered;
+                _hoveredChangedEventArgs.OldValue = _hovered;
                 _hoveredChangedEventArgs.NewValue = value;
                 _hoveredChangedEventArgs.Handled = false;
 
-                hovered = value;
+                _hovered = value;
                 InvalidateDrawing();
 
                 OnHoveredChanged(_hoveredChangedEventArgs);
                 HoveredChanged?.Invoke(this, _hoveredChangedEventArgs);
 
                 // Sound abspielen
-                if (hoverSound != null && hovered == TreeState.Active && _hoveredChangedEventArgs.OldValue != TreeState.Passive)
-                    hoverSound.Play();
+                if (_hoverSound != null && _hovered == TreeState.Active && _hoveredChangedEventArgs.OldValue != TreeState.Passive)
+                    _hoverSound.Play();
             }
         }
 
-        /// <summary>
-        /// Gibt an ob das aktuelle Elemente gerade duch die Maus gedrückt wird.
-        /// </summary>
+        /// <inheritdoc />
         public bool Pressed
         {
-            get { return pressed; }
+            get => _pressed;
             private set
             {
-                if (pressed != value)
+                if (_pressed != value)
                 {
-                    pressed = value;
+                    _pressed = value;
                     InvalidateDrawing();
                 }
             }
         }
 
         /// <summary>
-        /// Wird vom Parent aufgerufen wenn sich die Maus bewegt
+        /// Called from the parent control when the mouse was moved over this control.
         /// </summary>
-        /// <param name="args">Parameter für Mouse-Events</param>
-        /// <returns>Event verarbeitet?</returns>
+        /// <param name="args">The Mouse parameters.</param>
+        /// <returns>A value indicating whether the mouse input was handled by this control.</returns>
         internal bool InternalMouseMove(MouseEventArgs args)
         {
             // Children first (Order by Z-Order)
@@ -1220,7 +1097,7 @@ namespace engenious.UI
                 args.Bubbled = handled || args.Bubbled;
             }
 
-            // Ermitteln ob hovered ist (Aktive & Passive)
+            // Determine if control is in hovered state (Active & Passive)
             args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
             bool hovered =
                 args.LocalPosition.X >= 0 &&
@@ -1228,32 +1105,29 @@ namespace engenious.UI
                 args.LocalPosition.X < ActualSize.X &&
                 args.LocalPosition.Y < ActualSize.Y;
 
-            // Wenn sich der Hover-Status verändert hat -> Enter & Exit-Events
+            // Wenn the hover state changed -> Call matching change events
             if ((Hovered != TreeState.None) != hovered)
             {
                 if (hovered)
                 {
                     OnMouseEnter(args);
-                    if (MouseEnter != null)
-                        MouseEnter(this, args);
+                    MouseEnter?.Invoke(this, args);
                 }
                 else
                 {
-                    // Pressed-State abgeben
+                    // release pressed state
                     Pressed = false;
 
                     OnMouseLeave(args);
-                    if (MouseLeave != null)
-                        MouseLeave(this, args);
+                    MouseLeave?.Invoke(this, args);
                 }
             }
 
-            // Event für Mausbewegung
+            // Event for mouse move
             OnMouseMove(args);
-            if (MouseMove != null)
-                MouseMove(this, args);
+            MouseMove?.Invoke(this, args);
 
-            // Hover-State neu setzen
+            // Set hover state
             TreeState newState = TreeState.None;
             if (hovered) newState = passive ? TreeState.Passive : TreeState.Active;
             Hovered = newState;
@@ -1263,22 +1137,22 @@ namespace engenious.UI
 
         internal bool InternalLeftMouseDown(MouseEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
-            // Fokusieren
+            // Set focus
             Focus();
 
-            // Pressed-State aktivieren
+            // Activate pressed state
             Pressed = true;
 
             // Children first (Order by Z-Order)
@@ -1289,7 +1163,7 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local events
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
@@ -1309,7 +1183,7 @@ namespace engenious.UI
                 child.InternalLeftMouseUp(args);
             }
 
-            // Lokales Events
+            // Local event
             args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
             OnLeftMouseUp(args);
             LeftMouseUp?.Invoke(this, args);
@@ -1317,16 +1191,16 @@ namespace engenious.UI
 
         internal bool InternalLeftMouseClick(MouseEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // 
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
             // Children first (Order by Z-Order)
             foreach (var child in Children.InZOrder)
@@ -1336,7 +1210,7 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
@@ -1344,25 +1218,24 @@ namespace engenious.UI
                 LeftMouseClick?.Invoke(this, args);
             }
 
-            // Click-Sound abspielen
-            if (clickSound != null)
-                clickSound.Play();
+            // play click sound
+            _clickSound?.Play();
 
             return Background != null;
         }
 
         internal bool InternalLeftMouseDoubleClick(MouseEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
             // Children first (Order by Z-Order)
@@ -1373,34 +1246,32 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnLeftMouseDoubleClick(args);
-                if (LeftMouseDoubleClick != null)
-                    LeftMouseDoubleClick(this, args);
+                LeftMouseDoubleClick?.Invoke(this, args);
             }
 
-            // Click-Sound abspielen
-            if (clickSound != null)
-                clickSound.Play();
+            // play click sound
+            _clickSound?.Play();
 
             return Background != null;
         }
 
         internal bool InternalRightMouseDown(MouseEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore disabled
             if (!Enabled) return true;
 
             Focus();
@@ -1413,13 +1284,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            //  Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnRightMouseDown(args);
-                if (RightMouseDown != null)
-                    RightMouseDown(this, args);
+                RightMouseDown?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1434,25 +1304,24 @@ namespace engenious.UI
                 child.InternalRightMouseUp(args);
             }
 
-            // Lokales Events
+            // Locol event
             args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
             OnRightMouseUp(args);
-            if (RightMouseUp != null)
-                RightMouseUp(this, args);
+            RightMouseUp?.Invoke(this, args);
         }
 
         internal bool InternalRightMouseClick(MouseEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
             // Children first (Order by Z-Order)
@@ -1463,13 +1332,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnRightMouseClick(args);
-                if (RightMouseClick != null)
-                    RightMouseClick(this, args);
+                RightMouseClick?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1477,16 +1345,16 @@ namespace engenious.UI
 
         internal bool InternalRightMouseDoubleClick(MouseEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore i disabled
             if (!Enabled) return true;
 
             // Children first (Order by Z-Order)
@@ -1497,13 +1365,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnRightMouseDoubleClick(args);
-                if (RightMouseDoubleClick != null)
-                    RightMouseDoubleClick(this, args);
+                RightMouseDoubleClick?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1511,16 +1378,16 @@ namespace engenious.UI
 
         internal bool InternalMouseScroll(MouseScrollEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
             // Children first (Order by Z-Order)
@@ -1531,13 +1398,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnMouseScroll(args);
-                if (MouseScroll != null)
-                    MouseScroll(this, args);
+                MouseScroll?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1545,22 +1411,22 @@ namespace engenious.UI
 
         internal bool InternalTouchDown(TouchEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
-            // Fokusieren
+            // Set focus
             Focus();
 
-            // Pressed-State aktivieren
+            // Activate pressed state
             Pressed = true;
 
             // Children first (Order by Z-Order)
@@ -1571,13 +1437,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnTouchDown(args);
-                if (TouchDown != null)
-                    TouchDown(this, args);
+                TouchDown?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1593,13 +1458,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnTouchMove(args);
-                if (TouchMove != null)
-                    TouchMove(this, args);
+                TouchMove?.Invoke(this, args);
             }
         }
 
@@ -1613,34 +1477,33 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnTouchUp(args);
-                if (TouchUp != null)
-                    TouchUp(this, args);
+                TouchUp?.Invoke(this, args);
             }
         }
 
         internal bool InternalTouchTap(TouchEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
-            // Fokusieren
+            // Set focus
             Focus();
 
-            // Pressed-State aktivieren
+            // Activate pressed state
             Pressed = true;
 
             // Children first (Order by Z-Order)
@@ -1651,13 +1514,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnTouchTap(args);
-                if (TouchTap != null)
-                    TouchTap(this, args);
+                TouchTap?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1665,22 +1527,22 @@ namespace engenious.UI
 
         internal bool InternalTouchDoubleTap(TouchEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
-            // Fokusieren
+            // Set focus
             Focus();
 
-            // Pressed-State aktivieren
+            // Activate pressed state
             Pressed = true;
 
             // Children first (Order by Z-Order)
@@ -1691,13 +1553,12 @@ namespace engenious.UI
                 if (args.Handled) break;
             }
 
-            // Lokales Events
+            // Local event
             if (!args.Handled)
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnTouchDoubleTap(args);
-                if (TouchDoubleTap != null)
-                    TouchDoubleTap(this, args);
+                TouchDoubleTap?.Invoke(this, args);
             }
 
             return Background != null;
@@ -1712,118 +1573,166 @@ namespace engenious.UI
             return new Point((int)local.X, (int)local.Y);
         }
 
+        /// <summary>
+        /// Raises the <see cref="Control.MouseEnter"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnMouseEnter(MouseEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.MouseLeave"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnMouseLeave(MouseEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.MouseMove"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnMouseMove(MouseEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn die linke Maustaste heruntergedrückt wird.
+        /// Raises the <see cref="Control.LeftMouseDown"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Event.</param>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnLeftMouseDown(MouseEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn die linke Maustaste losgelassen wird.
+        /// Raises the <see cref="Control.LeftMouseUp"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Event.</param>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnLeftMouseUp(MouseEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn mit der linken Maustaste auf das Steuerelement geklickt wird.
+        /// Raises the <see cref="Control.LeftMouseClick"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Ereignis.</param>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnLeftMouseClick(MouseEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.LeftMouseDoubleClick"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnLeftMouseDoubleClick(MouseEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn die rechte Maustaste heruntergedrückt wird.
+        /// Raises the <see cref="Control.RightMouseDown"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Event.</param>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnRightMouseDown(MouseEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn die rechte Maustaste losgelassen wird.
+        /// Raises the <see cref="Control.RightMouseUp"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Event.</param>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnRightMouseUp(MouseEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn mit der rechten Maustaste auf das Steuerelement geklickt wird.
+        /// Raises the <see cref="Control.RightMouseClick"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Ereignis.</param>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnRightMouseClick(MouseEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.RightMouseDoubleClick"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnRightMouseDoubleClick(MouseEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.MouseScroll"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnMouseScroll(MouseScrollEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.TouchDown"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="TouchEventArgs"/> that contains the event data.</param>
         protected virtual void OnTouchDown(TouchEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.TouchMove"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="TouchEventArgs"/> that contains the event data.</param>
         protected virtual void OnTouchMove(TouchEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.TouchUp"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="TouchEventArgs"/> that contains the event data.</param>
         protected virtual void OnTouchUp(TouchEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.TouchTap"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="TouchEventArgs"/> that contains the event data.</param>
         protected virtual void OnTouchTap(TouchEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="TouchDoubleTap"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="TouchEventArgs"/> that contains the event data.</param>
         protected virtual void OnTouchDoubleTap(TouchEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.HoveredChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="MouseEventArgs"/> that contains the event data.</param>
         protected virtual void OnHoveredChanged(PropertyEventArgs<TreeState> args) { }
 
+        /// <inheritdoc />
         public event MouseEventDelegate MouseEnter;
 
+        /// <inheritdoc />
         public event MouseEventDelegate MouseLeave;
 
+        /// <inheritdoc />
         public event MouseEventDelegate MouseMove;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn die linke Maustaste heruntergedrückt wird.
-        /// </summary>
+        /// <inheritdoc />
         public event MouseEventDelegate LeftMouseDown;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn die linke Maustaste losgelassen wird.
-        /// </summary>
+        /// <inheritdoc />
         public event MouseEventDelegate LeftMouseUp;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn mit der linken Maustaste auf das Steuerelement geklickt wird.
-        /// </summary>
+        /// <inheritdoc />
         public event MouseEventDelegate LeftMouseClick;
 
+        /// <inheritdoc />
         public event MouseEventDelegate LeftMouseDoubleClick;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn die rechte Maustaste heruntergedrückt wird.
-        /// </summary>
+        /// <inheritdoc />
         public event MouseEventDelegate RightMouseDown;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn die rechte Maustaste losgelassen wird.
-        /// </summary>
+        /// <inheritdoc />
         public event MouseEventDelegate RightMouseUp;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn mit der rechten Maustaste auf das Steuerelement geklickt wird.
-        /// </summary>
+        /// <inheritdoc />
         public event MouseEventDelegate RightMouseClick;
 
+        /// <inheritdoc />
         public event MouseEventDelegate RightMouseDoubleClick;
 
+        /// <inheritdoc />
         public event MouseScrollEventDelegate MouseScroll;
 
+        /// <inheritdoc />
         public event TouchEventDelegate TouchDown;
 
+        /// <inheritdoc />
         public event TouchEventDelegate TouchMove;
 
+        /// <inheritdoc />
         public event TouchEventDelegate TouchUp;
 
+        /// <inheritdoc />
         public event TouchEventDelegate TouchTap;
 
+        /// <inheritdoc />
         public event TouchEventDelegate TouchDoubleTap;
 
+        /// <inheritdoc />
         public event PropertyChangedDelegate<TreeState> HoveredChanged;
 
         #endregion
@@ -1903,77 +1812,77 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt wird.
+        /// Raises the <see cref="Control.KeyDown"/> event.
         /// </summary>
-        /// <param name="args">Zusätzliche Daten zum Event.</param>
+        /// <param name="args">A <see cref="KeyEventArgs"/> that contains the event data.</param>
         protected virtual void OnKeyDown(KeyEventArgs args) { }
-
+        
         /// <summary>
-        /// Wird aufgerufen, wenn eine Taste losgelassen wird.
+        /// Raises the <see cref="Control.KeyUp"/> event.
         /// </summary>
-        /// <param name="args">Zusätzliche Daten zum Event.</param>
+        /// <param name="args">A <see cref="KeyEventArgs"/> that contains the event data.</param>
         protected virtual void OnKeyUp(KeyEventArgs args) { }
 
         /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt ist.
+        /// Raises the <see cref="Control.KeyPress"/> event.
         /// </summary>
-        /// <param name="args">Zusätzliche Daten zum Event.</param>
+        /// <param name="args">A <see cref="KeyEventArgs"/> that contains the event data.</param>
         protected virtual void OnKeyPress(KeyEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.KeyTextPress"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="KeyTextEventArgs"/> that contains the event data.</param>
         protected virtual void OnKeyTextPress(KeyTextEventArgs args)
         {
 
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt wird.
-        /// </summary>
+        /// <inheritdoc />
         public event KeyEventDelegate KeyDown;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn eine Taste losgelassen wird.
-        /// </summary>
+        /// <inheritdoc />
         public event KeyEventDelegate KeyUp;
 
-        /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt ist.
-        /// </summary>
+        /// <inheritdoc />
         public event KeyEventDelegate KeyPress;
 
+        /// <inheritdoc />
         public event KeyTextEventDelegate KeyTextPress;
 
         #endregion
 
         #region Tabbing & Fokus
 
-        private bool focused = false;
+        private bool _focused = false;
 
-        private bool tabStop = false;
+        private bool _tabStop = false;
 
-        private bool canFocus = false;
+        private bool _canFocus = false;
 
-        private int tabOrder = 0;
+        private int _tabOrder = 0;
 
-        private int zOrder = 0;
-        public bool PathDirty = true;
+        private int _zOrder = 0;
+        /// <summary>
+        /// A value indicating whether the <see cref="RootPath"/> is dirty and needs to be recalculated.
+        /// </summary>
+        internal bool PathDirty = true;
 
 
         private readonly PropertyEventArgs<bool> _tabStopChangedEventArgs = new PropertyEventArgs<bool>();
-        /// <summary>
-        /// Legt fest, ob das Control per Tab zu erreichen ist.
-        /// </summary>
+        /// <inheritdoc />
         public bool TabStop
         {
-            get { return tabStop; }
+            get => _tabStop;
             set
             {
-                if (tabStop == value) return;
+                if (_tabStop == value) return;
 
-                _tabStopChangedEventArgs.OldValue = tabStop;
+                _tabStopChangedEventArgs.OldValue = _tabStop;
                 _tabStopChangedEventArgs.NewValue = value;
                 _tabStopChangedEventArgs.Handled = false;
 
-                tabStop = value;
+                _tabStop = value;
 
                 OnTabStopChanged(_tabStopChangedEventArgs);
                 TabStopChanged?.Invoke(this, _tabStopChangedEventArgs);
@@ -1981,22 +1890,20 @@ namespace engenious.UI
         }
 
         private readonly PropertyEventArgs<bool> _canFocusChangedEventArgs = new PropertyEventArgs<bool>();
-        /// <summary>
-        /// Gibt an ob das Control den Fokus bekommen kann oder legt dies fest.
-        /// </summary>
+        /// <inheritdoc />
         public bool CanFocus
         {
-            get { return canFocus; }
+            get => _canFocus;
             set
             {
-                if (canFocus == value) return;
+                if (_canFocus == value) return;
 
-                _canFocusChangedEventArgs.OldValue = canFocus;
+                _canFocusChangedEventArgs.OldValue = _canFocus;
                 _canFocusChangedEventArgs.NewValue = value;
                 _canFocusChangedEventArgs.Handled = false;
 
-                canFocus = value;
-                if (!canFocus) Unfocus();
+                _canFocus = value;
+                if (!_canFocus) Unfocus();
 
                 OnCanFocusChanged(_canFocusChangedEventArgs);
                 CanFocusChanged?.Invoke(this, _canFocusChangedEventArgs);
@@ -2004,119 +1911,108 @@ namespace engenious.UI
         }
 
         private readonly PropertyEventArgs<int> _tabOrderChangedEventArgs = new PropertyEventArgs<int>();
-        /// <summary>
-        /// Gibt die Position der Tab-Reihenfolge an.
-        /// </summary>
+        /// <inheritdoc />
         public int TabOrder
         {
-            get { return tabOrder; }
+            get => _tabOrder;
             set
             {
-                if (tabOrder == value) return;
+                if (_tabOrder == value) return;
 
-                _tabOrderChangedEventArgs.OldValue = tabOrder;
+                _tabOrderChangedEventArgs.OldValue = _tabOrder;
                 _tabOrderChangedEventArgs.NewValue = value;
                 _tabOrderChangedEventArgs.Handled = false;
 
-                tabOrder = value;
+                _tabOrder = value;
 
                 OnTabOrderChanged(_tabOrderChangedEventArgs);
                 TabOrderChanged?.Invoke(this, _tabOrderChangedEventArgs);
             }
         }
 
-        /// <summary>
-        /// Gibt an ob das aktuelle Control den Fokus hat.
-        /// </summary>
+        /// <inheritdoc />
         public TreeState Focused
         {
             get
             {
-                // Aktuelles Control ist fokusiert
-                if (focused) return TreeState.Active;
+                // The control is focused
+                if (_focused) return TreeState.Active;
 
-                // Schauen, ob irgend ein Child fokusiert ist
+                // Check whether a child is focused
                 foreach (var child in Children.InZOrder)
                     if (child.Focused != TreeState.None)
                         return TreeState.Passive;
 
-                return TreeState.None;
+                return TreeState.None; // Control isn't focused
             }
         }
 
         private readonly PropertyEventArgs<int> _zOrderChangedEventArgs = new PropertyEventArgs<int>();
-        /// <summary>
-        /// Gibt die grafische Reihenfolge der Controls 
-        /// innerhalb eines Containers an. (0 ganz vorne, 9999 weiter hinten)
-        /// </summary>
+        /// <inheritdoc />
         public int ZOrder
         {
-            get { return zOrder; }
+            get => _zOrder;
             set
             {
-                if (zOrder == value) return;
+                if (_zOrder == value) return;
 
-                _zOrderChangedEventArgs.OldValue = zOrder;
+                _zOrderChangedEventArgs.OldValue = _zOrder;
                 _zOrderChangedEventArgs.NewValue = value;
                 _zOrderChangedEventArgs.Handled = false;
 
-                zOrder = value;
+                _zOrder = value;
 
                 OnZOrderChanged(_zOrderChangedEventArgs);
                 ZOrderChanged?.Invoke(this, _zOrderChangedEventArgs);
             }
         }
 
-        /// <summary>
-        /// Setzt den Fokus auf dieses Control.
-        /// </summary>
+        /// <inheritdoc />
         public void Focus()
         {
             if (CanFocus && Visible)
                 Root.SetFocus(this);
         }
 
-        /// <summary>
-        /// Entfernt den Fokus.
-        /// </summary>
+        /// <inheritdoc />
         public void Unfocus()
         {
-            if (focused)
+            if (_focused)
                 Root.SetFocus(null);
         }
 
         /// <summary>
-        /// Setzt den Fokus auf das angegebene Control für den kompletten 
-        /// Visual Tree ab diesem Control abwärts.
+        /// Set the focus to the given control and the
+        /// Visual Tree down from this control.
         /// </summary>
-        /// <param name="control"></param>
+        /// <param name="control">The control to set the focus of.</param>
         internal void SetFocus(Control control)
         {
-            // Rekursiver Aufruf
+            // Set focus on child controls
             foreach (var child in Children.InZOrder)
                 child.SetFocus(control);
 
             bool hit = (control == this);
-            if (focused != hit)
+            if (_focused != hit)
             {
                 EventArgs args = EventArgsPool.Instance.Take();
                 if (hit)
                 {
-                    // Unsichtbare und nicht fokusierbare Elemente ignorieren
+                    // Ignore if invisible, disabled and not focused
                     if (!Visible || !CanFocus || !Enabled)
                         return;
 
-                    focused = true;
+                    _focused = true;
 
-                    // Fokus gerade erhalten
+                    // Just got focus
                     OnGotFocus(args);
                     GotFocus?.Invoke(this, args);
                 }
                 else
                 {
-                    focused = false;
+                    _focused = false;
 
-                    // Fokus gerade verloren
+                    // Just lost focus
                     OnLostFocus(args);
                     LostFocus?.Invoke(this, args);
                 }
@@ -2128,23 +2024,25 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Tabbt den aktuellen Fokus eines Controls eine Stelle weiter.
+        /// Tab the current focus of a control one control further in the tab order.
         /// </summary>
-        /// <returns>Tab konnte in diesem Ast ausgeführt werden</returns>
+        /// <returns>
+        /// A value indicating whether the tab order could be moved a control further in the tab order.
+        /// </returns>
         internal bool InternalTabbedForward()
         {
-            // Unsichtbare Elemente können nicht fokusiert werden
+            // Ignore invisible controls
             if (!Visible) return false;
 
             bool findFocused = Focused != TreeState.None;
 
-            // Root selektiert -> Unselekt
-            if (focused)
+            // Root selected -> unselect
+            if (_focused)
             {
                 Unfocus();
             }
 
-            // Keine Selektion -> Erstes Element selektieren
+            // No selection -> select first element
             else if (Focused == TreeState.None && CanFocus &&
                 TabStop && AbsoluteEnabled && AbsoluteVisible)
             {
@@ -2155,7 +2053,7 @@ namespace engenious.UI
             var controls = Children.OrderBy(c => c.TabOrder).ToArray();
             foreach (var control in controls)
             {
-                // Solange skippen, bis das fokusierte Control dran ist
+                // Skip, to the focused control
                 if (findFocused && control.Focused != TreeState.None)
                     findFocused = false;
 
@@ -2163,18 +2061,20 @@ namespace engenious.UI
                     return true;
             }
 
-            // Es konnte nichts fokusiert werden
+            // Was not able to set focus
             return false;
         }
 
         /// <summary>
-        /// Tabbt den aktuellen Fokus eines Controls eine Stelle zurück.
+        /// Tab the current focus of a control one control back in the tab order.
         /// </summary>
-        /// <returns>Tab konnte in diesem Ast ausgeführt werden</returns>
+        /// <returns>
+        /// A value indicating whether the tab order could be moved a control back in the tab order.
+        /// </returns>
         internal bool InternalTabbedBackward()
         {
-            // Root selektiert -> Unselekt und exit
-            if (focused)
+            // Root selected -> unselect and exit
+            if (_focused)
             {
                 Unfocus();
                 return false;
@@ -2184,7 +2084,7 @@ namespace engenious.UI
             var controls = Children.OrderByDescending(c => c.TabOrder).ToArray();
             foreach (var control in controls)
             {
-                // Solange skippen, bis das fokusierte Control dran ist
+                // Skip, to the focused control
                 if (findFocused && control.Focused != TreeState.None)
                     findFocused = false;
 
@@ -2192,7 +2092,7 @@ namespace engenious.UI
                     return true;
             }
 
-            // Noch kein Fokus gefunden -> root
+            // No focus found yet -> root
             if (CanFocus && TabStop && AbsoluteEnabled && AbsoluteVisible)
             {
                 Focus();
@@ -2202,28 +2102,58 @@ namespace engenious.UI
             return false;
         }
 
+        /// <summary>
+        /// Raises the <see cref="Control.TabStopChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnTabStopChanged(PropertyEventArgs<bool> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.CanFocusChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnCanFocusChanged(PropertyEventArgs<bool> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.TabOrderChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnTabOrderChanged(PropertyEventArgs<int> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.ZOrderChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnZOrderChanged(PropertyEventArgs<int> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.GotFocus"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="EventArgs"/> that contains the event data.</param>
         protected virtual void OnGotFocus(EventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.LostFocus"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="EventArgs"/> that contains the event data.</param>
         protected virtual void OnLostFocus(EventArgs args) { }
 
+        /// <inheritdoc />
         public event PropertyChangedDelegate<bool> TabStopChanged;
 
+        /// <inheritdoc />
         public event PropertyChangedDelegate<bool> CanFocusChanged;
 
+        /// <inheritdoc />
         public event PropertyChangedDelegate<int> TabOrderChanged;
 
+        /// <inheritdoc />
         public event PropertyChangedDelegate<int> ZOrderChanged;
 
+        /// <inheritdoc />
         public event EventDelegate GotFocus;
 
+        /// <inheritdoc />
         public event EventDelegate LostFocus;
 
         #endregion
@@ -2232,16 +2162,16 @@ namespace engenious.UI
 
         internal bool InternalStartDrag(DragEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
             // Children first (Order by Z-Order)
@@ -2257,8 +2187,7 @@ namespace engenious.UI
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnStartDrag(args);
-                if (StartDrag != null)
-                    StartDrag(args);
+                StartDrag?.Invoke(this, args);
             }
 
             return Background != null;
@@ -2283,44 +2212,41 @@ namespace engenious.UI
                 args.LocalPosition.X < ActualSize.X &&
                 args.LocalPosition.Y < ActualSize.Y;
 
-            // Wenn sich der DropHover Status verändert hat
-            if ((hovered && ScreenManager.Dragging) != dropHovered)
+            // When the DropHover state changed
+            if ((hovered && ScreenManager.Dragging) != _dropHovered)
             {
-                if (dropHovered)
+                if (_dropHovered)
                 {
                     OnDropLeave(args);
-                    if (DropLeave != null)
-                        DropLeave(args);
+                    DropLeave?.Invoke(this, args);
                 }
                 else
                 {
                     OnDropEnter(args);
-                    if (DropEnter != null)
-                        DropEnter(args);
+                    DropEnter?.Invoke(this, args);
                 }
             }
 
             OnDropMove(args);
-            if (DropMove != null)
-                DropMove(args);
+            DropMove?.Invoke(this, args);
 
-            dropHovered = hovered && ScreenManager.Dragging;
+            _dropHovered = hovered && ScreenManager.Dragging;
 
             return hovered;
         }
 
         internal bool InternalEndDrop(DragEventArgs args)
         {
-            // Ignorieren, falls nicht im Control-Bereich
+            // Ignore if outside of control region
             Point size = ActualSize;
             if (args.LocalPosition.X < 0 || args.LocalPosition.X >= size.X ||
                 args.LocalPosition.Y < 0 || args.LocalPosition.Y >= size.Y)
                 return false;
 
-            // Ignorieren, falls nicht gehovered
+            // Ignore if invisible
             if (!Visible) return false;
 
-            // Ignorieren, falls ausgeschaltet
+            // Ignore if disabled
             if (!Enabled) return true;
 
             // Children first (Order by Z-Order)
@@ -2336,62 +2262,85 @@ namespace engenious.UI
             {
                 args.LocalPosition = CalculateLocalPosition(args.GlobalPosition, this);
                 OnEndDrop(args);
-                if (EndDrop != null)
-                    EndDrop(args);
+                EndDrop?.Invoke(this, args);
             }
 
-            // Leave
-            if (dropHovered)
+            // Leave event
+            if (_dropHovered)
             {
                 OnDropLeave(args);
-                if (DropLeave != null)
-                    DropLeave(args);
-                dropHovered = false;
+                DropLeave?.Invoke(this, args);
+                _dropHovered = false;
             }
 
             return Background != null;
         }
 
+        /// <summary>
+        /// Raises the <see cref="Control.StartDrag"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="DragEventArgs"/> that contains the event data.</param>
         protected virtual void OnStartDrag(DragEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.DropMove"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="DragEventArgs"/> that contains the event data.</param>
         protected virtual void OnDropMove(DragEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.DropEnter"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="DragEventArgs"/> that contains the event data.</param>
         protected virtual void OnDropEnter(DragEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.DropLeave"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="DragEventArgs"/> that contains the event data.</param>
         protected virtual void OnDropLeave(DragEventArgs args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Control.EndDrop"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="DragEventArgs"/> that contains the event data.</param>
         protected virtual void OnEndDrop(DragEventArgs args) { }
 
+        /// <inheritdoc />
         public event DragEventDelegate StartDrag;
 
+        /// <inheritdoc />
         public event DragEventDelegate DropMove;
 
+        /// <inheritdoc />
         public event DragEventDelegate DropEnter;
 
+        /// <inheritdoc />
         public event DragEventDelegate DropLeave;
 
+        /// <inheritdoc />
         public event DragEventDelegate EndDrop;
 
         #endregion
     }
 
     /// <summary>
-    /// Liste der möglichen Hover- und FokusStates
+    /// Specifies the possible hover and focus states.
     /// </summary>
     public enum TreeState
     {
         /// <summary>
-        /// Keinen Flag.
+        /// This control is currently inactive.
         /// </summary>
         None,
 
         /// <summary>
-        /// Dieses Control wird nur durch Children gesetzt.
+        /// This control only gets set by its children.
         /// </summary>
         Passive,
 
         /// <summary>
-        /// Dises Control ist aktiv gesetzt.
+        /// The control is active.
         /// </summary>
         Active
     }

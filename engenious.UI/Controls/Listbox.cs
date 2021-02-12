@@ -4,24 +4,27 @@ using engenious.Graphics;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// List-Control für jegliche Art von Daten.
+    /// Ui control for generic list data.
     /// </summary>
-    /// <typeparam name="T">Datentyp der aufzulistenden Daten</typeparam>
+    /// <typeparam name="T">Type of the contained elements</typeparam>
     public class Listbox<T> : ListControl<T> where T : class
     {
         /// <summary>
-        /// Gibt den Scroll-Container zurück der um das Stackpanel der ListBox gespannt ist.
+        /// Gets the <see cref="Controls.ScrollContainer"/> which contains the <see cref="StackPanel"/> for the items.
         /// </summary>
-        public ScrollContainer ScrollContainer { get; private set; }
+        public ScrollContainer ScrollContainer { get; }
 
         /// <summary>
-        /// Gibt das StackPanel zurück das für die Auflistung der Items genutzt wird.
+        /// Gets the <see cref="Controls.StackPanel"/> that is used for the list items.
         /// </summary>
-        public StackPanel StackPanel { get; private set; }
+        public StackPanel StackPanel { get; }
 
+        /// <summary>
+        /// Gets or sets the orientation of the listed elements.
+        /// </summary>
         public Orientation Orientation
         {
-            get { return StackPanel.Orientation; }
+            get => StackPanel.Orientation;
             set
             {
                 StackPanel.Orientation = value;
@@ -44,21 +47,15 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Liefert das Container Control des aktuell selektierten Items zurück.
+        /// Gets the container control containing the <see cref="ListControl{T}.SelectedItem"/>.
         /// </summary>
-        private Control SelectedItemContainer
-        {
-            get
-            {
-                return GetItemContainer(SelectedItem);
-            }
-        }
+        private Control SelectedItemContainer => GetItemContainer(SelectedItem);
 
         /// <summary>
-        /// Liefert das Container-Control des angegebenen Elements.
+        /// Gets the container control containing a specific list element.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">The list element to get the associated control of.</param>
+        /// <returns>The container control containing the given list item.</returns>
         private Control GetItemContainer(T item)
         {
             if (item != null)
@@ -69,9 +66,14 @@ namespace engenious.UI.Controls
                 }
             return null;
         }
-
-        public Listbox(BaseScreenComponent manager)
-            : base(manager)
+        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Listbox{T}"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Listbox(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
             ScrollContainer = new ScrollContainer(manager)
             {
@@ -89,6 +91,7 @@ namespace engenious.UI.Controls
             ApplySkin(typeof(Listbox<T>));
         }
 
+        /// <inheritdoc />
         protected override void OnInsert(T item, int index)
         {
             Control control = TemplateGenerator(item);
@@ -102,6 +105,7 @@ namespace engenious.UI.Controls
             StackPanel.Controls.Insert(index, wrapper);
         }
 
+        /// <inheritdoc />
         protected override void OnRemove(T item, int index)
         {
             Control control = GetItemContainer(item);
@@ -111,19 +115,21 @@ namespace engenious.UI.Controls
                 InvalidateDimensions();
         }
 
+        /// <inheritdoc />
         protected override void OnDrawBackground(SpriteBatch batch, Rectangle backgroundArea, GameTime gameTime, float alpha)
         {
             base.OnDrawBackground(batch, backgroundArea, gameTime, alpha);
 
-            // Selektiertes Item mit dem richtigen Brush markieren
+            // Draw background brush for selected item
             Control control = SelectedItemContainer;
-            if (control != null && SelectedItemBrush != null)
+            if (control != null)
             {
-                SelectedItemBrush.Draw(batch,
+                SelectedItemBrush?.Draw(batch,
                     new Rectangle(control.AbsolutePosition, control.ActualSize), alpha);
             }
         }
 
+        /// <inheritdoc />
         protected override void OnSelectedItemChanged(SelectionEventArgs<T> args)
         {
             base.OnSelectedItemChanged(args);
@@ -133,33 +139,34 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Stellt die Sichtbarkeit des angegebenen Items sicher.
+        /// Ensures that a given item is visible in the listbox by scrolling into the appropriate range.
         /// </summary>
-        /// <param name="item"></param>
+        /// <param name="item">The item to show in visible range.</param>
         public void EnsureVisibility(T item)
         {
             Control container = GetItemContainer(item);
             Rectangle visibleArea = ScrollContainer.VisibleArea;
 
-            // Element ist zu weit unten -> hoch scrollen
+            // Element too far down -> scroll up
             if (container.ActualPosition.Y + container.ActualSize.Y > visibleArea.Bottom)
                 ScrollContainer.VerticalScrollPosition =
                     container.ActualPosition.Y + container.ActualSize.Y - ActualClientSize.Y;
 
-            // Element ist zu weit oben -> nach unten scrollen
+            // Element too far up -> scroll down
             if (container.ActualPosition.Y < visibleArea.Top)
                 ScrollContainer.VerticalScrollPosition = container.ActualPosition.Y;
 
-            // Element ist zu weit rechts -> nach links scrollen
+            // Element too far right -> scroll left
             if (container.ActualPosition.X + container.ActualSize.X > visibleArea.Right)
                 ScrollContainer.HorizontalScrollPosition =
                     container.ActualPosition.X + container.ActualSize.X - ActualClientSize.X;
 
-            // Element ist zu weit links -> nach rechts scrollen
+            // Element too far left -> scroll right
             if (container.ActualPosition.X < visibleArea.Left)
                 ScrollContainer.HorizontalScrollPosition = container.ActualPosition.X;
         }
 
+        /// <inheritdoc />
         protected override void OnLeftMouseClick(MouseEventArgs args)
         {
             base.OnLeftMouseClick(args);

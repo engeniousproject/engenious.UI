@@ -13,24 +13,24 @@ using Vector2 = engenious.Vector2;
 namespace engenious.UI
 {
     /// <summary>
-    /// Basisklasse für alle MonoGame-Komponenten
+    /// Base screen component manager for engenious Components.
     /// </summary>
     public class BaseScreenComponent : DrawableGameComponent
     {
         /// <summary>
-        /// Maximaler Standard Delay zwischen zwei Clicks innerhalb eines Double Clicks.
+        /// Maximum default delay[ms] between clicks to be recognized as double clicks.
         /// </summary>
-        public const int DEFAULTDOUBLECLICKDELAY = 500;
+        public const int DefaultDoubleClickDelay = 500;
 
-        private ContainerControl root;
+        private ContainerControl _root;
 
-        private FlyoutControl flyout;
+        private FlyoutControl _flyout;
 
-        private SpriteBatch batch;
+        private SpriteBatch _batch;
 
-        private MouseMode mouseMode;
+        private MouseMode _mouseMode;
 
-        struct InvokeAction
+        private struct InvokeAction
         {
             public InvokeAction(Action action, ManualResetEvent resetEvent)
             {
@@ -42,14 +42,14 @@ namespace engenious.UI
             public ManualResetEvent ResetEvent { get; }
         }
 
-        private ConcurrentQueue<InvokeAction> invokes = new ConcurrentQueue<InvokeAction>();
+        private readonly ConcurrentQueue<InvokeAction> _invokes = new();
 
         /// <summary>
         /// Prefix für die Titel-Leiste
         /// </summary>
         public string TitlePrefix
         {
-            get { return _titlePrefix; }
+            get => _titlePrefix;
             set
             {
                 _titlePrefix = value;
@@ -58,7 +58,7 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Gibt das Root-Control zurück oder legt dieses fest.
+        /// Gets the root control containing all controls
         /// </summary>
         public ContentControl Frame { get; private set; }
 
@@ -68,71 +68,69 @@ namespace engenious.UI
         public ContainerControl ScreenTarget { get; set; }
 
         /// <summary>
-        /// Legt das Standard-Template für eine Navigation zu einem Screen fest.
+        /// Gets or sets the default transition to use to navigate to a screen.
         /// </summary>
         public Transition NavigateToTransition { get; set; }
 
         /// <summary>
-        /// Legt das Standard-Template für eine Navigation von einem Screen weg fest.
+        /// Gets or sets the default transition to use to navigate away from a screen.
         /// </summary>
         public Transition NavigateFromTransition { get; set; }
 
         /// <summary>
-        /// Referenz zum MonoGame Content Manager.
+        /// Gets the engenious ContentManager used for loading game content.
         /// </summary>
-        public ContentManagerBase Content { get; private set; }
+        public ContentManagerBase Content { get; }
 
         /// <summary>
-        /// Gibt an, ob gerade ein Drag-Vorgang im Gange ist.
+        /// Gets a value indicating whether dragging currently happens.
         /// </summary>
-        public bool Dragging { get { return DraggingArgs != null && DraggingArgs.Handled; } }
+        public bool Dragging => DraggingArgs != null && DraggingArgs.Handled;
 
         /// <summary>
-        /// Legt fest, ob es GamePad Support geben soll (nicht unterstützt bisher)
+        /// Gets or sets a value indicating whether game pad input should be activated. (Currently not supported)
         /// </summary>
         public bool GamePadEnabled { get; set; }
 
         /// <summary>
-        /// Legt fest, ob es Maus Support geben soll
+        /// Gets or sets a value indicating whether mouse input should be activated. 
         /// </summary>
         public bool MouseEnabled { get; set; }
 
         /// <summary>
-        /// Legt fest, ob es Touch Support geben soll.
+        /// Gets or sets a value indicating whether touch input should be activated. (Currently not supported)
         /// </summary>
-        //public bool TouchEnabled { get; set; }
+        public bool TouchEnabled { get; set; }
 
         /// <summary>
-        /// Legt fest, ob es Keyboard Support geben soll.
+        /// Gets or sets a value indicating whether keyboard input should be activated. 
         /// </summary>
         public bool KeyboardEnabled { get; set; }
 
         /// <summary>
-        /// Gibt den maximalen Zeitraum in Millisekunden zwischen zwei Clicks an um einen Double Click auszulösen oder legt diesen fest.
+        /// Gets or sets maximum delay[ms] between clicks to be recognized as double clicks.
+        /// <remarks>Default value is <see cref="DefaultDoubleClickDelay"/>.</remarks>
         /// </summary>
         public int DoubleClickDelay { get; set; }
 
         /// <summary>
-        /// Gibt den aktuellen Modus der Maus zurück.
+        /// Gets or sets the current <see cref="UI.MouseMode"/>.
         /// </summary>
         public MouseMode MouseMode
         {
-            get
-            {
-                return mouseMode;
-            }
+            get => _mouseMode;
             private set
             {
-                if (mouseMode != value)
+                if (_mouseMode != value)
                 {
-                    mouseMode = value;
-                    Game.IsMouseVisible = (mouseMode != MouseMode.Captured);
-                    Game.IsCursorGrabbed = (mouseMode == MouseMode.Captured);
+                    _mouseMode = value;
+                    Game.IsMouseVisible = (_mouseMode != MouseMode.Captured);
+                    Game.IsCursorGrabbed = (_mouseMode == MouseMode.Captured);
 
-                    if (mouseMode == MouseMode.Free)
+                    if (_mouseMode == MouseMode.Free)
                         Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
                     else
-                        resetMouse = true;
+                        _resetMouse = true;
                 }
             }
         }
@@ -140,12 +138,12 @@ namespace engenious.UI
         /// <summary>
         /// Reset (ignore) mouse-position. Used to compensate first movement after mouse-capture.
         /// </summary>
-        private bool resetMouse = false;
+        private bool _resetMouse = false;
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der Klasse BaseScreenComponent.
+        /// Initializes a new instance of the <see cref="BaseScreenComponent"/> class.
         /// </summary>
-        /// <param name="game">Die aktuelle Game-Instanz.</param>
+        /// <param name="game">The game instance for this <see cref="BaseScreenComponent"/>.</param>
         public BaseScreenComponent(IGame game)
             : base(game)
         {
@@ -154,8 +152,8 @@ namespace engenious.UI
             KeyboardEnabled = true;
             MouseEnabled = true;
             GamePadEnabled = true;
-            //TouchEnabled = true;
-            DoubleClickDelay = DEFAULTDOUBLECLICKDELAY;
+            TouchEnabled = true;
+            DoubleClickDelay = DefaultDoubleClickDelay;
 
             _pressedKeys = ((Keys[]) Enum.GetValues(typeof(Keys))).Where(x => (int)x != 0).Select(k => (int)k).Distinct().Select(idx => UnpressedKeyTimestamp).ToArray();
 
@@ -167,7 +165,7 @@ namespace engenious.UI
                 {
                     KeyTextEventArgs args = new KeyTextEventArgs() { Character = e };
 
-                    root.InternalKeyTextPress(args);
+                    _root.InternalKeyTextPress(args);
                 }
             };
 
@@ -175,23 +173,20 @@ namespace engenious.UI
 
             Game.Resized += (s, e) =>
             {
-                if (ClientSizeChanged != null)
-                    ClientSizeChanged(s, e);
+                ClientSizeChanged?.Invoke(s, e);
             };
         }
-
-        /// <summary>
-        /// Lädt die für MonoGameUI notwendigen Content-Dateien.
-        /// </summary>
+        
+        /// <inheritdoc />
         protected override void LoadContent()
         {
             Skin.Pix = new Texture2D(GraphicsDevice, 1, 1);
             Skin.Pix.SetData<Color>(stackalloc [] { Color.White });
 
             Skin.Current = new Skin(Content);
-            batch = new SpriteBatch(GraphicsDevice);
+            _batch = new SpriteBatch(GraphicsDevice);
 
-            root = new ContainerControl(this)
+            _root = new ContainerControl(this)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
@@ -202,7 +197,7 @@ namespace engenious.UI
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
-            root.Controls.Add(Frame);
+            _root.Controls.Add(Frame);
 
             ContainerControl screenContainer = new ContainerControl(this)
             {
@@ -212,29 +207,29 @@ namespace engenious.UI
             Frame.Content = screenContainer;
             ScreenTarget = screenContainer;
 
-            flyout = new FlyoutControl(this)
+            _flyout = new FlyoutControl(this)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
-            root.Controls.Add(flyout);
+            _root.Controls.Add(_flyout);
         }
 
-        private bool lastLeftMouseButtonPressed = false;
+        private bool _lastLeftMouseButtonPressed = false;
 
-        private bool lastRightMouseButtonPressed = false;
+        private bool _lastRightMouseButtonPressed = false;
 
-        private int lastMouseWheelValue = 0;
+        private int _lastMouseWheelValue = 0;
 
-        private Point lastMousePosition = Point.Zero;
+        private Point _lastMousePosition = Point.Zero;
 
-        private TimeSpan? lastLeftClick = null;
+        private TimeSpan? _lastLeftClick = null;
 
-        private TimeSpan? lastRightClick = null;
+        private TimeSpan? _lastRightClick = null;
 
         //private TimeSpan? lastTouchTap = null;
 
-        private int? draggingId = null;
+        private int? _draggingId = null;
 
         internal DragEventArgs DraggingArgs { get; private set; }
 
@@ -253,18 +248,18 @@ namespace engenious.UI
             if (invokedAction == null)
                 throw new ArgumentNullException(nameof(invokedAction));
             var resetEvent = new ManualResetEvent(false);
-            invokes.Enqueue(new InvokeAction(invokedAction, resetEvent));
+            _invokes.Enqueue(new InvokeAction(invokedAction, resetEvent));
             resetEvent.WaitOne();
             resetEvent.Dispose();
         }
 
         /// <summary>
-        /// Handling aller Eingaben, Mausbewegungen und Updaten aller Screens und Controls.
+        /// Handling of all input and update all screens and controls.
         /// </summary>
-        /// <param name="gameTime"></param>
+        /// <param name="gameTime">Contains the elapsed time since the last update, as well as total elapsed time.</param>
         public override void Update(GameTime gameTime)
         {
-            while(invokes.TryDequeue(out var act))
+            while(_invokes.TryDequeue(out var act))
             {
                 act.Action.Invoke();
                 act.ResetEvent.Set();
@@ -277,24 +272,24 @@ namespace engenious.UI
 
                 if (MouseEnabled)
                 {
-                    // Mausposition anhand des Mouse Modes ermitteln
+                    // Determine mouse position dependant on current mouse mode
                     MouseState mouse;
                     Point mousePosition;
-                    if (MouseMode == MouseMode.Captured && !resetMouse)
+                    if (MouseMode == MouseMode.Captured && !_resetMouse)
                     {
 
                         mouse = Mouse.GetState();
                         mousePosition = new Point(
-                            mouse.X - (lastMousePosition.X),
-                            mouse.Y - (lastMousePosition.Y));
+                            mouse.X - (_lastMousePosition.X),
+                            mouse.Y - (_lastMousePosition.Y));
                     }
-                    else if(resetMouse)
+                    else if(_resetMouse)
                     {
                         Mouse.SetPosition(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
-                        lastMousePosition = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
+                        _lastMousePosition = new Point(GraphicsDevice.Viewport.Width / 2, GraphicsDevice.Viewport.Height / 2);
                         mouse = Mouse.GetState();
                         mousePosition = new Point();
-                        resetMouse = false;
+                        _resetMouse = false;
                     }
                     else
                     {
@@ -310,11 +305,11 @@ namespace engenious.UI
                     mouseEventArgs.LocalPosition = mousePosition;
 
                     // Mouse Move
-                    if (mousePosition != lastMousePosition)
+                    if (mousePosition != _lastMousePosition)
                     {
                         mouseEventArgs.Handled = false;
 
-                        root.InternalMouseMove(mouseEventArgs);
+                        _root.InternalMouseMove(mouseEventArgs);
                         if (!mouseEventArgs.Handled)
                             MouseMove?.Invoke(mouseEventArgs);
 
@@ -326,9 +321,9 @@ namespace engenious.UI
                             DraggingArgs.GlobalPosition = mousePosition;
                             DraggingArgs.LocalPosition = mousePosition;
 
-                            draggingId = null;
+                            _draggingId = null;
 
-                            root.InternalStartDrag(DraggingArgs);
+                            _root.InternalStartDrag(DraggingArgs);
                             if (!DraggingArgs.Handled)
                                 StartDrag?.Invoke(DraggingArgs);
                         }
@@ -336,7 +331,7 @@ namespace engenious.UI
                         // Drop move
                         if (mouse.LeftButton == ButtonState.Pressed &&
                             DraggingArgs != null &&
-                            draggingId == null &&
+                            _draggingId == null &&
                             DraggingArgs.Handled)
                         {
                             //TODO: perhaps pool single object?
@@ -348,29 +343,29 @@ namespace engenious.UI
                             args.Icon = DraggingArgs.Icon;
                             args.Sender = DraggingArgs.Sender;
 
-                            root.InternalDropMove(args);
+                            _root.InternalDropMove(args);
                             if (!args.Handled)
                                 DropMove?.Invoke(args);
                         }
                     }
 
-                    // Linke Maustaste
+                    // Left mouse button
                     if (mouse.LeftButton == ButtonState.Pressed)
                     {
-                        if (!lastLeftMouseButtonPressed)
+                        if (!_lastLeftMouseButtonPressed)
                         {
                             mouseEventArgs.Handled = false;
 
-                            // Linke Maustaste wurde neu gedrückt
-                            root.InternalLeftMouseDown(mouseEventArgs);
+                            // Left mouse button was just newly pressed
+                            _root.InternalLeftMouseDown(mouseEventArgs);
                             if (!mouseEventArgs.Handled)
                                 LeftMouseDown?.Invoke(mouseEventArgs);
                         }
-                        lastLeftMouseButtonPressed = true;
+                        _lastLeftMouseButtonPressed = true;
                     }
                     else
                     {
-                        if (lastLeftMouseButtonPressed)
+                        if (_lastLeftMouseButtonPressed)
                         {
                             // Handle Drop
                             if (DraggingArgs != null && DraggingArgs.Handled)
@@ -382,7 +377,7 @@ namespace engenious.UI
                                 args.Icon = DraggingArgs.Icon;
                                 args.Sender = DraggingArgs.Sender;
 
-                                root.InternalEndDrop(args);
+                                _root.InternalEndDrop(args);
                                 if (!args.Handled)
                                     EndDrop?.Invoke(args);
                             }
@@ -390,96 +385,96 @@ namespace engenious.UI
                             // Discard Dragging Infos
                             DragEventArgsPool.Instance.Release(DraggingArgs);
                             DraggingArgs = null;
-                            draggingId = null;
+                            _draggingId = null;
 
-                            // Linke Maustaste wurde losgelassen
+                            // Left mouse button was released
                             mouseEventArgs.Handled = false;
 
-                            root.InternalLeftMouseClick(mouseEventArgs);
+                            _root.InternalLeftMouseClick(mouseEventArgs);
                             if (!mouseEventArgs.Handled)
                                 LeftMouseClick?.Invoke(mouseEventArgs);
 
-                            if (lastLeftClick.HasValue &&
-                                gameTime.TotalGameTime - lastLeftClick.Value < TimeSpan.FromMilliseconds(DoubleClickDelay))
+                            if (_lastLeftClick.HasValue &&
+                                gameTime.TotalGameTime - _lastLeftClick.Value < TimeSpan.FromMilliseconds(DoubleClickDelay))
                             {
                                 // Double Left Click
                                 mouseEventArgs.Handled = false;
 
-                                root.InternalLeftMouseDoubleClick(mouseEventArgs);
+                                _root.InternalLeftMouseDoubleClick(mouseEventArgs);
                                 if (!mouseEventArgs.Handled)
                                     LeftMouseDoubleClick?.Invoke(mouseEventArgs);
 
-                                lastLeftClick = null;
+                                _lastLeftClick = null;
                             }
                             else
                             {
-                                lastLeftClick = gameTime.TotalGameTime;
+                                _lastLeftClick = gameTime.TotalGameTime;
                             }
 
                             // Mouse Up
                             mouseEventArgs.Handled = false;
 
-                            root.InternalLeftMouseUp(mouseEventArgs);
+                            _root.InternalLeftMouseUp(mouseEventArgs);
                             if (!mouseEventArgs.Handled)
                                 LeftMouseUp?.Invoke(mouseEventArgs);
                         }
-                        lastLeftMouseButtonPressed = false;
+                        _lastLeftMouseButtonPressed = false;
                     }
 
-                    // Rechte Maustaste
+                    // Right mouse button
                     if (mouse.RightButton == ButtonState.Pressed)
                     {
-                        if (!lastRightMouseButtonPressed)
+                        if (!_lastRightMouseButtonPressed)
                         {
-                            // Rechte Maustaste neu gedrückt
+                            // Right mouse button was just newly pressed
                             mouseEventArgs.Handled = false;
 
-                            root.InternalRightMouseDown(mouseEventArgs);
+                            _root.InternalRightMouseDown(mouseEventArgs);
                             if (!mouseEventArgs.Handled)
                                 RightMouseDown?.Invoke(mouseEventArgs);
                         }
-                        lastRightMouseButtonPressed = true;
+                        _lastRightMouseButtonPressed = true;
                     }
                     else
                     {
-                        if (lastRightMouseButtonPressed)
+                        if (_lastRightMouseButtonPressed)
                         {
-                            // Rechte Maustaste losgelassen
+                            // Right mouse button was released
                             mouseEventArgs.Handled = false;
-                            root.InternalRightMouseClick(mouseEventArgs);
+                            _root.InternalRightMouseClick(mouseEventArgs);
                             if (!mouseEventArgs.Handled)
                                 RightMouseClick?.Invoke(mouseEventArgs);
 
-                            if (lastRightClick.HasValue &&
-                                gameTime.TotalGameTime - lastRightClick.Value < TimeSpan.FromMilliseconds(DoubleClickDelay))
+                            if (_lastRightClick.HasValue &&
+                                gameTime.TotalGameTime - _lastRightClick.Value < TimeSpan.FromMilliseconds(DoubleClickDelay))
                             {
                                 // Double Left Click
                                 mouseEventArgs.Handled = false;
 
-                                root.InternalRightMouseDoubleClick(mouseEventArgs);
+                                _root.InternalRightMouseDoubleClick(mouseEventArgs);
                                 if (!mouseEventArgs.Handled)
                                     RightMouseDoubleClick?.Invoke(mouseEventArgs);
 
-                                lastRightClick = null;
+                                _lastRightClick = null;
                             }
                             else
                             {
-                                lastRightClick = gameTime.TotalGameTime;
+                                _lastRightClick = gameTime.TotalGameTime;
                             }
 
                             mouseEventArgs.Handled = false;
 
-                            root.InternalRightMouseUp(mouseEventArgs);
+                            _root.InternalRightMouseUp(mouseEventArgs);
                             if (!mouseEventArgs.Handled)
                                 RightMouseUp?.Invoke(mouseEventArgs);
                         }
-                        lastRightMouseButtonPressed = false;
+                        _lastRightMouseButtonPressed = false;
                     }
 
                     // Mousewheel
-                    if (lastMouseWheelValue != mouse.ScrollWheelValue)
+                    if (_lastMouseWheelValue != mouse.ScrollWheelValue)
                     {
-                        int diff = (mouse.ScrollWheelValue - lastMouseWheelValue);
+                        int diff = (mouse.ScrollWheelValue - _lastMouseWheelValue);
 
                         MouseScrollEventArgs scrollArgs = new MouseScrollEventArgs
                         {
@@ -488,21 +483,21 @@ namespace engenious.UI
                             LocalPosition = mousePosition,
                             Steps = diff
                         };
-                        root.InternalMouseScroll(scrollArgs);
+                        _root.InternalMouseScroll(scrollArgs);
                         if (!scrollArgs.Handled)
                             MouseScroll?.Invoke(scrollArgs);
 
-                        lastMouseWheelValue = mouse.ScrollWheelValue;
+                        _lastMouseWheelValue = mouse.ScrollWheelValue;
                     }
 
-                    // Potentieller Positionsreset
+                    // Potential mouse position reset.
                     if (MouseMode == MouseMode.Free)
                     {
-                        lastMousePosition = mousePosition;
+                        _lastMousePosition = mousePosition;
                     }
                     else if (mousePosition.X != 0 || mousePosition.Y != 0)
                     {
-                        lastMousePosition = mouse.Location;
+                        _lastMousePosition = mouse.Location;
                     }
 
                     MouseEventArgsPool.Instance.Release(mouseEventArgs);
@@ -516,9 +511,9 @@ namespace engenious.UI
                 {
                     KeyboardState keyboard = Keyboard.GetState();
 
-                    bool shift = keyboard.IsKeyDown(Keys.LeftShift) | keyboard.IsKeyDown(Keys.RightShift);
-                    bool ctrl = keyboard.IsKeyDown(Keys.LeftControl) | keyboard.IsKeyDown(Keys.RightControl);
-                    bool alt = keyboard.IsKeyDown(Keys.LeftAlt) | keyboard.IsKeyDown(Keys.RightAlt);
+                    bool shift = keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift);
+                    bool ctrl = keyboard.IsKeyDown(Keys.LeftControl) || keyboard.IsKeyDown(Keys.RightControl);
+                    bool alt = keyboard.IsKeyDown(Keys.LeftAlt) || keyboard.IsKeyDown(Keys.RightAlt);
 
                     KeyEventArgs args;
 
@@ -530,49 +525,49 @@ namespace engenious.UI
                             // ReSharper disable once CompareOfFloatsByEqualityOperator
                             if (_pressedKeys[i] == UnpressedKeyTimestamp)
                             {
-                                // Taste ist neu
+                                // Newly pressed key
 
-                                args = KeyEventArgsPool.Take();
+                                args = KeyEventArgsPool.Instance.Take();
 
                                 args.Key = key;
                                 args.Shift = shift;
                                 args.Ctrl = ctrl;
                                 args.Alt = alt;
 
-                                root.InternalKeyDown(args);
+                                _root.InternalKeyDown(args);
 
                                 if (!args.Handled)
                                 {
                                     KeyDown?.Invoke(args);
                                 }
 
-                                KeyEventArgsPool.Release(args);
+                                KeyEventArgsPool.Instance.Release(args);
 
-                                args = KeyEventArgsPool.Take();
+                                args = KeyEventArgsPool.Instance.Take();
 
                                 args.Key = key;
                                 args.Shift = shift;
                                 args.Ctrl = ctrl;
                                 args.Alt = alt;
 
-                                root.InternalKeyPress(args);
+                                _root.InternalKeyPress(args);
                                 _pressedKeys[i] = gameTime.TotalGameTime.TotalMilliseconds + 500;
 
-                                KeyEventArgsPool.Release(args);
+                                KeyEventArgsPool.Instance.Release(args);
 
-                                // Spezialfall Tab-Taste (falls nicht verarbeitet wurde)
+                                // Special key Tab for focus switching (if it wasn't handles)
                                 if (key == Keys.Tab && !args.Handled)
                                 {
-                                    if (shift) root.InternalTabbedBackward();
-                                    else root.InternalTabbedForward();
+                                    if (shift) _root.InternalTabbedBackward();
+                                    else _root.InternalTabbedForward();
                                 }
                             }
                             else
                             {
-                                // Taste ist immernoch gedrückt
+                                // Key still pressed
                                 if (_pressedKeys[i] <= gameTime.TotalGameTime.TotalMilliseconds)
                                 {
-                                    args = KeyEventArgsPool.Take();
+                                    args = KeyEventArgsPool.Instance.Take();
 
                                     args.Key = key;
                                     args.Shift = shift;
@@ -580,13 +575,13 @@ namespace engenious.UI
                                     args.Alt = alt;
 
 
-                                    root.InternalKeyPress(args);
+                                    _root.InternalKeyPress(args);
                                     if (!args.Handled)
                                     {
                                         KeyPress?.Invoke(args);
                                     }
 
-                                    KeyEventArgsPool.Release(args);
+                                    KeyEventArgsPool.Instance.Release(args);
 
                                     _pressedKeys[i] = gameTime.TotalGameTime.TotalMilliseconds + 50;
                                 }
@@ -597,15 +592,15 @@ namespace engenious.UI
                             // ReSharper disable once CompareOfFloatsByEqualityOperator
                             if (_pressedKeys[i] != UnpressedKeyTimestamp)
                             {
-                                // Taste losgelassen
-                                args = KeyEventArgsPool.Take();
+                                // Key released
+                                args = KeyEventArgsPool.Instance.Take();
 
                                 args.Key = key;
                                 args.Shift = shift;
                                 args.Ctrl = ctrl;
                                 args.Alt = alt;
 
-                                root.InternalKeyUp(args);
+                                _root.InternalKeyUp(args);
                                 _pressedKeys[i] = UnpressedKeyTimestamp;
 
                                 if (!args.Handled)
@@ -613,7 +608,7 @@ namespace engenious.UI
                                     KeyUp?.Invoke(args);
                                 }
 
-                                KeyEventArgsPool.Release(args);
+                                KeyEventArgsPool.Instance.Release(args);
                             }
                         }
                     }
@@ -711,7 +706,7 @@ namespace engenious.UI
                 //                DraggingArgs = null;
                 //                draggingId = null;
 
-                //                // Linke Maustaste wurde losgelassen
+                //                // Left mouse button released
                 //                TouchEventArgs tapArgs = new TouchEventArgs
                 //                {
                 //                    TouchId = touchPoint.Id,
@@ -758,14 +753,14 @@ namespace engenious.UI
 
             #region Recalculate Sizes
 
-            if (root.HasInvalidDimensions())
+            if (_root.HasInvalidDimensions())
             {
                 Point available = new Point(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height);
-                Point required = root.GetExpectedSize(available);
-                root.SetActualSize(available);
+                Point required = _root.GetExpectedSize(available);
+                _root.SetActualSize(available);
             }
 
-            root.Update(gameTime);
+            _root.Update(gameTime);
 
             #endregion
 
@@ -774,13 +769,11 @@ namespace engenious.UI
 
             if (_titleDirty || (ActiveScreen?.Title != _lastActiveScreenTitle))
             {
-                string screentitle = ActiveScreen?.Title ?? string.Empty;
-                string windowtitle = TitlePrefix + (string.IsNullOrEmpty(screentitle) ? string.Empty : " - " + screentitle);
+                string screenTitle = ActiveScreen?.Title ?? string.Empty;
+                string windowTitle = TitlePrefix + (string.IsNullOrEmpty(screenTitle) ? string.Empty : " - " + screenTitle);
 
-                var window = Game.RenderingSurface as Window;
-
-                if (window != null && window.Title != windowtitle)
-                    window.Title = windowtitle;
+                if (Game.RenderingSurface is Window window && window.Title != windowTitle)
+                    window.Title = windowTitle;
 
                 _titleDirty = false;
                 _lastActiveScreenTitle = ActiveScreen?.Title;
@@ -790,84 +783,82 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Zeichnet Screens und Controls.
+        /// Draws the screens und controls.
         /// </summary>
-        /// <param name="gameTime"></param>
+        /// <param name="gameTime">Contains the elapsed time since the last draw, as well as total elapsed time.</param>
         public override void Draw(GameTime gameTime)
         {
-            root.PreDraw(gameTime);
-            root.Draw(batch, GraphicsDevice.Viewport.Bounds, gameTime);
+            _root.PreDraw(gameTime);
+            _root.Draw(_batch, GraphicsDevice.Viewport.Bounds, gameTime);
 
             // Drag Overlay
             if (DraggingArgs != null && DraggingArgs.Handled && DraggingArgs.Icon != null)
             {
-                batch.Begin();
+                _batch.Begin();
                 if (DraggingArgs.IconSize != Point.Zero)
-                    batch.Draw(DraggingArgs.Icon, new Rectangle(lastMousePosition, DraggingArgs.IconSize), Color.White);
+                    _batch.Draw(DraggingArgs.Icon, new Rectangle(_lastMousePosition, DraggingArgs.IconSize), Color.White);
                 else
-                    batch.Draw(DraggingArgs.Icon, new Vector2(lastMousePosition.X, lastMousePosition.Y), Color.White);
-                batch.End();
+                    _batch.Draw(DraggingArgs.Icon, new Vector2(_lastMousePosition.X, _lastMousePosition.Y), Color.White);
+                _batch.End();
             }
         }
 
-        private List<Screen> historyStack = new List<Screen>();
+        private readonly List<Screen> _historyStack = new List<Screen>();
 
         /// <summary>
-        /// Gibt an ob der aktuelle History Stack eine Navigation Back-Navigation erlaubt.
+        /// Gets a value indicating whether <see cref="NavigateBack"/> can be executed.
         /// </summary>
-        public bool CanGoBack { get { return historyStack.Count > 1; } }
+        public bool CanGoBack => _historyStack.Count > 1;
 
-        private Screen activeScreen = null;
+        private Screen _activeScreen = null;
         private bool _titleDirty;
         private string _lastActiveScreenTitle;
         private string _titlePrefix;
 
         /// <summary>
-        /// Referenz auf den aktuellen Screen.
+        /// Gets a reference to the currently active <see cref="Screen"/>.
         /// </summary>
         public Screen ActiveScreen
         {
-            get
-            {
-                return activeScreen;
-            }
+            get => _activeScreen;
             private set
             {
-                if (activeScreen != value)
+                if (_activeScreen != value)
                 {
-                    activeScreen = value;
+                    _activeScreen = value;
                     _titleDirty = true;
                 }
             }
         }
 
         /// <summary>
-        /// Liste der History.
+        /// Gets a list of the navigation <see cref="Screen"/> history used to navigate back and forth.
         /// </summary>
-        public IEnumerable<Screen> History { get { return historyStack; } }
+        public IEnumerable<Screen> History => _historyStack;
 
         /// <summary>
-        /// Navigiert den Screen Manager zum angegebenen Screen.
+        /// Navigates to the <see cref="Screen"/>.
         /// </summary>
-        /// <param name="screen"></param>
-        /// <param name="parameter">Ein Parameter für den neuen Screen.</param>
-        /// <returns>Gibt an ob die Navigation durchgeführt wurde.</returns>
+        /// <param name="screen">The <see cref="Screen"/> to navigate to.</param>
+        /// <param name="parameter">A parameter passed to the screen on navigation.</param>
+        /// <returns>Gets a value indicating whether the navigation was executed.</returns>
         public bool NavigateToScreen(Screen screen, object parameter = null)
         {
             return Navigate(screen, false, parameter);
         }
 
         /// <summary>
-        /// Navigiert zurück, sofern möglich.
+        /// Navigates to the previous <see cref="Screen"/> in the <see cref="History"/> if possible.
         /// </summary>
-        /// <returns>Gibt an ob die Navigation durchgeführt wurde.</returns>
-        public bool NavigateBack()
+        /// <param name="parameter">A parameter passed to the screen on navigation.</param>
+        /// <returns>Gets a value indicating whether the navigation was executed.</returns>
+        public bool NavigateBack(object parameter = null)
         {
             if (CanGoBack)
             {
-                historyStack.Remove(ActiveScreen);
-                Screen screen = historyStack[0];
-                Navigate(screen, true, null);
+                _historyStack.Remove(ActiveScreen);
+                Screen screen = _historyStack[0];
+                Navigate(screen, true, parameter);
             }
 
             return false;
@@ -878,7 +869,6 @@ namespace engenious.UI
             bool overlayed = false;
 
             _titleDirty = true;
-            // Navigation ankündigen und prüfen, ob das ok geht.
             var args = new NavigationEventArgs()
             {
                 IsBackNavigation = isBackNavigation,
@@ -886,27 +876,27 @@ namespace engenious.UI
                 Screen = screen,
             };
 
-            // Schritt 1: Vorherigen Screen "abmelden"
+            // Step 1: "deregister" previous screen
             if (ActiveScreen != null)
             {
                 overlayed = ActiveScreen.IsOverlay;
 
                 ActiveScreen.InternalNavigateFrom(args);
 
-                // Abbruch durch Screen eingeleitet
+                // previous screen canceled navigation
                 if (args.Cancel) { return false; }
 
-                // Screen deaktivieren
+                // deactivate previous screen
                 ActiveScreen.IsActiveScreen = false;
 
-                // Spezialfall (aktueller Screen nicht in History, neuer Screen Overlay)
+                // Special case (active screen not in history, new Screen Overlay)
                 if (!ActiveScreen.InHistory && screen != null && screen.IsOverlay)
-                    historyStack.Insert(0, ActiveScreen);
+                    _historyStack.Insert(0, ActiveScreen);
 
-                // Ausblenden, wenn der neue Screen nicht gerade ein Overlay ist
+                // transition out, if the new screen is not an overlay
                 if (screen == null || !screen.IsOverlay)
                 {
-                    // Überblenden, falls erforderlich
+                    // transition, if necessary
                     if (NavigateFromTransition != null)
                     {
                         ActiveScreen.Alpha = 1f;
@@ -916,7 +906,7 @@ namespace engenious.UI
                             ScreenTarget.Controls.Remove(e);
                             ((Screen)e).IsVisibleScreen = false;
                         };
-                        activeScreen.StartTransition(trans);
+                        _activeScreen.StartTransition(trans);
                     }
                     else
                     {
@@ -925,33 +915,33 @@ namespace engenious.UI
                     }
                 }
 
-                // NavigatedFrom-Event aufrufen
+                // Call NavigatedFrom event
                 args.Cancel = false;
                 args.Handled = false;
                 args.IsBackNavigation = isBackNavigation;
                 args.Screen = screen;
                 ActiveScreen.InternalNavigatedFrom(args);
 
-                // entfernen
+                // remove
                 args.Screen = ActiveScreen;
                 ActiveScreen = null;
             }
             else args.Screen = null;
 
-            // Schritt 2: zum neuen Screen navigieren
+            // Step 2: navigate to the new screen
             if (screen != null)
             {
-                // NavigateTo-Event aufrufen
+                // Call NavigateTo event
                 args.Cancel = false;
                 args.Handled = false;
                 args.IsBackNavigation = isBackNavigation;
                 screen.InternalNavigateTo(args);
 
-                // Neuen Screen einhängen
-                if (historyStack.Contains(screen))
-                    historyStack.Remove(screen);
+                // Add new screen to history
+                if (_historyStack.Contains(screen))
+                    _historyStack.Remove(screen);
                 if (screen.InHistory)
-                    historyStack.Insert(0, screen);
+                    _historyStack.Insert(0, screen);
 
                 if (!overlayed)
                 {
@@ -968,10 +958,10 @@ namespace engenious.UI
                 ActiveScreen = screen;
                 ActiveScreen.IsActiveScreen = true;
 
-                // Default Mouse Mode anwenden
+                // apply default Mouse Mode
                 MouseMode = ActiveScreen.DefaultMouseMode;
 
-                // Navigate-Events aufrufen
+                // call Navigate events
                 args.Cancel = false;
                 args.Handled = false;
                 args.IsBackNavigation = isBackNavigation;
@@ -982,7 +972,7 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Navigiert bis zum ersten Screen zurück.
+        /// Navigates back to the initial screen.
         /// </summary>
         public void NavigateHome()
         {
@@ -991,64 +981,105 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Öffnet ein Flyout.
+        /// Opens a flyout.
         /// </summary>
-        /// <param name="control"></param>
-        /// <param name="position"></param>
+        /// <param name="control">The control to flyout.</param>
+        /// <param name="position">The position for the control.</param>
         public void Flyout(Control control, Point position)
         {
-            flyout.AddControl(control, position);
+            _flyout.AddControl(control, position);
         }
 
         /// <summary>
-        /// Schließt ein Flyout wieder.
+        /// Closes a flyout.
         /// </summary>
-        /// <param name="control"></param>
+        /// <param name="control">The control to remove from the flyout.</param>
         public void Flyback(Control control)
         {
-            flyout.RemoveControl(control);
+            _flyout.RemoveControl(control);
         }
 
         /// <summary>
-        /// Wechselt in den Catured Mouse Mode.
+        /// Captures the mouse.
+        /// <remarks>Sets <see cref="MouseMode"/> to <see cref="UI.MouseMode.Captured"/>.</remarks>
         /// </summary>
         public void CaptureMouse()
         {
             MouseMode = MouseMode.Captured;
         }
-
+        
         /// <summary>
-        /// Wechselt in den Free Mouse Mode.
+        /// Frees the mouse.
+        /// <remarks>Sets <see cref="MouseMode"/> to <see cref="UI.MouseMode.Free"/>.</remarks>
         /// </summary>
         public void FreeMouse()
         {
             MouseMode = MouseMode.Free;
         }
 
+        /// <summary>
+        /// Occurs when the mouse was moved on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate MouseMove;
 
-        public event DragEventDelegate StartDrag;
+        /// <summary>
+        /// Occurs when a drag event was started on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
+        public event DragEventBaseDelegate StartDrag;
 
-        public event DragEventDelegate DropMove;
+        /// <summary>
+        /// Occurs when the mouse was moved while dragging on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
+        public event DragEventBaseDelegate DropMove;
 
-        public event DragEventDelegate EndDrop;
+        /// <summary>
+        /// Occurs when the drag event was stopped on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
+        public event DragEventBaseDelegate EndDrop;
 
+        /// <summary>
+        /// Occurs when the left mouse button was released on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate LeftMouseUp;
 
+        /// <summary>
+        /// Occurs when the left mouse button was pressed on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate LeftMouseDown;
 
+        /// <summary>
+        /// Occurs when the left mouse button was clicked on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate LeftMouseClick;
 
+        /// <summary>
+        /// Occurs when the left mouse button was double clicked on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate LeftMouseDoubleClick;
 
+        /// <summary>
+        /// Occurs when the right mouse button was released on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate RightMouseUp;
 
+        /// <summary>
+        /// Occurs when the right mouse button was pressed on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate RightMouseDown;
 
+        /// <summary>
+        /// Occurs when the right mouse button was clicked on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate RightMouseClick;
 
+        /// <summary>
+        /// Occurs when the right mouse button was double clicked on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseEventBaseDelegate RightMouseDoubleClick;
 
+        /// <summary>
+        /// Occurs when the right mouse scroll wheel was scrolled on this <see cref="BaseScreenComponent"/>.
+        /// </summary>
         public event MouseScrollEventBaseDelegate MouseScroll;
 
         //public event TouchEventBaseDelegate TouchDown;
@@ -1062,22 +1093,22 @@ namespace engenious.UI
         //public event TouchEventBaseDelegate TouchDoubleTap;
 
         /// <summary>
-        /// Event, das aufgerufen wird, wenn eine Taste gedrückt wird.
+        /// Occurs when a key on the keyboard was pressed on this <see cref="BaseScreenComponent"/>.
         /// </summary>
         public event KeyEventBaseDelegate KeyDown;
 
         /// <summary>
-        /// Event, das aufgerufen wird, wenn eine Taste gedrückt ist.
+        /// Occurs when a key on the keyboard is pressed on this <see cref="BaseScreenComponent"/>.
         /// </summary>
         public event KeyEventBaseDelegate KeyPress;
 
         /// <summary>
-        /// Event, das aufgerufen wird, wenn eine taste losgelassen wird.
+        /// Occurs when a key on the keyboard was released on this <see cref="BaseScreenComponent"/>.
         /// </summary>
         public event KeyEventBaseDelegate KeyUp;
 
         /// <summary>
-        /// Event, das aufgerufen wird, wenn die Fenstergröße geändert wurde.
+        /// Occurs when the client(e.g. a window) size was changed.
         /// </summary>
         public event EventHandler ClientSizeChanged;
     }

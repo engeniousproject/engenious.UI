@@ -6,10 +6,8 @@ using System.Threading;
 
 namespace engenious.UI
 {
-
-
     /// <summary>
-    /// Erweiterte Liste für Controls
+    /// A specialized thread-safe list that can be manipulated while reading from it, by collecting and postponing these actions.
     /// </summary>
     public class ItemCollection<T> : IList<T> where T : class
     {
@@ -56,30 +54,31 @@ namespace engenious.UI
                 }
             }
         }
-        private readonly ReaderWriterLockSlim lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-        protected readonly List<T> _items = new List<T>();
+        private readonly ReaderWriterLockSlim _lockSlim = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        /// <summary>
+        /// The contained items list.
+        /// </summary>
+        protected readonly List<T> Items = new List<T>();
         private readonly Queue<PostponedAction> _postponedActions = new Queue<PostponedAction>();
 
-        public ItemCollection() { }
-
-        private struct ReadLockWrapper : IDisposable
+        private readonly struct ReadLockWrapper : IDisposable
         {
             private readonly ItemCollection<T> _collection;
 
             public ReadLockWrapper(ItemCollection<T> collection)
             {
                 _collection = collection;
-                _collection.lockSlim.EnterReadLock();
+                _collection._lockSlim.EnterReadLock();
             }
             public void Dispose()
             {
-                _collection.lockSlim.ExitReadLock();
+                _collection._lockSlim.ExitReadLock();
                 _collection.TryApplyPostponedActions();
             }
         }
 
         private ReadLockWrapper ReadLock() => new ReadLockWrapper(this);
-        private struct WriteLockOrPostponeWrapper : IDisposable
+        private readonly struct WriteLockOrPostponeWrapper : IDisposable
         {
             private readonly ItemCollection<T> _collection;
 
@@ -91,10 +90,10 @@ namespace engenious.UI
                 var toPostpone = false;
                 try
                 {
-                    if (_collection.lockSlim.IsReadLockHeld)
+                    if (_collection._lockSlim.IsReadLockHeld)
                         toPostpone = true;
                     else
-                        _collection.lockSlim.EnterWriteLock();
+                        _collection._lockSlim.EnterWriteLock();
                 }
                 catch (LockRecursionException)
                 {
@@ -106,7 +105,7 @@ namespace engenious.UI
             public void Dispose()
             {
                 if (!WasPostponed)
-                    _collection.lockSlim.ExitWriteLock();
+                    _collection._lockSlim.ExitWriteLock();
             }
         }
 
@@ -118,8 +117,6 @@ namespace engenious.UI
             {
                 if (writeOrPostpone.WasPostponed)
                 {
-                    if (_postponedActions.Count > 0)
-                        ;
                     return;
                 }
 
@@ -127,44 +124,45 @@ namespace engenious.UI
                     action.Apply(this);
             }
         }
-        
+
+        /// <inheritdoc />
         public T this[int index]
         {
             get
             {
                 using (ReadLock())
                 {
-                    return _items[index];
+                    return Items[index];
                 }
                 
             }
 
-            set
-            {
-                throw new NotSupportedException();
-            }
+            set => throw new NotSupportedException();
         }
 
+        /// <inheritdoc />
         public int Count
         {
             get
             {
                 using (ReadLock())
                 {
-                    return _items.Count;
+                    return Items.Count;
                 }
                 
             }
         }
 
+        /// <inheritdoc />
         public bool IsReadOnly => false;
 
+        /// <inheritdoc />
         public virtual void Add(T item)
         {
             if (item == null)
-                throw new ArgumentNullException("Item cant be null");
+                throw new ArgumentNullException(nameof(item));
             using (ReadLock())
-                if (_items.Contains(item))
+                if (Items.Contains(item))
                     throw new ArgumentException("Item is already part of this collection");
             using (var writeOrPostpone = WriteLockOrPostpone() )
             {
@@ -177,14 +175,15 @@ namespace engenious.UI
 
         private void AddInternal(T item)
         {
-            // Event werfen
+            // Call event
             OnInsert?.Invoke(item);
 
-            // Control einfügen
-            _items.Add(item);
-            OnInserted?.Invoke(item, _items.Count-1);
+            // Insert control
+            Items.Add(item);
+            OnInserted?.Invoke(item, Items.Count-1);
         }
 
+        /// <inheritdoc />
         public virtual void Clear()
         {
             using (var writeOrPostpone = WriteLockOrPostpone())
@@ -198,46 +197,49 @@ namespace engenious.UI
 
         private void ClearInternal()
         {
-            for (int i = 0; i < _items.Count; i++)
+            for (int i = 0; i < Items.Count; i++)
             {
-                OnRemove?.Invoke(_items[i], i);
+                OnRemove?.Invoke(Items[i], i);
             }
-            _items.Clear();
+            Items.Clear();
         }
 
+        /// <inheritdoc />
         public bool Contains(T item)
         {
             using (ReadLock())
             {
-                return _items.Contains(item);
+                return Items.Contains(item);
             }
             
         }
 
+        /// <inheritdoc />
         public void CopyTo(T[] array, int arrayIndex)
         {
             using (ReadLock())
             {
-                _items.CopyTo(array, arrayIndex);
+                Items.CopyTo(array, arrayIndex);
             }
             
         }
 
 
-
+        /// <inheritdoc />
         public int IndexOf(T item)
         {
             using (ReadLock())
             {
-                return _items.IndexOf(item);
+                return Items.IndexOf(item);
             }
             
         }
 
+        /// <inheritdoc />
         public virtual void Insert(int index, T item)
         {
             if (item == null)
-                throw new ArgumentNullException("Item cant be null");
+                throw new ArgumentNullException(nameof(item));
             using (var writeOrPostpone = WriteLockOrPostpone())
             {
                 if (writeOrPostpone.WasPostponed)
@@ -249,24 +251,25 @@ namespace engenious.UI
 
         private void InsertInternal(int index, T item)
         {
-            if (_items.Contains(item))
+            if (Items.Contains(item))
                 throw new ArgumentException("Item is already part of this collection");
             OnInsert?.Invoke(item);
-            // Control einfügen
-            _items.Insert(index, item);
+            // Insert control
+            Items.Insert(index, item);
 
-            // Event werfen
+            // Call event
             OnInserted?.Invoke(item, index);
         }
 
+        /// <inheritdoc />
         public virtual bool Remove(T item)
         {
             if (item == null)
-                throw new ArgumentNullException("Item cant be null");
+                throw new ArgumentNullException(nameof(item));
 
             using (ReadLock())
             {
-                if (!_items.Contains(item))
+                if (!Items.Contains(item))
                     return false;
             }
             
@@ -283,18 +286,19 @@ namespace engenious.UI
 
         private bool RemoveInternal(T item)
         {
-            // Control entfernen
-            int index = _items.IndexOf(item);
+            // Remove control
+            int index = Items.IndexOf(item);
 
             // Event
             OnRemove?.Invoke(item, index);
 
-            return _items.Remove(item);
+            return Items.Remove(item);
         }
 
+        /// <inheritdoc />
         public virtual void RemoveAt(int index)
         {
-            if (index < 0 && index >= _items.Count)
+            if (index < 0 && index >= Items.Count)
                 throw new ArgumentOutOfRangeException(nameof(index));
             using (var writeOrPostpone = WriteLockOrPostpone())
             {
@@ -308,18 +312,28 @@ namespace engenious.UI
 
         private void RemoveAtInternal(int index)
         {
-            // Control entfernen
-            T c = _items[index];
+            // Remove control
+            T c = Items[index];
 
-            // Event werfen
+            // Call event
             OnRemove?.Invoke(c, index);
 
-            _items.RemoveAt(index);
+            Items.RemoveAt(index);
         }
 
+        /// <summary>
+        /// Occurs when an item is going to be inserted into the collection.
+        /// </summary>
         public event ItemCollectionDelegate<T> OnInsert;
+
+        /// <summary>
+        /// Occurs when an item was inserted into the collection.
+        /// </summary>
         public event ItemCollectionIndexedDelegate<T> OnInserted;
 
+        /// <summary>
+        /// Occurs when an item is going to be removed from the collection.
+        /// </summary>
         public event ItemCollectionIndexedDelegate<T> OnRemove;
 
         /// <summary>
@@ -327,9 +341,8 @@ namespace engenious.UI
         /// </summary>
         public struct Enumerator : IEnumerator<T>
         {
-            private readonly ItemCollection<T> _collection;
             private List<T>.Enumerator _enumerator;
-            private ReadLockWrapper _readLock;
+            private readonly ReadLockWrapper _readLock;
 
             /// <summary>
             /// Initializes a new instance of the <see cref="Enumerator"/> struct used to lock the collection while enumerating.
@@ -337,9 +350,8 @@ namespace engenious.UI
             /// <param name="collection">The collection of which to wrap the enumerator of.</param>
             public Enumerator(ItemCollection<T> collection)
             {
-                _collection = collection;
-                _readLock = _collection.ReadLock();
-                _enumerator = collection._items.GetEnumerator();
+                _readLock = collection.ReadLock();
+                _enumerator = collection.Items.GetEnumerator();
             }
 
             /// <inheritdoc />
@@ -379,6 +391,10 @@ namespace engenious.UI
             return GetEnumerator();
         }
 
+        /// <summary>
+        /// Sorts this list by using a comparer.
+        /// </summary>
+        /// <param name="comparer">The comparer to order by.</param>
         public void Sort(IComparer<T> comparer)
         {
             using (var writeOrPostpone = WriteLockOrPostpone())
@@ -392,10 +408,21 @@ namespace engenious.UI
 
         private void SortInternal(IComparer<T> comparer)
         {
-            _items.Sort(comparer);
+            Items.Sort(comparer);
         }
     }
 
-    public delegate void ItemCollectionIndexedDelegate<T>(T item, int index);
-    public delegate void ItemCollectionDelegate<T>(T item);
+    /// <summary>
+    /// Represents the method that will handle item changes at a specific index.
+    /// </summary>
+    /// <param name="item">The item that will be used.</param>
+    /// <param name="index">The index the change happened at.</param>
+    /// <typeparam name="T">The type of the item.</typeparam>
+    public delegate void ItemCollectionIndexedDelegate<in T>(T item, int index);
+    /// <summary>
+    /// Represents the method that will handle item changes.
+    /// </summary>
+    /// <param name="item">The item that is affected.</param>
+    /// <typeparam name="T">The type of the item.</typeparam>
+    public delegate void ItemCollectionDelegate<in T>(T item);
 }

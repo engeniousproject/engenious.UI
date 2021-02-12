@@ -8,32 +8,32 @@ namespace engenious.UI
     public struct Border : IEquatable<Border>
     {
         /// <summary>
-        /// Linke Seite
+        /// The border to the left.
         /// </summary>
         public int Left;
 
         /// <summary>
-        /// Obere Seite
+        /// The border to the top.
         /// </summary>
         public int Top;
         
         /// <summary>
-        /// Rechte Seite
+        /// The border to the right.
         /// </summary>
         public int Right;
 
         /// <summary>
-        /// Untere Seite
+        /// The border to the bottom.
         /// </summary>
         public int Bottom;
 
         /// <summary>
-        /// Erstellt eine Border-Instanz mit den angegebenen Initialwerten.
+        /// Initializes a new instance of the <see cref="Border"/> struct.
         /// </summary>
-        /// <param name="left">Abstand links</param>
-        /// <param name="top">Abstand oben</param>
-        /// <param name="right">Abstand rechts</param>
-        /// <param name="bottom">Abstand unten</param>
+        /// <param name="left">The border to the left.</param>
+        /// <param name="top">The border to the top.</param>
+        /// <param name="right">The border to the right.</param>
+        /// <param name="bottom">The border to the bottom.</param>
         public Border(int left, int top, int right, int bottom)
         {
             Left = left;
@@ -43,10 +43,10 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Erstellt einen Border mit gleichem Abstand auf allen vier Seiten.
+        /// Creates a <see cref="Border"/> struct with the same distance to all sides.
         /// </summary>
-        /// <param name="value">Wert für alle vier Seiten.</param>
-        /// <returns>Border-Instanz</returns>
+        /// <param name="value">Value for all for sides</param>
+        /// <returns>The created <see cref="Border"/> struct.</returns>
         public static Border All(int value)
         {
             return new Border()
@@ -57,13 +57,13 @@ namespace engenious.UI
                 Top = value
             };
         }
-
+        
         /// <summary>
-        /// Erstellt einen Border auf Basis der Angaben für horizontale und vertikale Werte.
+        /// Creates a <see cref="Border"/> struct with the same distance to the opposing sides.
         /// </summary>
-        /// <param name="horizontal">Abstand für horizontale Seiten (links, rechts)</param>
-        /// <param name="vertical">Abstand für vertikale Seiten (oben, unten)</param>
-        /// <returns>Border-Instanz</returns>
+        /// <param name="horizontal">Distance value for top and bottom.</param>
+        /// <param name="vertical">Distance value for left and right.</param>
+        /// <returns>The created <see cref="Border"/> struct.</returns>
         public static Border All(int horizontal, int vertical)
         {
             return new Border()
@@ -75,14 +75,16 @@ namespace engenious.UI
             };
         }
 
+
+        
         /// <summary>
-        /// Erstellt eine Border-Instanz mit den angegebenen Initialwerten.
+        /// Creates a <see cref="Border"/> struct with the same distance to the opposing sides.
         /// </summary>
-        /// <param name="left">Abstand links</param>
-        /// <param name="top">Abstand oben</param>
-        /// <param name="right">Abstand rechts</param>
-        /// <param name="bottom">Abstand unten</param>
-        /// <returns>Border-Instanz</returns>
+        /// <param name="left">Distance to the left.</param>
+        /// <param name="top">Distance to the top.</param>
+        /// <param name="right">Distance to the right.</param>
+        /// <param name="bottom">Distance to the bottom.</param>
+        /// <returns>The created <see cref="Border"/> struct.</returns>
         public static Border All(int left, int top, int right, int bottom)
         {
             return new Border()
@@ -94,30 +96,19 @@ namespace engenious.UI
             };
         }
 
-        /// <summary>
-        /// Wandelt die aktuelle Border-Instanz in einen string um.
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override string ToString()
         {
-            return string.Format("{0}/{1}/{2}/{3}", Left, Top, Right, Bottom);
+            return $"{Left}/{Top}/{Right}/{Bottom}";
         }
 
-        /// <summary>
-        /// Überprüft, ob die aktuelle Border-Instanz gleich der gegebenen ist.
-        /// </summary>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             return obj is Border b && Equals(b);
         }
 
-        /// <summary>
-        /// Überprüft, ob die aktuelle Border-Instanz gleich der gegebenen ist.
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool Equals(Border other)
         {
             return other.Left == Left &&
@@ -126,10 +117,7 @@ namespace engenious.UI
                 other.Bottom == Bottom;
         }
 
-        /// <summary>
-        /// Gibt einen Hashwert zurück
-        /// </summary>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             return Left + Right + Top + Bottom;

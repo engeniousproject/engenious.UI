@@ -4,61 +4,59 @@ using engenious.Input;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Basis-Control für Item-Listen
+    /// Ui base control for displaying generic list data.
     /// </summary>
     public abstract class ListControl<T> : Control, IListControl where T : class
     {
-        private Brush selectedItemBrush = null;
+        private Brush _selectedItemBrush = null;
 
-        private T selectedItem = null;
+        private T _selectedItem = null;
 
         /// <summary>
-        /// Liefert eine Liste der enthaltenen Elemente zurück.
+        /// Gets a list of all contained elements.
         /// </summary>
-        public ItemCollection<T> Items { get; private set; }
+        public ItemCollection<T> Items { get; }
 
         /// <summary>
-        /// Liefert das aktuell selektierte Element zurück oder legt dieses fest.
+        /// Gets or sets the currently selected item.
         /// </summary>
         public T SelectedItem
         {
-            get { return selectedItem; }
+            get => _selectedItem;
             set
             {
-                if (selectedItem != value)
+                if (_selectedItem != value)
                 {
                     SelectionEventArgs<T> args = new SelectionEventArgs<T>()
                     {
-                        OldItem = selectedItem,
+                        OldItem = _selectedItem,
                         NewItem = value
                     };
 
-                    selectedItem = value;
+                    _selectedItem = value;
 
                     OnSelectedItemChanged(args);
-                    if (SelectedItemChanged != null)
-                        SelectedItemChanged(this, args);
+                    SelectedItemChanged?.Invoke(this, args);
                 }
             }
         }
 
         private readonly PropertyEventArgs<Brush> _selectedItemBrushChangedArgs = new PropertyEventArgs<Brush>();
-        /// <summary>
-        /// Gibt den Brush für selektierte Elemente zurück oder legt diesen fest.
-        /// </summary>
+
+        /// <inheritdoc />
         public Brush SelectedItemBrush
         {
-            get { return selectedItemBrush; }
+            get => _selectedItemBrush;
             set
             {
-                if (selectedItemBrush == value) return;
+                if (_selectedItemBrush == value) return;
                 
                 
-                _selectedItemBrushChangedArgs.OldValue = selectedItemBrush;
+                _selectedItemBrushChangedArgs.OldValue = _selectedItemBrush;
                 _selectedItemBrushChangedArgs.NewValue = value;
                 _selectedItemBrushChangedArgs.Handled = false;
 
-                selectedItemBrush = value;
+                _selectedItemBrush = value;
                 InvalidateDrawing();
 
                 OnSelectedItemBrushChanged(_selectedItemBrushChangedArgs);
@@ -67,9 +65,10 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Standard Konstruktor für das List-Control.
+        /// Initializes a new instance of the <see cref="ListControl{T}"/> class.
         /// </summary>
-        /// <param name="manager"></param>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public ListControl(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
@@ -77,7 +76,7 @@ namespace engenious.UI.Controls
             TabStop = true;
 
             ItemCollection<T> collection = new ItemCollection<T>();
-            collection.OnInserted += (item, index) => OnInsert(item, index);
+            collection.OnInserted += OnInsert;
             collection.OnRemove += (item, index) =>
             {
                 if (SelectedItem == item)
@@ -89,13 +88,24 @@ namespace engenious.UI.Controls
             ApplySkin(typeof(ListControl<T>));
         }
 
+        /// <summary>
+        /// Gets called when an item is gonna be removed.
+        /// </summary>
+        /// <param name="item">The item to be removed.</param>
+        /// <param name="index">The index the item is gonna be removed from.</param>
         protected abstract void OnRemove(T item, int index);
 
+        /// <summary>
+        /// Gets called when an item was added.
+        /// </summary>
+        /// <param name="item">The item that was added.</param>
+        /// <param name="index">The index the item was added at.</param>
         protected abstract void OnInsert(T item, int index);
 
+        /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {
-            // Nur reagieren, wenn der Fokus gesetzt ist
+            // Ignore when control is not focused
             if (Focused == TreeState.None) return;
 
             switch (args.Key)
@@ -121,18 +131,21 @@ namespace engenious.UI.Controls
             base.OnKeyPress(args);
         }
 
+        /// <inheritdoc />
         public void SelectFirst()
         {
             if (Items.Count > 0)
                 SelectedItem = Items[0];
         }
 
+        /// <inheritdoc />
         public void SelectLast()
         {
             if (Items.Count > 0)
-                SelectedItem = Items[Items.Count - 1];
+                SelectedItem = Items[^1];
         }
 
+        /// <inheritdoc />
         public void SelectNext()
         {
             if (SelectedItem == null)
@@ -148,12 +161,13 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <inheritdoc />
         public void SelectPrevious()
         {
             if (SelectedItem == null)
             {
                 if (Items.Count > 0)
-                    SelectedItem = Items[Items.Count - 1];
+                    SelectedItem = Items[^1];
             }
             else
             {
@@ -163,16 +177,39 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="SelectedItemChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="SelectionEventArgs{T}"/> that contains the event data.</param>
         protected virtual void OnSelectedItemChanged(SelectionEventArgs<T> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="SelectedItemBrushChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Brush}"/> that contains the event data.</param>
         protected virtual void OnSelectedItemBrushChanged(PropertyEventArgs<Brush> args) { }
 
+        /// <summary>
+        /// Occurs when the <see cref="SelectedItem"/> was changed.
+        /// </summary>
         public event SelectionDelegate<T> SelectedItemChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="SelectedItemBrushChanged"/> was changed.
+        /// </summary>
         public event PropertyChangedDelegate<Brush> SelectedItemBrushChanged;
 
-        public GenerateTempalteDelegate<T> TemplateGenerator { get; set; }
+        /// <summary>
+        /// Gets or sets the <see cref="GenerateTemplateDelegate{T}"/> used for generating the container controls for
+        /// the <see cref="ListControl{T}"/> items.
+        /// </summary>
+        public GenerateTemplateDelegate<T> TemplateGenerator { get; set; }
     }
 
-    public delegate Control GenerateTempalteDelegate<T>(T item);
+    /// <summary>
+    /// Represents a method that will be used to create a templated <see cref="Control"/> for a specified generic item.
+    /// </summary>
+    /// <param name="item">The item to generate the templated <see cref="Control"/> for.</param>
+    /// <typeparam name="T">The type of the item to be templated.</typeparam>
+    public delegate Control GenerateTemplateDelegate<in T>(T item);
 }

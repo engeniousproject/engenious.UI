@@ -5,15 +5,22 @@ using System.Linq;
 namespace engenious.UI
 {
     /// <summary>
-    /// Erweiterte Liste für Controls
+    /// Specialized list for containing controls, with different orderings.
     /// </summary>
     public class ControlCollection : ItemCollection<Control>
     {
         internal readonly ItemCollection<Control> InZOrder;
         internal readonly ReverseItemCollectionEnumerable<Control> AgainstZOrder = new ReverseItemCollectionEnumerable<Control>();
 
-        protected Control Owner { get; private set; }
+        /// <summary>
+        /// The <see cref="Control"/> that owns this collection.
+        /// </summary>
+        protected Control Owner { get; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ControlCollection"/> class.
+        /// </summary>
+        /// <param name="owner">The <see cref="Control"/> that owns this collection.</param>
         public ControlCollection(Control owner)
             : base()
         {
@@ -22,18 +29,19 @@ namespace engenious.UI
             AgainstZOrder.BaseList = InZOrder;
         }
 
+        /// <inheritdoc />
         public override void Add(Control item)
         {
             if (item == null)
-                throw new ArgumentNullException("Item cant be null");
+                throw new ArgumentNullException(nameof(item));
 
             if (item.Parent != null)
                 throw new ArgumentException("Item is already part of a different collection");
 
-            // Fokus-Management
+            // Focus management
             item.SetFocus(null);
 
-            // Taborder einreihen
+            // Insert in tab order.
             if (item.TabOrder == 0)
                 item.TabOrder = int.MaxValue;
             else
@@ -42,8 +50,8 @@ namespace engenious.UI
                     if (control.TabOrder >= item.TabOrder) control.TabOrder++;
                 }
 
+            // Insert in ZOrder
             InZOrder.Add(item);//TODO insertion sort
-            // ZOrder einreihen
             item.ZOrderChanged += item_ZOrderChanged;
 
             base.Add(item);
@@ -55,10 +63,11 @@ namespace engenious.UI
             Owner.PathDirty = true;
         }
 
+        /// <inheritdoc />
         public override void Clear()
         {
             //TODO verify?
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 0; i < Count; i++)
             {
                 this[i].SetFocus(null);
                 this[i].Parent = null;
@@ -73,18 +82,19 @@ namespace engenious.UI
             ReorderZ(null);
         }
 
+        /// <inheritdoc />
         public override void Insert(int index, Control item)
         {
             if (item == null)
-                throw new ArgumentNullException("Item cant be null");
+                throw new ArgumentNullException(nameof(item));
 
             if (item.Parent != null)
                 throw new ArgumentException("Item is already part of a different collection");
 
-            // Fokus-Management
+            // Focus management
             item.SetFocus(null);
 
-            // TabOrder
+            // Tab order
             if (item.TabOrder == 0)
                 item.TabOrder = index;
             foreach (var control in this)
@@ -92,9 +102,9 @@ namespace engenious.UI
                 if (control.TabOrder >= item.TabOrder) control.TabOrder++;
             }
 
+            // Insert in ZOrder
             InZOrder.Add(item);//TODO: insert sort?
 
-            // ZOrder einreihen
             item.ZOrderChanged += item_ZOrderChanged;
 
             base.Insert(index, item);
@@ -106,6 +116,7 @@ namespace engenious.UI
             Owner.PathDirty = true;
         }
 
+        /// <inheritdoc />
         public override bool Remove(Control item)
         {
             if (base.Remove(item))
@@ -128,9 +139,10 @@ namespace engenious.UI
             return false;
         }
 
+        /// <inheritdoc />
         public override void RemoveAt(int index)
         {
-            // Fokus entfernen
+            // Remove focus
             Control c = this[index];
             if (c != null)
             {
@@ -147,29 +159,29 @@ namespace engenious.UI
             }
         }
 
-        private List<Control> tabOrderTempList = new List<Control>();
+        private readonly List<Control> _tabOrderTempList = new List<Control>();
 
         private class TabOrderComparer : IComparer<Control>
         {
             public int Compare(Control x, Control y) =>x.TabOrder.CompareTo(y.TabOrder);
         }
 
-        private static IComparer<Control> tabOrderComparer = new TabOrderComparer();
+        private static readonly IComparer<Control> _tabOrderComparer = new TabOrderComparer();
         private void ReorderTab()
         {
-            // Taborder neu ermitteln
+            // Recalculate tab order
             int tab = 1;
-            foreach (var item in tabOrderTempList)
+            foreach (var item in _tabOrderTempList)
             {
-                tabOrderTempList.Add(item);
+                _tabOrderTempList.Add(item);
             }
-            tabOrderTempList.Sort(tabOrderComparer);
-            foreach (var control in tabOrderTempList)
+            _tabOrderTempList.Sort(_tabOrderComparer);
+            foreach (var control in _tabOrderTempList)
                 control.TabOrder = tab++;
         }
 
         void item_ZOrderChanged(Control sender, PropertyEventArgs<int> args)
-            => ReorderZ(sender); // Ein Control hat die Z-Order geändert -> neu sortieren
+            => ReorderZ(sender); // A control changed its ZOrder -> resort ZOrder
 
         private class ZOrderComparer : IComparer<Control>
         {
@@ -181,14 +193,14 @@ namespace engenious.UI
             }
         }
         private readonly ZOrderComparer _zOrderComparer = new ZOrderComparer();
-        private bool isDoingUpdate = false;
+        private bool _isDoingUpdate = false;
         private void ReorderZ(Control control)
         {
-            if (isDoingUpdate) return; // Wir sind schon in einem Reorder-Vorgang
+            if (_isDoingUpdate) return; // Cancel if we are already reordering
 
-            isDoingUpdate = true;
+            _isDoingUpdate = true;
 
-            // Platz schaffen für das veränderte Control
+            // move controls to fit given control
             if (control != null)
                 foreach (var c in this)
                 {
@@ -196,14 +208,14 @@ namespace engenious.UI
                 }
 
             InZOrder.Sort(_zOrderComparer);
-            // Taborder neu ermitteln
+            // Recalculate tab order
             int index = 1;
             foreach (var c in InZOrder)
                 c.TabOrder = index++;
 
             //AgainstZOrder.BaseList = InZOrder;
 
-            isDoingUpdate = false;
+            _isDoingUpdate = false;
         }
     }
 }

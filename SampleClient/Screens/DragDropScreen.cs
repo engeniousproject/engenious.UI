@@ -47,7 +47,7 @@ namespace SampleClient.Screens
             };
 
             Button button1 = new TextButton(manager, "Button 1");
-            button1.StartDrag += (args) =>
+            button1.StartDrag += (sender, args) =>
             {
                 args.Handled = true;
                 args.Content = "Button 1";
@@ -57,7 +57,7 @@ namespace SampleClient.Screens
             };
             Button button2 = new TextButton(manager, "Button 2");
             Button button3 = new TextButton(manager, "Button 3");
-            button3.StartDrag += (args) =>
+            button3.StartDrag += (sender, args) =>
             {
                 args.Handled = true;
                 args.Content = "Button 3";
@@ -87,18 +87,18 @@ namespace SampleClient.Screens
 
             panel.Controls.Add(output);
 
-            panel.EndDrop += (args) =>
+            panel.EndDrop += (sender, args) =>
             {
                 args.Handled = true;
                 output.Text = args.Content.ToString();
             };
 
-            panel.DropEnter += (args) =>
+            panel.DropEnter += (sender, args) =>
             {
                 panel.Background = dragTargetBrush;
             };
 
-            panel.DropLeave += (args) =>
+            panel.DropLeave += (sender, args) =>
             {
                 panel.Background = defaultBrush;
             };

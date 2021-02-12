@@ -1,19 +1,17 @@
 ﻿namespace engenious.UI
 {
     /// <summary>
-    /// Liste der möglichen Mouse-Modi für den Screen.
+    /// Specifies possible mouse modes.
     /// </summary>
     public enum MouseMode
     {
         /// <summary>
-        /// Der Mauszeiger wird im Zentrum gefangen und nach jeder Bewegung wieder zurück 
-        /// gesetzt. Er wird ausgeblendet und die Bewegungswerte innerhalb der Mouse-Events 
-        /// entsprechen dem Bewegungsdelta seit dem letzten Aufruf.
+        /// The mouse cursor is hidden and mouse event data only contains delta of mouse movements and no absolute positions.
         /// </summary>
         Captured,
 
         /// <summary>
-        /// Der Mauszeiger kann sich frei bewegen und wird ganz normal angezeigt.
+        /// The cursor is freely movable and visible.
         /// </summary>
         Free
     }

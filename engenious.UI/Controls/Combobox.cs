@@ -3,61 +3,70 @@
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Typische Combobox zur Auswahl eines Elements aus einer Liste.
+    /// A ui control Combobox for selecting an element from a dropdown list.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The contained element type.</typeparam>
     public class Combobox<T> : ListControl<T>, ICombobox where T : class
     {
-        public Listbox<T> Selector { get; private set; }
+        /// <summary>
+        /// Gets the <see cref="Listbox{T}"/> control containing the selectable elements.
+        /// </summary>
+        public Listbox<T> Selector { get; }
 
+        /// <inheritdoc />
         public bool IsOpen => Selector.Parent != null;
 
+        /// <inheritdoc />
         public Brush ButtonBrushOpen {
-            get => buttonBrushOpen;
+            get => _buttonBrushOpen;
             set
             {
-                if (buttonBrushOpen == value)
+                if (_buttonBrushOpen == value)
                     return;
-                buttonBrushOpen = value;
+                _buttonBrushOpen = value;
                 if(!IsOpen)
-                    imageControl.Background = value;
+                    _imageControl.Background = value;
             }
         }
 
-        private Brush buttonBrushOpen;
+        private Brush _buttonBrushOpen;
 
+        /// <inheritdoc />
         public Brush ButtonBrushClose
         {
-            get => buttonBrushClose;
+            get => _buttonBrushClose;
             set
             {
-                if (buttonBrushClose == value)
+                if (_buttonBrushClose == value)
                     return;
-                buttonBrushClose = value;
+                _buttonBrushClose = value;
                 if (IsOpen)
-                    imageControl.Background = value;
+                    _imageControl.Background = value;
             }
         }
 
+        /// <inheritdoc />
         public Brush DropdownBackgroundBrush
         {
             get => Selector.Background;
-            set
-            {
-                Selector.Background = value;
-            }
+            set => Selector.Background = value;
         }
 
-        private Brush buttonBrushClose;
+        private Brush _buttonBrushClose;
 
-        private Image imageControl;
+        private readonly Image _imageControl;
 
-        private ContentControl mainControl;
+        private readonly ContentControl _mainControl;
 
-        public Combobox(BaseScreenComponent manager)
-            : base(manager)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Combobox{T}"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Combobox(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         { 
-            mainControl = new ContentControl(manager)
+            _mainControl = new ContentControl(manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
@@ -75,13 +84,13 @@ namespace engenious.UI.Controls
             grid.Columns.Add(new ColumnDefinition() { ResizeMode = ResizeMode.Fixed, Width = 20 });
             Children.Add(grid);
 
-            grid.AddControl(mainControl, 0, 0);
-            imageControl = new Image(manager)
+            grid.AddControl(_mainControl, 0, 0);
+            _imageControl = new Image(manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
-            grid.AddControl(imageControl, 1, 0);
+            grid.AddControl(_imageControl, 1, 0);
 
             Selector = new Listbox<T>(manager);
             Selector.HorizontalAlignment = HorizontalAlignment.Left;
@@ -94,14 +103,11 @@ namespace engenious.UI.Controls
 
             Selector.ParentChanged += (s,e) =>
             {
-                if (IsOpen)
-                    imageControl.Background = ButtonBrushClose;
-                else
-                    imageControl.Background = ButtonBrushOpen;
+                _imageControl.Background = IsOpen ? ButtonBrushClose : ButtonBrushOpen;
             };
         }
 
-        void Selector_SelectedItemChanged(Control sender, SelectionEventArgs<T> args)
+        private void Selector_SelectedItemChanged(Control sender, SelectionEventArgs<T> args)
         {
             if (Selector.Parent == null) return;
 
@@ -116,24 +122,28 @@ namespace engenious.UI.Controls
             return TemplateGenerator(item);
         }
 
+        /// <inheritdoc />
         protected override void OnInsert(T item, int index)
         {
             Selector.Items.Insert(index, item);
         }
 
+        /// <inheritdoc />
         protected override void OnRemove(T item, int index)
         {
-            // TODO: Prüfen, ob es sich um das selektierte Element handelt
+            // TODO: Check whether it is the selected element
             Selector.Items.Remove(item);
         }
 
+        /// <inheritdoc />
         protected override void OnSelectedItemChanged(SelectionEventArgs<T> args)
         {
             base.OnSelectedItemChanged(args);
 
-            mainControl.Content = TemplateGenerator(args.NewItem);
+            _mainControl.Content = TemplateGenerator(args.NewItem);
         }
 
+        /// <inheritdoc />
         protected override void OnLeftMouseClick(MouseEventArgs args)
         {
             base.OnLeftMouseClick(args);

@@ -1,53 +1,53 @@
 ﻿namespace engenious.UI
 {
     /// <summary>
-    /// Liste von Möglichkeiten zum horizontalen Alignment.
+    /// Specifies how an object or text is aligned on the horizontal axis.
     /// </summary>
     public enum HorizontalAlignment
     {
         /// <summary>
-        /// Links angeordnet
+        /// Left aligned.
         /// </summary>
         Left,
 
         /// <summary>
-        /// Rechts angeordnet
+        /// Right aligned.
         /// </summary>
         Right,
 
         /// <summary>
-        /// Zentriert
+        /// Aligned in the center on the horizontal axis.
         /// </summary>
         Center,
 
         /// <summary>
-        /// Auf voller Breite
+        /// Stretch to the maximum available width.
         /// </summary>
         Stretch
     }
 
     /// <summary>
-    /// Liste der Möglichkeiten zum vertikalen Alignment.
+    /// Specifies how an object or text is aligned on the vertical axis.
     /// </summary>
     public enum VerticalAlignment
     {
         /// <summary>
-        /// Oben angeordnet
+        /// Top aligned.
         /// </summary>
         Top,
 
         /// <summary>
-        /// Unten angeordnet
+        /// Bottom aligned.
         /// </summary>
         Bottom,
 
         /// <summary>
-        /// Zentriert
+        /// Aligned in the center on the vertical axis.
         /// </summary>
         Center,
 
         /// <summary>
-        /// Volle Höhe
+        /// Stretch to the maximum available height.
         /// </summary>
         Stretch
     }

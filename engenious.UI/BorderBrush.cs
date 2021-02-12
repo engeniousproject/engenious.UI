@@ -3,109 +3,109 @@
 namespace engenious.UI
 {
     /// <summary>
-    /// Brush für einfarbige Hintergründe und automatisch generierte Umrahmungslinien.
+    /// A <see cref="Brush"/> for drawing borders.
     /// </summary>
     public class BorderBrush : Brush
     {
-        private Texture2D tex;
+        private Texture2D _tex;
 
-        private int lineWidth;
+        private int _lineWidth;
 
-        private Color lineColor;
+        private Color _lineColor;
 
-        private LineType lineType;
+        private LineType _lineType;
 
         /// <summary>
-        /// Gibt die Hintergrund-Farbe des Rahmens zurück oder legt diese fest.
+        /// Gets or sets the background color of the brush.
         /// </summary>
         public Color BackgroundColor { get; set; }
 
         /// <summary>
-        /// Gibt die Liniendicke des Rahmens zurück oder legt diese fest.
+        /// Gets or sets the line width of the border in px.
         /// </summary>
         public int LineWidth
         {
-            get { return lineWidth; }
+            get => _lineWidth;
             set
             {
-                if (lineWidth != value)
+                if (_lineWidth != value)
                 {
-                    lineWidth = value;
+                    _lineWidth = value;
                     RebuildTexture();
                 }
             }
         }
 
         /// <summary>
-        /// Legt die Linienfarbe des Rahmens zurück oder liegt diese fest.
+        /// Gets or sets the <see cref="Color"/> for the border line.
         /// </summary>
         public Color LineColor
         {
-            get { return lineColor; }
+            get => _lineColor;
             set
             {
-                if (lineColor != value)
+                if (_lineColor != value)
                 {
-                    lineColor = value;
+                    _lineColor = value;
                 }
             }
         }
 
         /// <summary>
-        /// Gibt die Linienart des Rahmens zurück oder legt diese fest.
+        /// Gets or sets the <see cref="LineType"/> for this border.
         /// </summary>
         public LineType LineType
         {
-            get { return lineType; }
+            get => _lineType;
             set
             {
-                if (lineType != value)
+                if (_lineType != value)
                 {
-                    lineType = value;
+                    _lineType = value;
                     RebuildTexture();
                 }
             }
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der BorderBrush-Klasse
+        /// Initializes a new instance of the <see cref="BorderBrush"/> class.
         /// </summary>
-        /// <param name="backgroundColor">Die Hintergrundfarbe</param>
+        /// <param name="backgroundColor">The background color for the brush.</param>
         public BorderBrush(Color backgroundColor) :
             this(backgroundColor, LineType.None, Color.Transparent) { }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der BorderBrush-Klasse
+        /// Initializes a new instance of the <see cref="BorderBrush"/> class.
         /// </summary>
-        /// <param name="lineType">Der Typ der Umrandungslinie</param>
-        /// <param name="lineColor">Die Farbe der Umrandungslinie</param>
-        /// <param name="lineWidth">Die Dicke der Umrandungslinie</param>
+        /// <param name="lineType">The <see cref="UI.LineType"/> of the border line.</param>
+        /// <param name="lineColor">The <see cref="Color"/> of the border line.</param>
+        /// <param name="lineWidth">The line width of the border line in px. <remarks>Defaults to 1px</remarks></param>
         public BorderBrush(LineType lineType, Color lineColor, int lineWidth = 1)
             : this(Color.Transparent, lineType, lineColor, lineWidth) { }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der BorderBrush-Klasse
+        /// Initializes a new instance of the <see cref="BorderBrush"/> class.
         /// </summary>
-        /// <param name="backgroundColor">Die Hintergrundfarbe</param>
-        /// <param name="lineType">Der Typ der Umrandungslinie</param>
-        /// <param name="lineColor">Die Farbe der Umrandungslinie</param>
-        /// <param name="lineWidth">Die Dicke der Umrandungslinie</param>
+        /// <param name="backgroundColor">The background color for the brush.</param>
+        /// <param name="lineType">The <see cref="UI.LineType"/> of the border line.</param>
+        /// <param name="lineColor">The <see cref="Color"/> of the border line.</param>
+        /// <param name="lineWidth">The line width of the border line in px. <remarks>Defaults to 1px</remarks></param>
         public BorderBrush(Color backgroundColor, LineType lineType, Color lineColor, int lineWidth = 1)
         {
             BackgroundColor = backgroundColor;
-            this.lineType = lineType;
-            this.lineColor = lineColor;
-            this.lineWidth = lineWidth;
+            _lineType = lineType;
+            _lineColor = lineColor;
+            _lineWidth = lineWidth;
             RebuildTexture();
         }
 
         private void RebuildTexture()
         {
-            // Alte Textur entsorgen
-            if (tex != null)
+            // Dispose old texture
+            if (_tex != null)
             {
-                tex.Dispose();
-                tex = null;
+                _tex.Dispose();
+                _tex = null;
             }
 
             Color[] buffer;
@@ -117,8 +117,8 @@ namespace engenious.UI
                     buffer = new Color[LineWidth * LineWidth];
                     for (int i = 0; i < buffer.Length; i++)
                         buffer[i] = Color.White;
-                    tex = new Texture2D(Skin.Pix.GraphicsDevice, LineWidth, LineWidth);
-                    tex.SetData(buffer);
+                    _tex = new Texture2D(Skin.Pix.GraphicsDevice, LineWidth, LineWidth);
+                    _tex.SetData(buffer);
                     MinWidth = MinHeight = (LineWidth * 2) + 1;
                     break;
 
@@ -132,36 +132,31 @@ namespace engenious.UI
                             buffer[index] = (x < LineWidth && y < LineWidth ? Color.White : Color.Transparent);
                         }
                     }
-                    tex = new Texture2D(Skin.Pix.GraphicsDevice, LineWidth * 2, LineWidth * 2);
-                    tex.SetData(buffer);
+                    _tex = new Texture2D(Skin.Pix.GraphicsDevice, LineWidth * 2, LineWidth * 2);
+                    _tex.SetData(buffer);
                     MinWidth = MinHeight = (LineWidth * 2) + 1;
                     break;
             }
         }
 
-        /// <summary>
-        /// Zeichnet mit der aktuellen BorderBrush-Instanz
-        /// </summary>
-        /// <param name="batch">Der (bereits gestartete) SpriteBatch</param>
-        /// <param name="area">Render-Bereich</param>
-        /// <param name="alpha">Alpha-Blending</param>
+        /// <inheritdoc />
         public override void Draw(SpriteBatch batch, Rectangle area, float alpha)
         {
             batch.Draw(Skin.Pix, area, BackgroundColor * alpha);
 
-            // Rahmen malen
-            if (tex != null)
+            // Draw border line
+            if (_tex != null)
             {
-                batch.Draw(tex, 
+                batch.Draw(_tex, 
                     new Rectangle(area.X, area.Y, area.Width, LineWidth), 
                     new Rectangle(0, 0, area.Width, LineWidth), LineColor * alpha);
-                batch.Draw(tex, 
+                batch.Draw(_tex, 
                     new Rectangle(area.X, area.Y, LineWidth, area.Height), 
                     new Rectangle(0, 0, LineWidth, area.Height), LineColor * alpha);
-                batch.Draw(tex, 
+                batch.Draw(_tex, 
                     new Rectangle(area.X, area.Y + area.Height - LineWidth, area.Width, LineWidth), 
                     new Rectangle(0, 0, area.Width, LineWidth), LineColor * alpha);
-                batch.Draw(tex, 
+                batch.Draw(_tex, 
                     new Rectangle(area.X + area.Width - LineWidth, area.Y, LineWidth, area.Height),
                     new Rectangle(0, 0, LineWidth, area.Height), LineColor * alpha);
             }
@@ -169,22 +164,22 @@ namespace engenious.UI
     }
 
     /// <summary>
-    /// Liste von möglichen Linientypen
+    /// Specifies the possible types for drawing lines.
     /// </summary>
     public enum LineType
     {
         /// <summary>
-        /// Keine Linie
+        /// Do not draw any line.
         /// </summary>
         None,
 
         /// <summary>
-        /// Durchgängige Linie
+        /// Draw one solid line
         /// </summary>
         Solid,
 
         /// <summary>
-        /// Gepunktete Linie
+        /// Draw a dotted line
         /// </summary>
         Dotted,
     }

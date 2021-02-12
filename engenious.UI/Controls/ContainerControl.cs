@@ -3,20 +3,20 @@
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Basisklasse für alle Controls mit mehreren Inhalten
+    /// A ui control base class for all container controls.
     /// </summary>
     public class ContainerControl : Control
     {
         /// <summary>
-        /// Liste aller Controls
+        /// Gets a list of all controls.
         /// </summary>
-        public ControlCollection Controls { get { return Children; } }
+        public ControlCollection Controls => Children;
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der ContainerControl-Klasse.
+        /// Initializes a new instance of the <see cref="CanvasControl"/> class.
         /// </summary>
-        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
-        /// <param name="style">Der zu verwendende Style</param>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public ContainerControl(BaseScreenComponent manager, string style = "") :
             base(manager, style)
         {

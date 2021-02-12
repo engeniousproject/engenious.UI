@@ -1,15 +1,16 @@
 ﻿namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Ein einfacher Container für Steuerelemente
+    /// Ui  <see cref="ContainerControl"/> containing other controls.
     /// </summary>
     public class Panel : ContainerControl
     {
         /// <summary>
-        /// Erstellt eine neue Instanz der Klasse Panel
+        /// Initializes a new instance of the <see cref="Panel"/> class.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
-        public Panel(BaseScreenComponent manager) : base(manager)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Panel(BaseScreenComponent manager, string style = "") : base(manager, style)
         {
             ApplySkin(typeof(Panel));
         }

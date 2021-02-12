@@ -4,12 +4,21 @@ using System.Collections.Generic;
 
 namespace engenious.UI
 {
+    /// <summary>
+    /// An enumerable that can enumerate backwards through a <see cref="List{T}"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the items in the <see cref="List{T}"/>.</typeparam>
     public class ReverseEnumerable<T> : IEnumerable<T>
     {
-        
+        /// <summary>
+        /// Sets the base <see cref="List{T}"/> to iterate through.
+        /// </summary>
         public List<T> BaseList { private get; set; }
+        /// <summary>
+        /// The enumerator used to enumerate backwards through a <see cref="List{T}"/>.
+        /// </summary>
         [Serializable]
-        public struct ReverseEnumerator : IEnumerator<T>, IEnumerator
+        public struct ReverseEnumerator : IEnumerator<T>
         {
             private readonly List<T> _list;
             private int _index;
@@ -22,10 +31,12 @@ namespace engenious.UI
                 _current = default(T);
             }
 
+            /// <inheritdoc />
             public void Dispose()
             {
             }
 
+            /// <inheritdoc />
             public bool MoveNext()
             {
                 var localList = _list;
@@ -47,6 +58,7 @@ namespace engenious.UI
                 return false;
             }
 
+            /// <inheritdoc />
             public T Current => _current;
 
             object IEnumerator.Current
@@ -69,6 +81,10 @@ namespace engenious.UI
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="ReverseEnumerator"/>.
+        /// </summary>
+        /// <returns>The <see cref="ReverseEnumerator"/>.</returns>
         public ReverseEnumerator GetEnumerator()
         {
             return new ReverseEnumerator(BaseList);

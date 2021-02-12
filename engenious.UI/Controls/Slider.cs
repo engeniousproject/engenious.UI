@@ -5,86 +5,84 @@ using engenious.Input;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Das Slider-Control erlaubt das Verschieben eines Reglers per Maus oder Tastatur.
+    /// Ui control to select a value in a range with a slider.
     /// </summary>
     public class Slider : Control
     {
-        private int range;
+        private int _range;
         /// <summary>
-        /// Gibt die grafische Ausrichtung des Sliders zurück oder legt diese fest.
+        /// Gets or sets the <see cref="UI.Orientation"/> of the slider.
         /// </summary>
         public Orientation Orientation { get; set; }
 
         /// <summary>
-        /// Gibt den Brush, mit dem der Slider-Vordergrund gemalt werden soll, zurück oder legt diesen fest.
+        /// Gets or sets the brush for the slider knob.
         /// </summary>
         public Brush KnobBrush { get; set; }
 
         /// <summary>
-        /// Gibt den Maximalwert zurück oder legt diesen fest.
+        ///  Gets or sets the maximum value of the slider.
         /// </summary>
         public int Range
         {
-            get => range;
+            get => _range;
             set
             {
-                range = value;
-                Value = Math.Min(range, Value);
+                _range = value;
+                Value = Math.Min(_range, Value);
             }
         }
 
         /// <summary>
-        /// Gibt die Breite/Höhe des Sliders zurück oder legt diesen fest.
+        /// Gets or sets the size of the knob.
         /// </summary>
         public int KnobSize { get; set; }
+        
+        private int _sliderValue;
 
         /// <summary>
-        /// Der aktuelle Wert
-        /// </summary>
-        private int sliderValue;
-
-        /// <summary>
-        /// Gibt den aktuellen Wert zurück oder legt diesen fest.
+        /// Gets or sets the current value of the slider.
         /// </summary>
         public int Value
         {
-            get
-            {
-                return sliderValue;
-            }
+            get => _sliderValue;
             set
             {
-                sliderValue = Math.Max(0, Math.Min(Range, value));
+                _sliderValue = Math.Max(0, Math.Min(Range, value));
                 RecalculateKnob();
-                if(ValueChanged != null)
-                    ValueChanged.Invoke(sliderValue);
+                ValueChanged?.Invoke(_sliderValue);
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the slider direction should be inverted.
+        /// </summary>
         public bool Invert { get; set; }
 
+        /// <summary>
+        /// Gets or sets the big step increase/decrease used for clicking besides the knob.
+        /// </summary>
         public int BigStep { get; set; } = 0;
 
-        public int SmallStep { get; set; } = 1;
-
-
         /// <summary>
-        /// Gibt an ob die Maus geklickt wird während das Control fokussiert ist
+        /// Gets or sets the small step increase/decrease used in scrolling.
         /// </summary>
-        private bool mouseClickActive = false;
+        public int SmallStep { get; set; } = 1;
+        
+        private bool _mouseClickActive = false;
 
-        private Rectangle knob;
+        private Rectangle _knob;
 
         /// <summary>
-        /// Wird ausgelöst wenn sich der Wert ändert
+        /// Occurs when the <see cref="Value"/> property was changed.
         /// </summary>
         public event ValueChangedDelegate ValueChanged;
 
         /// <summary>
-        /// Erzeugt einen neuen Slider.
+        /// Initializes a new instance of the <see cref="Slider"/> class.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
-        /// <param name="style">(Optional) Der zu verwendende Style.</param>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public Slider(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
@@ -97,21 +95,15 @@ namespace engenious.UI.Controls
             ApplySkin(typeof(Slider));
         }
 
-        /// <summary>
-        /// Malt den Content des Controls
-        /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="contentArea">Bereich für den Content in absoluten Koordinaten</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
+        /// <inheritdoc />
         protected override void OnDrawContent(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
             RecalculateKnob();
 
-            //Zeichne Background
+            // Draw background
             Background.Draw(batch, contentArea, alpha);
 
-            KnobBrush.Draw(batch, new Rectangle(knob.Location + contentArea.Location, knob.Size), alpha);
+            KnobBrush.Draw(batch, new Rectangle(_knob.Location + contentArea.Location, _knob.Size), alpha);
         }
 
         private void RecalculateKnob()
@@ -129,40 +121,37 @@ namespace engenious.UI.Controls
             if (Orientation == Orientation.Horizontal)
             {
 
-                //Berechne die Position des SliderKnobs     
-                sliderKnob.Y = 0;                                                       //Y Koordinate des Knobs
-                sliderKnob.Width = KnobSize;                                                              //Der Slider ist SliderWidth breit
-                float WidthRange = ((float)drawableKnobSpace.Width / Range);                        //Berechnet wieviel Pixel 1 in Value wert ist
-                sliderKnob.X = (int)Math.Round(drawableKnobSpace.X + (WidthRange * val) - KnobSize / 2);    //Berechnet die X Position des Knobs
-                sliderKnob.Height = ActualClientArea.Height;                                             //Der SliderKnob ist immer so hoch wie der Slider
+                // Calculate the position of the knob
+                sliderKnob.Y = 0;                                                       // Y coordinate of the knob
+                sliderKnob.Width = KnobSize;                                                              // the slider has a width of KnobSize
+                float widthRange = ((float)drawableKnobSpace.Width / Range);                        // Calculates how many pixel correspond 1 to one value difference
+                sliderKnob.X = (int)Math.Round(drawableKnobSpace.X + (widthRange * val) - KnobSize / 2);    // X coordinate of the blob
+                sliderKnob.Height = ActualClientArea.Height;                                             // The knobs height is always the same as the slider
             }
             else
             {
                 //Berechne die Position des SliderKnobs     
-                sliderKnob.X = 0;                                                                             //Der SliderKnob beginnt immer am oberen Rand des Sliders
-                sliderKnob.Height = KnobSize;                                                             //Der Slider ist SliderWidthpx hoch
-                float HeightRange = ((float)drawableKnobSpace.Height / Range);                              //Berechnet wieviel Pixel 1 in Value wert ist
-                sliderKnob.Y = (int)Math.Round(drawableKnobSpace.Y + drawableKnobSpace.Height - (HeightRange * val) - KnobSize / 2);    //Berechnet die X Position des Knobs
-                sliderKnob.Width = ActualClientArea.Width;                                               //Der SliderKnob ist immer so breit wie der Slider
+                sliderKnob.X = 0;                                                                            // Y coordinate of the knob
+                sliderKnob.Height = KnobSize;                                                             // the slider has a height of KnobSize
+                float heightRange = ((float)drawableKnobSpace.Height / Range);                              // Calculates how many pixel correspond 1 to one value difference
+                sliderKnob.Y = (int)Math.Round(drawableKnobSpace.Y + drawableKnobSpace.Height - (heightRange * val) - KnobSize / 2);    // X coordinate of the blob
+                sliderKnob.Width = ActualClientArea.Width;                                               // The knobs width is always the same as the slider
             }
 
-            knob = sliderKnob;
+            _knob = sliderKnob;
         }
 
-        Point grabPoint;
-
-        /// <summary>
-        /// Wird aufgerufen, wenn die linke Maustaste heruntergedrückt wird.
-        /// </summary>
-        /// <param name="args">Weitere Informationen zum Event.</param>
+        Point _grabPoint;
+        
+        /// <inheritdoc />
         protected override void OnLeftMouseDown(MouseEventArgs args)
         {
             
 
-            if(knob.Intersects(args.LocalPosition))
+            if(_knob.Contains(args.LocalPosition))
             {
-                grabPoint = args.LocalPosition - (knob.Location + new Point(knob.Width / 2, knob.Height / 2)); 
-                mouseClickActive = true;
+                _grabPoint = args.LocalPosition - (_knob.Location + new Point(_knob.Width / 2, _knob.Height / 2)); 
+                _mouseClickActive = true;
             }
             else if(BigStep == 0)
             {
@@ -177,62 +166,55 @@ namespace engenious.UI.Controls
             else
             {
                 int scrollDirection = Orientation ==
-                    Orientation.Horizontal && args.LocalPosition.X < knob.X || Orientation == Orientation.Vertical && args.LocalPosition.Y < knob.Y
+                    Orientation.Horizontal && args.LocalPosition.X < _knob.X || Orientation == Orientation.Vertical && args.LocalPosition.Y < _knob.Y
                     ? 1 : -1;
                 Value += BigStep * scrollDirection * (Invert ? -1 : 1);
             }
 
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs args)
         {
             base.OnMouseMove(args);
-            //Berechnen des Werts wenn die Maus gehalten wird & das Control ausgewählt ist
-            if (mouseClickActive)
+            // Calculation of the value when the mouse is hold and the control is selected
+            if (_mouseClickActive)
             {
 
                 Point localMousePos = args.LocalPosition;
-                //Wenn der Slider Horizontal ist
                 if (Orientation == Orientation.Horizontal)
                 {
-                    //Berechne den Wert des Sliders
-                    Value = (args.LocalPosition.X - KnobSize / 2 - grabPoint.X) * Range / (ActualClientArea.Width - KnobSize);
-                    if (localMousePos.X <= 0) Value = 0;                     //Wenn die Maus Position kleiner als 0 ist -> Value = 0
-                    if (localMousePos.X >= ActualClientArea.Width) Value = Range; //Wenn die Maus Position größer als die Breite des Controls -> Value = Range
+                    // Calculate the value of the slider
+                    Value = (args.LocalPosition.X - KnobSize / 2 - _grabPoint.X) * Range / (ActualClientArea.Width - KnobSize);
+                    if (localMousePos.X <= 0) Value = 0;                     // When mouse position < 0 -> Value = 0
+                    if (localMousePos.X >= ActualClientArea.Width) Value = Range; // When mouse position > width of control -> Value = Range
                 }
 
-                //Wenn der Slider vertikal ist
                 if (Orientation == Orientation.Vertical)
                 {
-                    //Berechne den Wert des Sliders
-                    Value = Range - (args.LocalPosition.Y - KnobSize / 2 - grabPoint.Y) * Range / (ActualClientArea.Height - KnobSize);
-                    if (Value <= 0) Value = 0;                      //Wenn die Maus Position kleiner als 0 ist -> Value = 0
-                    if (Value >= Range) Value = Range;              //Wenn die Maus Position größer als die Breite des Controls -> Value = Range
+                    // Calculate the value of the slider
+                    Value = Range - (args.LocalPosition.Y - KnobSize / 2 - _grabPoint.Y) * Range / (ActualClientArea.Height - KnobSize);
+                    if (Value <= 0) Value = 0;                      // When mouse position < 0 -> Value = 0
+                    if (Value >= Range) Value = Range;              // When mouse position > height of control -> Value = Range
                 }
                 if (Invert)
                     Value = Range - Value;
             }
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn die linke Maustaste losgelassen wird.
-        /// </summary>
-        /// <param name="args">Weitere Informationen zum Event.</param>
+        /// <inheritdoc />
         protected override void OnLeftMouseUp(MouseEventArgs args)
         {
-            mouseClickActive = false;
+            _mouseClickActive = false;
         }
 
         /// <summary>
-        /// Delegat zur Änderung des Slider-Wertes.
+        /// Represents the method that will handle the <see cref="Slider.ValueChanged"/> event of a <see cref="Slider"/>.
         /// </summary>
-        /// <param name="Value">Der neue Wert.</param>
-        public delegate void ValueChangedDelegate(int Value);
+        /// <param name="value">The value of the slider.</param>
+        public delegate void ValueChangedDelegate(int value);
 
-        /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt ist.
-        /// </summary>
-        /// <param name="args">Zusätzliche Daten zum Event.</param>
+        /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {
             if (Focused != TreeState.Active)
@@ -258,6 +240,7 @@ namespace engenious.UI.Controls
                 Value = 0;
         }
 
+        /// <inheritdoc />
         protected override void OnMouseScroll(MouseScrollEventArgs args)
         {
             Value += args.Steps * SmallStep * (Invert ? -1 : 1);

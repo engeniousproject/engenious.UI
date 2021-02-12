@@ -8,14 +8,17 @@ using System.Threading.Tasks;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Standard-Schaltfläche mit Text.
+    /// Ui control text button.
     /// </summary>
     public class TextButton : Button
     {
+        /// <summary>
+        /// Gets the label containing the button text.
+        /// </summary>
         public Label Label => (Label)Content;
 
         /// <summary>
-        /// Gibt die Schriftart an mit der der Inhalt gezeichnet werden soll oder legt diese fest.
+        /// Gets or sets the font used for rendering the button text.
         /// </summary>
         public SpriteFont Font
         {
@@ -24,7 +27,7 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Gibt die Textfarbe an mit der der Inhalt gezeichnet werden soll oder legt diese fest.
+        /// Gets or sets the color used for rendering the button text.
         /// </summary>
         public Color TextColor
         {
@@ -33,16 +36,16 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Gibt die Ausrichtung des Textes innerhalb des Controls auf horizontaler Ebene an.
+        /// Gets or sets the <see cref="HorizontalAlignment"/> of the text.
         /// </summary>
         public HorizontalAlignment HorizontalTextAlignment
         {
             get => Label.HorizontalTextAlignment;
             set => Label.HorizontalTextAlignment = value;
         }
-
+        
         /// <summary>
-        /// Gibt die Ausrichtung des Textes innerhalb des Controls auf vertikaler Ebene an.
+        /// Gets or sets the <see cref="VerticalAlignment"/> of the text.
         /// </summary>
         public VerticalAlignment VerticalTextAlignment
         {
@@ -51,8 +54,7 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Gibt an, ob das Control automatisch den Text an geeigneter Stelle
-        /// umbrechen soll, falls er nicht in eine Zeile passt.
+        /// Gets or sets a value indicating whether the text should be wrapped ond word boundaries if necessary.
         /// </summary>
         public bool WordWrap
         {
@@ -61,11 +63,11 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Initialisiert einen Standard-Button mit Text-Inhalt.
+        /// Initializes a new instance of the <see cref="TextButton"/> class.
         /// </summary>
-        /// <param name="manager">Der <see cref="BaseScreenComponent"/>.</param>
-        /// <param name="text">Text, der auf der Schaltfläche angezeigt werden soll.</param>
-        /// <param name="style">(Optional) Der zu verwendende Style.</param>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="text">The text of this button.</param>
+        /// <param name="style">The style to use for this control.</param>
         public TextButton(BaseScreenComponent manager, string text, string style = ""): base(manager, style)
         {
             Content = new Label(manager) { Text = text };

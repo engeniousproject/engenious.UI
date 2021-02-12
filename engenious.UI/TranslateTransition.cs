@@ -3,63 +3,55 @@
 namespace engenious.UI
 {
     /// <summary>
-    /// Transition, die eine Trnslation auf das Zielcontrol anwendet.
+    /// Transition for translating controls.
     /// </summary>
     public class TranslateTransition : Transition
     {
-        private Point from;
-        private Point to;
+        private readonly Point _from;
+        private readonly Point _to;
 
         /// <summary>
-        /// Erzeugt eine neue AlphaTransition für das angegebene Control.
+        /// Initializes a new instance of the <see cref="AlphaTransition"/> class.
         /// </summary>
-        /// <param name="control">Zielcontrol.</param>
-        /// <param name="curve">Bewegungskurve.</param>
-        /// <param name="duration">Animationslänge.</param>
-        /// <param name="to">Zieltranformation.</param>
-        public TranslateTransition(Control control, Func<float, float> curve, TimeSpan duration, Point to)
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <param name="curve">The transition curve.</param>
+        /// <param name="duration">The time duration of the transition.</param>
+        /// <param name="to">The desired location at the end of the transition.</param>
+        public TranslateTransition(Control control, TransitionCurveDelegate curve, TimeSpan duration, Point to)
             : this(control, curve, duration, TimeSpan.Zero, to) { }
 
         /// <summary>
-        /// Erzeugt eine neue AlphaTransition für das angegebene Control.
+        /// Initializes a new instance of the <see cref="TranslateTransition"/> class.
         /// </summary>
-        /// <param name="control">Zielcontrol.</param>
-        /// <param name="curve">Bewegungskurve.</param>
-        /// <param name="duration">Animationslänge.</param>
-        /// <param name="delay">Wartezeit bis zum Start der Animation.</param>
-        /// <param name="to">Zieltransformation.</param>
-        public TranslateTransition(Control control, Func<float,float> curve, TimeSpan duration, TimeSpan delay, Point to) 
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <param name="curve">The transition curve.</param>
+        /// <param name="duration">The time duration of the transition.</param>
+        /// <param name="delay">The time delay to wait before starting the transition.</param>
+        /// <param name="to">The desired location at the end of the transition.</param>
+        public TranslateTransition(Control control, TransitionCurveDelegate curve, TimeSpan duration, TimeSpan delay, Point to) 
             : base(control, curve, duration, delay)
         {
-            from = new Point(
+            _from = new Point(
                 (int)control.Transformation.Translation.X, 
                 (int)control.Transformation.Translation.Y);
-            this.to = to;
+            _to = to;
         }
 
-        /// <summary>
-        /// Wendet die Transition auf das Steuerelement an.
-        /// </summary>
-        /// <param name="control">Zielcontrol der Transition.</param>
-        /// <param name="value">Wert im zeitlichen Ablauf der Transition.</param>
+        /// <inheritdoc />
         protected override void ApplyValue(Control control, float value)
         {
-            Point diff = to - from;
+            Point diff = _to - _from;
 
             Matrix trans = control.Transformation;
-            trans.M41 = from.X + (diff.X * value);
-            trans.M42 = from.Y + (diff.Y * value);
+            trans.M14 += _from.X + (diff.X * value);
+            trans.M24 += _from.Y + (diff.Y * value);
             control.Transformation = trans;
         }
 
-        /// <summary>
-        /// Fertigt eine Kopie dieser Transition an, ersetzt aber das Zielcontrol.
-        /// </summary>
-        /// <param name="control">Das neue Zielcontrol.</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public override Transition Clone(Control control)
         {
-            return new TranslateTransition(control, Curve, Duration, Delay, to);
+            return new TranslateTransition(control, Curve, Duration, Delay, _to);
         }
     }
 }

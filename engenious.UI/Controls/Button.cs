@@ -3,15 +3,15 @@
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Standard Schaltfläche
+    /// A clickable UI element.
     /// </summary>
     public class Button : ContentControl
     {
         /// <summary>
-        /// Erzeugt eine neue Instanz der Klasse Button.
+        /// Initializes a new instance of the <see cref="Button"/> class.
         /// </summary>
-        /// <param name="manager">Der <see cref="BaseScreenComponent"/></param>
-        /// <param name="style">(Optional) der zu verwendende Style</param>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public Button(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
@@ -20,11 +20,8 @@ namespace engenious.UI.Controls
 
             ApplySkin(typeof(Button));
         }
-
-        /// <summary>
-        /// Wird aufgrefufen, wenn eine Taste gedrückt wird.
-        /// </summary>
-        /// <param name="args">Ein <see cref="KeyEventArgs"/>-Objekt mit weiteren Informationen zum Event</param>
+        
+        /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {
             base.OnKeyPress(args);
@@ -43,10 +40,7 @@ namespace engenious.UI.Controls
             }
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn mit der linken Maustaste auf das Steuerelement geklickt wird.
-        /// </summary>
-        /// <param name="args">Weitere Informationen zum Ereignis.</param>
+        /// <inheritdoc />
         protected override void OnLeftMouseClick(MouseEventArgs args)
         {
             base.OnLeftMouseClick(args);
@@ -60,6 +54,7 @@ namespace engenious.UI.Controls
             args.Handled = true;
         }
 
+        /// <inheritdoc />
         protected override void OnTouchTap(TouchEventArgs args)
         {
             base.OnTouchTap(args);
@@ -74,13 +69,15 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Methode, die aufgerufen wird, nachdem der Click-EventHadler (falls vorhanden) ausgeführt wurde.
+        /// Raises the <see cref="Executed"/> event.
         /// </summary>
-        /// <param name="args">Weitere Informationen zum Ereignis.</param>
+        /// <param name="args">A <see cref="EventArgs"/> that contains the event data.</param>
         protected virtual void OnExecuted(EventArgs args) { }
 
         /// <summary>
-        /// Event, das aufgerufen wird, nachdem der Click-EventHadler (falls vorhanden) ausgeführt wurde.
+        /// Occurs after the <see cref="Control.LeftMouseClick"/>,
+        /// a <see cref="Control.KeyPress"/> using <see cref="Keys.Enter"/> or <see cref="Keys.Space"/>,
+        /// or a <see cref="Control.TouchTap"/> got executed.
         /// </summary>
         public event EventDelegate Executed;
     }

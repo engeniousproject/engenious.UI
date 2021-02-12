@@ -7,82 +7,98 @@ using engenious.Input;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Control für Texteingabe
+    /// Ui textbox control for text input.
     /// </summary>
     public class Textbox : ContentControl, ITextControl
     {
-        private int cursorPosition;
+        private int _cursorPosition;
 
-        private int selectionStart;
+        private int _selectionStart;
 
-        private readonly Label label;
+        private readonly Label _label;
 
-        private readonly ScrollContainer scrollContainer;
+        private readonly ScrollContainer _scrollContainer;
 
         /// <summary>
-        /// Gibt die aktuelle Cursor-Position an oder legt diese fest.
+        /// Gets or sets the current cursor position.
         /// </summary>
         public int CursorPosition
         {
-            get { return cursorPosition; }
+            get => _cursorPosition;
             set
             {
                 if (value < 0 || value > Text.Length)
                     return;
 
-                cursorBlinkTime = 0;
-                if (cursorPosition != value)
+                _cursorBlinkTime = 0;
+                if (_cursorPosition != value)
                 {
                     var cursorOffset = (int)Font.MeasureString(Text.Substring(0, value)).X;
-                    if (cursorOffset < scrollContainer.HorizontalScrollPosition)
-                        scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset);
-                    else if (cursorOffset > scrollContainer.HorizontalScrollPosition + scrollContainer.ActualClientArea.Width)
-                        scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset - scrollContainer.ActualClientArea.Width);
-                    cursorPosition = Math.Min(label.Text.Length, value);
+                    if (cursorOffset < _scrollContainer.HorizontalScrollPosition)
+                        _scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset);
+                    else if (cursorOffset > _scrollContainer.HorizontalScrollPosition + _scrollContainer.ActualClientArea.Width)
+                        _scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset - _scrollContainer.ActualClientArea.Width);
+                    _cursorPosition = Math.Min(_label.Text.Length, value);
                     InvalidateDrawing();
                 }
             }
         }
 
         /// <summary>
-        /// Gibt den Beginn des Selektionsbereichs an oder legt diesen fest.
+        /// Gets or sets the start of the selection range.
         /// </summary>
         public int SelectionStart
         {
-            get { return selectionStart; }
+            get => _selectionStart;
             set
             {
-                if (selectionStart != value)
+                if (_selectionStart != value)
                 {
-                    selectionStart = value;
+                    _selectionStart = value;
                     InvalidateDrawing();
                 }
             }
         }
 
-        public string Text { get => label.Text; set => label.Text = value; }
-        public SpriteFont Font { get => label.Font; set => label.Font = value; }
-        public Color TextColor { get => label.TextColor; set => label.TextColor = value; }
-        public HorizontalAlignment HorizontalTextAlignment { get => label.HorizontalTextAlignment; set => label.HorizontalTextAlignment = value; }
-        public VerticalAlignment VerticalTextAlignment { get => label.VerticalTextAlignment; set => label.VerticalTextAlignment = value; }
-        public bool WordWrap { get => label.WordWrap; set => label.WordWrap = value; }
-        public bool LineWrap { get => label.LineWrap; set => label.LineWrap = value; }
+        /// <inheritdoc />
+        public string Text { get => _label.Text; set => _label.Text = value; }
 
+        /// <inheritdoc />
+        public SpriteFont Font { get => _label.Font; set => _label.Font = value; }
+
+        /// <inheritdoc />
+        public Color TextColor { get => _label.TextColor; set => _label.TextColor = value; }
+
+        /// <inheritdoc />
+        public HorizontalAlignment HorizontalTextAlignment { get => _label.HorizontalTextAlignment; set => _label.HorizontalTextAlignment = value; }
+
+        /// <inheritdoc />
+        public VerticalAlignment VerticalTextAlignment { get => _label.VerticalTextAlignment; set => _label.VerticalTextAlignment = value; }
+
+        /// <inheritdoc />
+        public bool WordWrap { get => _label.WordWrap; set => _label.WordWrap = value; }
+
+        /// <inheritdoc />
+        public bool LineWrap { get => _label.LineWrap; set => _label.LineWrap = value; }
+
+        /// <summary>
+        /// Occurs when the <see cref="Text"/> was changed.
+        /// </summary>
         public event PropertyChangedDelegate<string> TextChanged
         {
-            add { label.TextChanged += value; }
-            remove { label.TextChanged -= value; }
+            add => _label.TextChanged += value;
+            remove => _label.TextChanged -= value;
         }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der Textbox-Klasse
+        /// Initializes a new instance of the <see cref="Textbox"/> class.
         /// </summary>
-        /// <param name="manager"></param>
-        /// <param name="style"></param>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public Textbox(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
-            label = new Label(manager, style)
+            _label = new Label(manager, style)
             {
                 HorizontalTextAlignment = HorizontalAlignment.Left,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -91,16 +107,16 @@ namespace engenious.UI.Controls
                 DrawFocusFrame = false
             };
 
-            scrollContainer = new ScrollContainer(manager)
+            _scrollContainer = new ScrollContainer(manager)
             {
                 HorizontalScrollbarVisibility = ScrollbarVisibility.Never,
                 VerticalScrollbarVisibility = ScrollbarVisibility.Never,
                 HorizontalScrollbarEnabled = true,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
 
-                Content = label
+                Content = _label
             };
-            Content = scrollContainer;
+            Content = _scrollContainer;
 
             TabStop = true;
             CanFocus = true;
@@ -108,20 +124,9 @@ namespace engenious.UI.Controls
             ApplySkin(typeof(Textbox));
         }
 
-        protected override void OnPreDraw(GameTime gameTime)
-        {
-            base.OnPreDraw(gameTime);
-        }
-
-        private int cursorBlinkTime;
-
-        /// <summary>
-        /// Malt den Content des Controls
-        /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="area">Bereich für den Content in absoluten Koordinaten</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
+        private int _cursorBlinkTime;
+        
+        /// <inheritdoc />
         protected override void OnDrawContent(SpriteBatch batch, Rectangle area, GameTime gameTime, float alpha)
         {
 
@@ -130,48 +135,49 @@ namespace engenious.UI.Controls
             if (SelectionStart > Text.Length)
                 SelectionStart = CursorPosition;
 
-            // Selektion
+            // Selection range
             if (SelectionStart != CursorPosition)
             {
                 int from = Math.Min(SelectionStart, CursorPosition);
                 int to = Math.Max(SelectionStart, CursorPosition);
                 var selectFrom = Font.MeasureString(Text.Substring(0, from));
                 var selectTo = Font.MeasureString(Text.Substring(from, to - from));
-                var rect = new Rectangle(area.X + (int)selectFrom.X - scrollContainer.HorizontalScrollPosition, area.Y, (int)selectTo.X, (int)selectTo.Y);
+                var rect = new Rectangle(area.X + (int)selectFrom.X - _scrollContainer.HorizontalScrollPosition, area.Y, (int)selectTo.X, (int)selectTo.Y);
                 batch.Draw(Skin.Pix, rect, Color.LightBlue);
             }
 
             base.OnDrawContent(batch, area, gameTime, alpha);
 
-            // Cursor (wenn Fokus)
+            // Cursor (when in focus)
             if (Focused == TreeState.Active)
             {
-                if (cursorBlinkTime % 1000 < 500)
+                if (_cursorBlinkTime % 1000 < 500)
                 {
                     var selectionSize = Font.MeasureString(Text.Substring(0, CursorPosition));
-                    batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectionSize.X - scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
+                    batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectionSize.X - _scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
                 }
-                cursorBlinkTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
+                _cursorBlinkTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
         }
 
+        /// <inheritdoc />
         protected override void OnKeyTextPress(KeyTextEventArgs args)
         {
-            // Ignorieren, wenn kein Fokus
+            // Ignore, if unfocused
             if (Focused != TreeState.Active) return;
 
-            // Steuerzeichen ignorieren
+            // Ignore control character
             if (args.Character == '\b' || args.Character == '\t' || args.Character == '\n' || args.Character == '\r')
                 return;
 
-            // Strg-Kombinationen (A, X, C, V) ignorieren
+            // Ignore ctrl hotkeys (A, X, C, V)
             if (args.Character == '\u0001' ||
                 args.Character == '\u0003' ||
                 args.Character == '\u0016' ||
                 args.Character == '\u0018')
                 return;
 
-            //Escape ignorieren
+            // Ignore Escape
             if (args.Character == '\u001b')
                 return;
 
@@ -190,16 +196,13 @@ namespace engenious.UI.Controls
             args.Handled = true;
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt ist.
-        /// </summary>
-        /// <param name="args">Zusätzliche Daten zum Event.</param>
+        /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {
-            // Ignorieren, wenn kein Fokus
-            if (Focused != TreeState.Active && scrollContainer.Focused != TreeState.Active) return;
+            // Ignore, if unfocused
+            if (Focused != TreeState.Active && _scrollContainer.Focused != TreeState.Active) return;
 
-            // Linke Pfeiltaste
+            // Left arrow key
             if (args.Key == Keys.Left)
             {
                 if (args.Ctrl)
@@ -219,7 +222,7 @@ namespace engenious.UI.Controls
                 args.Handled = true;
             }
 
-            // Rechte Pfeiltaste
+            // Right arrow key
             if (args.Key == Keys.Right)
             {
                 if (args.Ctrl)
@@ -238,7 +241,7 @@ namespace engenious.UI.Controls
                 args.Handled = true;
             }
 
-            // Pos1-Taste
+            // Pos1 key
             if (args.Key == Keys.Home)
             {
                 CursorPosition = 0;
@@ -247,7 +250,7 @@ namespace engenious.UI.Controls
                 args.Handled = true;
             }
 
-            // Ende-Taste
+            // End key
             if (args.Key == Keys.End)
             {
                 CursorPosition = Text.Length;
@@ -276,7 +279,7 @@ namespace engenious.UI.Controls
                 args.Handled = true;
             }
 
-            // Entfernen
+            // Del key
             if (args.Key == Keys.Delete)
             {
                 if (SelectionStart != CursorPosition)
@@ -297,7 +300,7 @@ namespace engenious.UI.Controls
             // Ctrl+A (Select all)
             if (args.Key == Keys.A && args.Ctrl)
             {
-                // Alles markieren
+                // Select everything
                 SelectionStart = 0;
                 CursorPosition = Text.Length;
 
@@ -310,7 +313,7 @@ namespace engenious.UI.Controls
                 int from = Math.Min(SelectionStart, CursorPosition);
                 int to = Math.Max(SelectionStart, CursorPosition);
 
-                // Selektion kopieren
+                // Copy selection to clipboard
                 if (from == to) SystemSpecific.ClearClipboard();
                 else SystemSpecific.SetClipboardText(Text.Substring(from, to - from));
 
@@ -323,7 +326,7 @@ namespace engenious.UI.Controls
                 int from = Math.Min(SelectionStart, CursorPosition);
                 int to = Math.Max(SelectionStart, CursorPosition);
 
-                // Selektion ausschneiden
+                // Copy selection to clipboard
                 if (from == to) SystemSpecific.ClearClipboard();
                 else SystemSpecific.SetClipboardText(Text.Substring(from, to - from));
 
@@ -337,7 +340,7 @@ namespace engenious.UI.Controls
             // Ctrl+V (Paste)
             if (args.Key == Keys.V && args.Ctrl)
             {
-                // Selektierten Text löschen
+                // Delete currently selected text
                 if (SelectionStart != CursorPosition)
                 {
                     int from = Math.Min(SelectionStart, CursorPosition);
@@ -347,7 +350,7 @@ namespace engenious.UI.Controls
                     SelectionStart = from;
                 }
 
-                // Text einfügen und Cursor ans Ende setzen
+                // Insert text at current position and advance cursor to lst inserted character
                 string paste = SystemSpecific.GetClipboardText();
                 Text = Text.Substring(0, CursorPosition) + paste + Text.Substring(CursorPosition);
                 CursorPosition += paste.Length;
@@ -358,8 +361,8 @@ namespace engenious.UI.Controls
 
             args.Handled = true;
 
-            //Manche Keys weitergeben
-            if (ignoreKeys.Contains<Keys>(args.Key))
+            // Passthrough ignored keys.
+            if (_ignoreKeys.Contains(args.Key))
                 args.Handled = false;
 
             base.OnKeyPress(args);
@@ -386,35 +389,38 @@ namespace engenious.UI.Controls
             return Text.Length;
         }
 
-        private bool mouseDown;
+        private bool _mouseDown;
 
+        /// <inheritdoc />
         protected override void OnLeftMouseDown(MouseEventArgs args)
         {
             base.OnLeftMouseDown(args);
 
-            CursorPosition = FindClosestPosition(args.LocalPosition + new Point(scrollContainer.HorizontalScrollPosition - Padding.Left, scrollContainer.VerticalScrollPosition - Padding.Top));
+            CursorPosition = FindClosestPosition(args.LocalPosition + new Point(_scrollContainer.HorizontalScrollPosition - Padding.Left, _scrollContainer.VerticalScrollPosition - Padding.Top));
             SelectionStart = CursorPosition;
 
-            mouseDown = true;
+            _mouseDown = true;
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs args)
         {
             base.OnMouseMove(args);
-            if (mouseDown)
+            if (_mouseDown)
             {
-                CursorPosition = FindClosestPosition(args.LocalPosition + new Point(scrollContainer.HorizontalScrollPosition - Padding.Left, scrollContainer.VerticalScrollPosition - Padding.Top));
+                CursorPosition = FindClosestPosition(args.LocalPosition + new Point(_scrollContainer.HorizontalScrollPosition - Padding.Left, _scrollContainer.VerticalScrollPosition - Padding.Top));
             }
         }
 
+        /// <inheritdoc />
         protected override void OnLeftMouseUp(MouseEventArgs args)
         {
             base.OnLeftMouseUp(args);
 
-            mouseDown = false;
+            _mouseDown = false;
         }
 
-        Keys[] ignoreKeys =
+        readonly Keys[] _ignoreKeys =
         {
             Keys.Escape,
             Keys.Tab,

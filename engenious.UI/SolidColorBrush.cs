@@ -714,23 +714,21 @@ namespace engenious.UI
         public static Brush YellowGreen { get; } = new SolidColorBrush(Color.YellowGreen);
         #endregion
 
-        private readonly Color color;
+        private readonly Color _color;
 
         /// <summary>
-        /// Creates a new brush with the given <see cref="Color"/>
+        /// Initializes a new instance of the <see cref="SolidColorBrush"/> class.
         /// </summary>
-        /// <param name="color">The color to be used for this brush</param>
+        /// <param name="color">The color to be used for this brush.</param>
         public SolidColorBrush(Color color)
         {
-            this.color = color;
+            _color = color;
         }
 
-        /// <summary>
         /// <inheritdoc/>
-        /// </summary>
         public override void Draw(SpriteBatch batch, Rectangle area, float alpha)
         {
-            batch.Draw(Skin.Pix, area, color);
+            batch.Draw(Skin.Pix, area, _color);
         }
     }
 }

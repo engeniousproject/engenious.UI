@@ -1,17 +1,17 @@
 ﻿namespace engenious.UI
 {
     /// <summary>
-    /// Auflistung von Orientierungen.
+    /// Specifies possible orientations.
     /// </summary>
     public enum Orientation
     {
         /// <summary>
-        /// Horizantale Orientierung.
+        /// A horizontal orientation.
         /// </summary>
         Horizontal,
 
         /// <summary>
-        /// Vertikale Orientierung.
+        /// A vertical orientation.
         /// </summary>
         Vertical
     }

@@ -2,19 +2,22 @@
 
 namespace engenious.UI.Controls
 {
+    /// <summary>
+    /// Ui container control for organizing controls into pages.
+    /// </summary>
     public class TabControl : Control
     {
         /// <summary>
-        /// Liste alle Pages
+        /// Gets a list of all <see cref="TabPage"/> controls organized by this control.
         /// </summary>
-        public ItemCollection<TabPage> Pages { get; private set; }
+        public ItemCollection<TabPage> Pages { get; }
 
         /// <summary>
-        /// Content des TabControl
+        /// Gets or sets the content of the <see cref="TabControl"/>.
         /// </summary>
         private Control Content
         {
-            get { return Children.FirstOrDefault(); }
+            get => Children.FirstOrDefault();
             set
             {
                 if (Content != value)
@@ -27,48 +30,47 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Die zur Darstellung benötigten Controls
+        /// The controls needed for visualization.
         /// </summary>
-        private StackPanel tabListStack;
-        private Grid tabControlGrid;
-        private ContentControl tabPage;
+        private readonly StackPanel _tabListStack;
+        private readonly ContentControl _tabPage;
 
         /// <summary>
-        /// Die nötigen Brushes
+        /// The needed brushes.
         /// </summary>
-        public Brush tabActiveBrush;
-        public Brush tabBrush;
-        public Brush tabPageBackground;
-        public Brush tabListBackground;
+        private Brush _tabActiveBrush;
+        private Brush _tabBrush;
+        private Brush _tabPageBackground;
+        private Brush _tabListBackground;
 
         /// <summary>
-        /// Die Brush für den aktiven Tab
+        /// Gets or sets the <see cref="Brush"/> used for highlighting the currently active tab in the tab list.
         /// </summary>
         public Brush TabActiveBrush
         {
-            get { return tabActiveBrush; }
+            get => _tabActiveBrush;
             set
             {
-                tabActiveBrush = value;
-                if (tabListStack.Controls.Count > 0)
-                    tabListStack.Controls.ElementAt(SelectedTabIndex).Background = tabActiveBrush;
+                _tabActiveBrush = value;
+                if (_tabListStack.Controls.Count > 0)
+                    _tabListStack.Controls.ElementAt(SelectedTabIndex).Background = _tabActiveBrush;
             }
         }
 
         /// <summary>
-        /// Brush für inaktive Tabs
+        /// Gets or sets the <see cref="Brush"/> used for rendering the non active tabs in the tab list.
         /// </summary>
         public Brush TabBrush
         {
-            get { return tabBrush; }
+            get => _tabBrush;
             set
             {
-                tabBrush = value;
-                if (tabListStack.Controls.Count > 0)
+                _tabBrush = value;
+                if (_tabListStack.Controls.Count > 0)
                 {
-                    foreach (Control c in tabListStack.Controls)
+                    foreach (Control c in _tabListStack.Controls)
                     {
-                        int index = tabListStack.Controls.IndexOf(c);
+                        int index = _tabListStack.Controls.IndexOf(c);
                         if (index != SelectedTabIndex)
                             c.Background = TabBrush;
                     }
@@ -77,66 +79,69 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Brush für den TabPage Background
+        /// Gets or sets the <see cref="Brush"/> used as a background for a <see cref="TabPage"/>.
         /// </summary>
         public Brush TabPageBackground
         {
-            get { return tabPageBackground; }
+            get => _tabPageBackground;
             set
             {
-                tabPageBackground = value;
-                tabPage.Background = TabPageBackground;
+                _tabPageBackground = value;
+                _tabPage.Background = TabPageBackground;
             }
         }
 
         /// <summary>
-        /// Brush für den Hintergrund der TabListe
+        /// Gets or sets the <see cref="Brush"/> used for the background of the tab list.
         /// </summary>
         public Brush TabListBackground
         {
-            get { return tabListBackground; }
+            get => _tabListBackground;
             set
             {
-                tabListBackground = value;
-                tabListStack.Background = TabListBackground;
+                _tabListBackground = value;
+                _tabListStack.Background = TabListBackground;
             }
         }
 
-        /// <summary>
-        /// Spacing zwischen Tabs
-        /// </summary>
-        private int tabSpacing;
+        private int _tabSpacing;
 
+        /// <summary>
+        /// Gets or sets the spacing between tabs in the tab list.
+        /// </summary>
         public int TabSpacing
         {
-            get
-            {
-                return tabSpacing;
-            }
+            get => _tabSpacing;
             set
             {
-                tabSpacing = value;
-                foreach (Control tabLabel in tabListStack.Controls)
-                    tabLabel.Margin = new Border(0, 0, tabSpacing, 0);
+                _tabSpacing = value;
+                foreach (Control tabLabel in _tabListStack.Controls)
+                    tabLabel.Margin = new Border(0, 0, _tabSpacing, 0);
             }
         }
 
         /// <summary>
-        /// Der Index des aktiven Tabs
+        /// Gets the index of the currently selected tab.
         /// </summary>
-        private int SelectedTabIndex = 0;
+        public int SelectedTabIndex { get; private set; } = 0;
 
         /// <summary>
-        /// Base Constructor
+        /// Gets the currently selected tab.
         /// </summary>
-        /// <param name="manager">ScreenManager</param>
-        public TabControl(BaseScreenComponent manager) : base(manager)
+        public TabPage SelectedTab => Pages[SelectedTabIndex];
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TabControl"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public TabControl(BaseScreenComponent manager, string style = "") : base(manager, style)
         {
             Pages = new ItemCollection<TabPage>();
             Pages.OnInserted += OnInserted;
             Pages.OnRemove += OnRemove;
 
-            tabControlGrid = new Grid(manager)
+            var tabControlGrid = new Grid(manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
@@ -147,17 +152,17 @@ namespace engenious.UI.Controls
             Content = tabControlGrid;
 
 
-            tabListStack = new StackPanel(manager);
-            tabListStack.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tabListStack.Orientation = Orientation.Horizontal;
-            tabListStack.Background = TabListBackground;
-            tabControlGrid.AddControl(tabListStack, 0, 0);
+            _tabListStack = new StackPanel(manager);
+            _tabListStack.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _tabListStack.Orientation = Orientation.Horizontal;
+            _tabListStack.Background = TabListBackground;
+            tabControlGrid.AddControl(_tabListStack, 0, 0);
 
-            tabPage = new ContentControl(manager);
-            tabPage.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tabPage.VerticalAlignment = VerticalAlignment.Stretch;
-            tabPage.Background = TabPageBackground;
-            tabControlGrid.AddControl(tabPage, 0, 1);
+            _tabPage = new ContentControl(manager);
+            _tabPage.HorizontalAlignment = HorizontalAlignment.Stretch;
+            _tabPage.VerticalAlignment = VerticalAlignment.Stretch;
+            _tabPage.Background = TabPageBackground;
+            tabControlGrid.AddControl(_tabPage, 0, 1);
 
             ApplySkin(typeof(TabControl));
         }
@@ -177,72 +182,78 @@ namespace engenious.UI.Controls
             title.TabStop = true;
             title.KeyDown += (s, e) =>
             {
-                if (e.Key == engenious.Input.Keys.Enter && title.Focused == TreeState.Active)
+                if (e.Key == Input.Keys.Enter && title.Focused == TreeState.Active)
                     SelectTab(Pages.IndexOf(item));
             };
-            tabListStack.Controls.Add(title);
+            _tabListStack.Controls.Add(title);
 
             SelectTab(SelectedTabIndex);
         }
 
         /// <summary>
-        /// Wird aufgerufen wenn ein Element aus "Pages" entfernt wird, entfernt den Eintrag in der TabList
+        /// Called when a page is removed from <see cref="Pages"/> removes the entry from the tab list.
         /// </summary>
         private void OnRemove(TabPage item, int index)
         {
-            tabListStack.Controls.RemoveAt(index);                      //Entferne den Tab
-            if (Pages.Count > 0)                                        //Nur fortfahren wenn noch Pages vorhanden
+            _tabListStack.Controls.RemoveAt(index);                         // Remove the tab
+            if (Pages.Count > 0)                                            // Only when there are pages left
             {
-                if (index >= tabListStack.Controls.Count)                //Wenn die letzte Page entfernt wird...
-                    SelectedTabIndex = tabListStack.Controls.Count - 1;     //Setze den TabIndex auf die "neue" letzte
-                else SelectedTabIndex = index;                          //Andernfalls, setze den TabIndex  auf den aktuellen index
+                if (index >= _tabListStack.Controls.Count)                  // If the last page is removed...
+                    SelectedTabIndex = _tabListStack.Controls.Count - 1;    // Set the tab index to the "new" last index
+                else SelectedTabIndex = index;                              // Otherwise, set the selected tab index to the current index
 
-                SelectTab(SelectedTabIndex);                            //Selektiere den Tab
+                SelectTab(SelectedTabIndex);                                // Select the tab
             }
-            tabListStack.InvalidateDimensions();                        //Zeichne den TabListStack neu
+            _tabListStack.InvalidateDimensions();                           // Renew the tab list stack
         }
 
         /// <summary>
-        /// Selektieren eines Tabs mit Index
+        /// Select a tab page with a given index.
         /// </summary>
+        /// <param name="index">The index of the tab page to select.</param>
         public void SelectTab(int index)
         {
-            tabListStack.Controls.ElementAt(SelectedTabIndex).Background = TabBrush;
+            _tabListStack.Controls.ElementAt(SelectedTabIndex).Background = TabBrush;
             SelectedTabIndex = index;
-            tabListStack.Controls.ElementAt(index).Background = TabActiveBrush;
+            _tabListStack.Controls.ElementAt(index).Background = TabActiveBrush;
 
-            tabPage.Content = Pages.ElementAt(SelectedTabIndex);
+            _tabPage.Content = Pages.ElementAt(SelectedTabIndex);
 
-            if (TabIndexChanged != null)
-                TabIndexChanged.Invoke(this, Pages.ElementAt(index), SelectedTabIndex);
+            SelectedTabChanged?.Invoke(this, Pages.ElementAt(index), SelectedTabIndex);
         }
 
         /// <summary>
-        /// Selektieren eines Tabs mit Page
+        /// Select a tab page.
         /// </summary>
+        /// <param name="page">The <see cref="TabPage"/> to select</param>
         public void SelectTab(TabPage page)
         {
             try
             {
-                tabListStack.Controls.ElementAt(SelectedTabIndex).Background = TabBrush;
+                _tabListStack.Controls.ElementAt(SelectedTabIndex).Background = TabBrush;
                 SelectedTabIndex = Pages.IndexOf(page);
             }
             finally
             {
-                tabListStack.Controls.ElementAt(SelectedTabIndex).Background = TabActiveBrush;
-                tabPage.Content = Pages.ElementAt(SelectedTabIndex);
+                _tabListStack.Controls.ElementAt(SelectedTabIndex).Background = TabActiveBrush;
+                _tabPage.Content = Pages.ElementAt(SelectedTabIndex);
 
-                if (TabIndexChanged != null)
-                    TabIndexChanged.Invoke(this, page, SelectedTabIndex);
+                SelectedTabChanged?.Invoke(this, page, SelectedTabIndex);
             }
 
         }
+        
+        /// <summary>
+        /// Occurs when the <see cref="SelectedTab"/> changed.
+        /// </summary>
+        public event SelectionChangedDelegate SelectedTabChanged;
 
         /// <summary>
-        /// Event wenn der TabIndex sich ändert
+        /// Represents the method that will handle the <see cref="TabControl.SelectedTabChanged"/> event of a <see cref="TabControl"/>.
         /// </summary>
-        public event SelectionChangedDelegate TabIndexChanged;
-
+        /// <param name="control">The control the event occured on.</param>
+        /// <param name="tab">The tab page that was selected.</param>
+        /// <param name="index">The index of the tab page that was selected.</param>
         public delegate void SelectionChangedDelegate(Control control, TabPage tab, int index);
     }
 }

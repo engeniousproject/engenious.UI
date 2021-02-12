@@ -3,54 +3,55 @@
 namespace engenious.UI
 {
     /// <summary>
-    /// Basisklasse für Animationstransitions von Controls.
+    /// Base class for transition animations.
     /// </summary>
     public abstract class Transition
     {
         /// <summary>
-        /// Aktuell abgelaufene Zeit der Animation.
+        /// Gets the currently elapsed time.
         /// </summary>
         public TimeSpan Current { get; private set; }
 
         /// <summary>
-        /// Wartezeit bis zum Start der Animation.
+        /// Gets the delay to wait till starting the transition.
         /// </summary>
-        public TimeSpan Delay { get; private set; }
+        public TimeSpan Delay { get; }
 
         /// <summary>
-        /// Länge der Animation.
+        /// Gets the duration of the transition.
         /// </summary>
-        public TimeSpan Duration { get; private set; }
+        public TimeSpan Duration { get; }
 
         /// <summary>
-        /// Control, das animiert wird.
+        /// Gets the control that will be animated.
         /// </summary>
-        public Control Control { get; private set; }
+        public Control Control { get; }
 
         /// <summary>
-        /// Bewegungskurve.
+        /// Gets the transition curve used for transitioning.
         /// </summary>
-        public Func<float, float> Curve { get; private set; }
+        /// <seealso cref="TransitionCurveDelegate"/>
+        public TransitionCurveDelegate Curve { get; }
 
         /// <summary>
-        /// Erstellt eine neue Transition für das angegebene Control.
+        /// Initializes a new instance of the <see cref="Transition"/> class.
         /// </summary>
-        /// <param name="control">Zielcontrol.</param>
-        /// <param name="curve">Bewegungskurve.</param>
-        /// <param name="duration">Animationslänge.</param>
-        public Transition(Control control, Func<float, float> curve, TimeSpan duration) :
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <param name="curve">The transition curve.</param>
+        /// <param name="duration">The time duration of the transition.</param>
+        public Transition(Control control, TransitionCurveDelegate curve, TimeSpan duration) :
             this(control, curve, duration, TimeSpan.Zero)
         {
         }
 
         /// <summary>
-        /// Erstellt eine neue Transition für das angegebene Control.
+        /// Initializes a new instance of the <see cref="Transition"/> class.
         /// </summary>
-        /// <param name="control">Zielcontrol.</param>
-        /// <param name="curve">Bewegungskurve.</param>
-        /// <param name="duration">Animationslänge.</param>
-        /// <param name="delay">Wartezeit bis zum Start der Animation.</param>
-        public Transition(Control control, Func<float, float> curve, TimeSpan duration, TimeSpan delay)
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <param name="curve">The transition curve.</param>
+        /// <param name="duration">The time duration of the transition.</param>
+        /// <param name="delay">The time delay to wait before starting the transition.</param>
+        public Transition(Control control, TransitionCurveDelegate curve, TimeSpan duration, TimeSpan delay)
         {
             Current = new TimeSpan();
             Control = control;
@@ -60,85 +61,89 @@ namespace engenious.UI
         }
 
         /// <summary>
-        /// Update-Methode für die Animation.
+        /// Update the transition and apply it.
         /// </summary>
-        /// <param name="gameTime"></param>
-        /// <returns></returns>
+        /// <param name="gameTime">Contains the elapsed time since the last update, as well as total elapsed time.</param>
+        /// <returns>Whether the transition is still ongoing.</returns>
         public bool Update(GameTime gameTime)
         {
-            // Neue Zeit berechnen
+            // Calculate elapsed time of transition
             Current += gameTime.ElapsedGameTime;
 
-            // Vorlaufzeit (Delay)
+            // Ignore if still below delay
             if (Current < Delay) return true;
 
-            // Funktionseingang ermitteln
+            // Determine transition progress in percent
             float position = Math.Max(0, Math.Min(1, (float)(
                 (Current.TotalMilliseconds - Delay.TotalMilliseconds) / Duration.TotalMilliseconds)));
             float value = Math.Max(0, Math.Min(1, Curve(position)));
 
-            // Auf Control anwenden
+            // Apply transition to control
             ApplyValue(Control, value);
 
-            // Abbruchbedingung
+            // At end of transition
             if (position >= 1f)
             {
-                if (Finished != null)
-                    Finished(this, Control);
+                Finished?.Invoke(this, Control);
                 return false;
             }
             return true;
         }
 
         /// <summary>
-        /// Wendet die Transition auf das Steuerelement an.
+        /// Applies the transition to a control.
         /// </summary>
-        /// <param name="control">Zielcontrol der Transition.</param>
-        /// <param name="value">Wert im zeitlichen Ablauf der Transition.</param>
+        /// <param name="control">The <see cref="Control"/> to apply the transition to.</param>
+        /// <param name="value">Value depicting the progress of the transition in percent[0f-1f].</param>
         protected abstract void ApplyValue(Control control, float value);
 
         /// <summary>
-        /// Fertigt eine Kopie dieser Transition an, ersetzt aber das Zielcontrol.
+        /// Creates a cloned instance of this <see cref="Transition"/> but with a different control to apply the transition to.
         /// </summary>
-        /// <param name="control">Das neue Zielcontrol.</param>
-        /// <returns></returns>
+        /// <param name="control">The control to apply the transition to.</param>
+        /// <returns>The cloned <see cref="Transition"/>.</returns>
         public abstract Transition Clone(Control control);
 
         /// <summary>
-        /// Signalisiert das Ende der Animation.
+        /// Occurs when the transition was finished.
         /// </summary>
         public event TransitionDelegate Finished;
 
         #region Transition Curves
 
         /// <summary>
-        /// Lineare Bewegung
+        /// Depicts a linear transition curve.
         /// </summary>
-        /// <param name="position">Verlaufsposition im Wertebereich 0 bis 1</param>
-        /// <returns>Wert-Multiplikator</returns>
+        /// <param name="position">Value depicting the progress of the transition in percent[0f-1f].</param>
+        /// <returns>The linearly interpolated value(=<paramref name="position"/>).</returns>
         public static float Linear(float position)
         {
-            // Clamp
             return position;
         }
 
         /// <summary>
-        /// Quadratische Bewegung
+        /// Depicts a cubic transition curve.
         /// </summary>
-        /// <param name="position">Verlaufsposition im Wertebereich 0 bis 1</param>
-        /// <returns>Wert-Multiplikator</returns>
-        public static float Qubic(float position)
+        /// <param name="position">Value depicting the progress of the transition in percent[0f-1f].</param>
+        /// <returns>The cubic interpolated value(=pow(<paramref name="position"/>, 2)).</returns>
+        public static float Cubic(float position)
         {
-            return (float)Math.Pow(position, 2);
+            return MathF.Pow(position, 2);
         }
 
         #endregion
     }
 
     /// <summary>
-    /// Delegat für Events bei Transistions.
+    /// Represents the method that will handle the <see cref="Transition.Finished"/> event of a <see cref="Transition"/>.
     /// </summary>
-    /// <param name="sender">Die auslösende Transition.</param>
-    /// <param name="control">Das animierte Control.</param>
+    /// <param name="sender">The transition that was finished.</param>
+    /// <param name="control">The control the transition was applied to.</param>
     public delegate void TransitionDelegate(Transition sender, Control control);
+
+    /// <summary>
+    /// Represents the method that will curve transitions to be able to have different interpolation speeds across the transition time.
+    /// </summary>
+    /// <param name="t">The point to sample the curve at in percent[0f-1f].</param>
+    public delegate float TransitionCurveDelegate(float t);
 }

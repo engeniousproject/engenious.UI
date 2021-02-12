@@ -3,33 +3,71 @@ using engenious.Graphics;
 
 namespace engenious.UI
 {
+    /// <summary>
+    /// A <see cref="Brush"/> that repeats or stretches given textures along the x-axis and y-axis respectively and independently.
+    /// While rendering a central texture with given parameters independent from the others as well.
+    /// </summary>
     public sealed class NineTileBrush : Brush
     {
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the center.
+        /// </summary>
         public Texture2D CenterTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the left edge.
+        /// </summary>
         public Texture2D LeftTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the right edge.
+        /// </summary>
         public Texture2D RightTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the top edge.
+        /// </summary>
         public Texture2D TopTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the bottom edge.
+        /// </summary>
         public Texture2D BottomTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the upper left corner.
+        /// </summary>
         public Texture2D UpperLeftTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the upper right corner.
+        /// </summary>
         public Texture2D UpperRightTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the lower left corner.
+        /// </summary>
         public Texture2D LowerLeftTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="Texture2D"/> of the lower right corner.
+        /// </summary>
         public Texture2D LowerRightTexture { get; set; }
 
+        /// <summary>
+        /// Gets or sets the color to colorize the brush with.
+        /// </summary>
         public Color Color { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NineTileBrush"/> class.
+        /// </summary>
         public NineTileBrush()
         {
             Color = Color.White;
         }
 
+        /// <inheritdoc />
         public override void Draw(SpriteBatch batch, Rectangle area, float alpha)
         {
             Color color = Color * alpha;
@@ -63,10 +101,23 @@ namespace engenious.UI
             batch.Draw(LowerRightTexture, new Rectangle(area.X + area.Width - LowerRightTexture.Width, area.Y + area.Height - LowerRightTexture.Height, LowerRightTexture.Width, LowerRightTexture.Height), color);
         }
 
+        /// <summary>
+        /// Creates a <see cref="NineTileBrush"/> by cutting a given <see cref="Texture2D"/>.
+        /// </summary>
+        /// <param name="texture">The <see cref="Texture2D"/> to extract the <see cref="NineTileBrush"/> from.</param>
+        /// <param name="cutX">The spacing from the border to cut at the x-axis.</param>
+        /// <param name="cutY">The spacing from the border to cut at the y-axis.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">Is thrown when <paramref name="texture"/> is null.</exception>
+        /// <exception cref="ArgumentException">
+        /// Is thrown when either <paramref name="cutX"/> is smaller than zero,
+        /// bigger than half the width of <paramref name="texture"/>, <paramref name="cutY"/> is smaller than zero,
+        /// or bigger than half the height of <paramref name="texture"/>.
+        /// </exception>
         public static NineTileBrush FromSingleTexture(Texture2D texture, int cutX, int cutY)
         {
             if (texture == null)
-                throw new ArgumentNullException("texture");
+                throw new ArgumentNullException(nameof(texture));
 
             if (cutX <= 0)
                 throw new ArgumentException("cutX is too small");
@@ -84,9 +135,9 @@ namespace engenious.UI
             brush.MinWidth = (cutX * 2) + 1;
             brush.MinHeight = (cutY * 2) + 1;
 
-            #region Ecken
+            #region Corners
 
-            // Eck-Buffer
+            // Corner-Buffer
             uint[] buffer1 = new uint[cutX * cutY];
 
             // Upper Left
@@ -111,7 +162,7 @@ namespace engenious.UI
 
             #endregion
 
-            #region Horizontale Kanten
+            #region Horizontal Edges
 
             int buffer2SizeX = (texture.Width - cutX - cutX);
             int buffer2SizeY = cutY;
@@ -129,7 +180,7 @@ namespace engenious.UI
 
             #endregion
 
-            #region Vertikale Kanten
+            #region Vertical Edges
 
             int buffer3SizeX = cutX;
             int buffer3SizeY = (texture.Height - cutY - cutY);
@@ -147,7 +198,7 @@ namespace engenious.UI
 
             #endregion
 
-            #region Zentrum
+            #region Central
 
             int buffer4SizeX = (texture.Width - cutX - cutX);
             int buffer4SizeY = (texture.Height - cutY - cutY);

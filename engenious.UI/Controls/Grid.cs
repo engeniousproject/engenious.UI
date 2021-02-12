@@ -4,38 +4,65 @@ using System.Linq;
 
 namespace engenious.UI.Controls
 {
+    /// <summary>
+    /// A ui control for organizing controls in a grid.
+    /// </summary>
     public class Grid : Control
     {
-        private List<CellMapping> cellMapping = new List<CellMapping>();
+        private readonly List<CellMapping> _cellMapping = new();
 
-        public List<ColumnDefinition> Columns { get; private set; }
+        /// <summary>
+        /// Gets a list of <see cref="ColumnDefinition"/> for this <see cref="Grid"/>.
+        /// </summary>
+        public List<ColumnDefinition> Columns { get; }
 
-        public List<RowDefinition> Rows { get; private set; }
+        /// <summary>
+        /// Gets a list of <see cref="RowDefinition"/> for this <see cref="Grid"/>.
+        /// </summary>
+        public List<RowDefinition> Rows { get; }
 
-        public Grid(BaseScreenComponent manager, string style = "") :
-            base(manager, style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Grid"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Grid(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
             Columns = new List<ColumnDefinition>();
             Rows = new List<RowDefinition>();
             ApplySkin(typeof(Grid));
         }
 
+        /// <summary>
+        /// Adds a <see cref="Control"/> into a specific row and column.
+        /// </summary>
+        /// <param name="control">The <see cref="Control"/> to add.</param>
+        /// <param name="column">The column to place the control in.</param>
+        /// <param name="row">The row to place the control in.</param>
+        /// <param name="columnSpan">The number of columns the control should span over.</param>
+        /// <param name="rowSpan">The number of rows the control should span over.</param>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="control"/> was null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="row"/>, <paramref name="rowSpan"/>,
+        /// <paramref name="column"/> or <paramref name="columnSpan"/> where out of range.
+        /// </exception>
         public void AddControl(Control control, int column, int row, int columnSpan = 1, int rowSpan = 1)
         {
             if (control == null)
-                throw new ArgumentNullException("control");
+                throw new ArgumentNullException(nameof(control));
 
             if (column < 0 || column > Columns.Count - 1)
-                throw new ArgumentOutOfRangeException("column");
+                throw new ArgumentOutOfRangeException(nameof(column));
 
             if (row < 0 || row > Rows.Count - 1)
-                throw new ArgumentOutOfRangeException("row");
+                throw new ArgumentOutOfRangeException(nameof(row));
 
             if (columnSpan < 1)
-                throw new ArgumentOutOfRangeException("columnSpan");
+                throw new ArgumentOutOfRangeException(nameof(columnSpan));
 
             if (rowSpan < 1)
-                throw new ArgumentOutOfRangeException("rowSpan");
+                throw new ArgumentOutOfRangeException(nameof(rowSpan));
 
             var mapping = new CellMapping(control);
             for (int x = 0; x < columnSpan; x++)
@@ -54,17 +81,18 @@ namespace engenious.UI.Controls
                 mapping.Rows.Add(Rows[rowIndex]);
             }
 
-            cellMapping.Add(mapping);
+            _cellMapping.Add(mapping);
             Children.Add(control);
         }
 
+        /// <inheritdoc />
         public override Point GetExpectedSize(Point available)
         {
             Point result = GetMinClientSize(available);
             Point client = GetMaxClientSize(available);
 
-            // Restliche Controls
-            foreach (var mapping in cellMapping)
+            // rest of the controls
+            foreach (var mapping in _cellMapping)
             {
                 Point cell = new Point();
 
@@ -95,25 +123,25 @@ namespace engenious.UI.Controls
 
             int totalWidth = 0, partsX = 0;
 
-            // Automatische Spalten ermitteln
+            // determine automatic columns.
             foreach (var column in Columns)
             {
                 switch (column.ResizeMode)
                 {
                     case ResizeMode.Parts:
-                        // Anteilige Spalten ermitteln
+                        // determine parts columns
                         partsX += column.Width;
                         break;
 
                     case ResizeMode.Fixed:
-                        // Statische Spalten ermitteln
+                        // determine static columns
                         column.ExpectedWidth = column.Width;
                         totalWidth += column.ExpectedWidth;
                         break;
 
                     case ResizeMode.Auto:
-                        int width = column.MinWidth.HasValue ? column.MinWidth.Value : 0;
-                        foreach (var mapping in cellMapping)
+                        int width = column.MinWidth ?? 0;
+                        foreach (var mapping in _cellMapping)
                         {
                             if (!mapping.Columns.Contains(column))
                                 continue;
@@ -162,20 +190,20 @@ namespace engenious.UI.Controls
                 switch (row.ResizeMode)
                 {
                     case ResizeMode.Parts:
-                        // Anteilige Spalten ermitteln
+                        // determine parts rows
                         partsY += row.Height;
                         break;
 
                     case ResizeMode.Fixed:
-                        // Statische Zeilen ermitteln
+                        // determine static rows
                         row.ExpectedHeight = row.Height;
                         totalHeight += row.ExpectedHeight;
                         break;
 
                     case ResizeMode.Auto:
-                        // Automatische Spalten ermitteln
+                        // determine automatic rows
                         int height = row.MinHeight ?? 0;
-                        foreach (var mapping in cellMapping)
+                        foreach (var mapping in _cellMapping)
                         {
                             if (!mapping.Rows.Contains(row))
                                 continue;
@@ -220,6 +248,7 @@ namespace engenious.UI.Controls
             return result + Borders;
         }
 
+        /// <inheritdoc />
         public override void SetActualSize(Point available)
         {
             Point minSize = GetExpectedSize(available);
@@ -247,7 +276,7 @@ namespace engenious.UI.Controls
 
             #region Set Controls
 
-            foreach (var mapping in cellMapping)
+            foreach (var mapping in _cellMapping)
             {
                 Point cellOffset = new Point(mapping.Columns[0].ActualOffset, mapping.Rows[0].ActualOffset);
 
@@ -265,6 +294,8 @@ namespace engenious.UI.Controls
 
             #endregion
         }
+
+        /// <inheritdoc />
         protected override void SetDimension(Point actualSize, Point containerSize)
         {
             var size = new Point(
@@ -325,30 +356,34 @@ namespace engenious.UI.Controls
 
 
         /// <summary>
-        /// Interne Klasse zur Haltung der Cell-Mappings
+        /// Internal class used for containing cell mappings.
         /// </summary>
         private class CellMapping
         {
             /// <summary>
-            /// Referenz auf das entsprechende Control
+            /// Gets the <see cref="Control"/> which gets mapped.
             /// </summary>
-            public Control Control { get; private set; }
+            public Control Control { get; }
 
             /// <summary>
-            /// Auflistung der betroffenen Columns
+            /// Gets a list <see cref="ColumnDefinition"/> of the columns which are relevant to this mapping.
             /// </summary>
-            public List<ColumnDefinition> Columns { get; private set; }
+            public List<ColumnDefinition> Columns { get; }
 
             /// <summary>
-            /// Auflistung der betroffenen Rows
+            /// Gets a list <see cref="RowDefinition"/> of the rows which are relevant to this mapping.
             /// </summary>
-            public List<RowDefinition> Rows { get; private set; }
+            public List<RowDefinition> Rows { get; }
 
             /// <summary>
-            /// Erwartete Control-Größe
+            /// Gets or sets the expected <see cref="Control"/> size.
             /// </summary>
             public Point ExpectedSize { get; set; }
 
+            /// <summary>
+            /// Initializes a new instance o the <see cref="CellMapping"/> class.
+            /// </summary>
+            /// <param name="control">The <see cref="Control"/> to map.</param>
             public CellMapping(Control control)
             {
                 Columns = new List<ColumnDefinition>();
@@ -358,45 +393,108 @@ namespace engenious.UI.Controls
         }
     }
 
+    /// <summary>
+    /// A class describing the requirements for a column.
+    /// </summary>
     public class ColumnDefinition
     {
+        /// <summary>
+        /// Gets or sets the <see cref="Controls.ResizeMode"/> used for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public ResizeMode ResizeMode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the minimal width required for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public int? MinWidth { get; set; }
 
+        /// <summary>
+        /// Gets or sets the width for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public int Width { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maximum allowed width for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public int? MaxWidth { get; set; }
 
+        /// <summary>
+        /// Gets or sets the actual offset for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public int ActualOffset { get; set; }
 
+        /// <summary>
+        /// Gets or sets the actual width for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public int ActualWidth { get; set; }
-
+        
+        /// <summary>
+        /// Gets or sets the expected width for this <see cref="ColumnDefinition"/>.
+        /// </summary>
         public int ExpectedWidth { get; set; }
     }
 
+    /// <summary>
+    /// A class describing the requirements for a row.
+    /// </summary>
     public class RowDefinition
     {
+        /// <summary>
+        /// Gets or sets the <see cref="Controls.ResizeMode"/> used for this <see cref="RowDefinition"/>.
+        /// </summary>
         public ResizeMode ResizeMode { get; set; }
 
+        /// <summary>
+        /// Gets or sets the minimal height required for this <see cref="RowDefinition"/>.
+        /// </summary>
         public int? MinHeight { get; set; }
 
+        /// <summary>
+        /// Gets or sets the height for this <see cref="RowDefinition"/>.
+        /// </summary>
         public int Height { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maximum allowed height for this <see cref="RowDefinition"/>.
+        /// </summary>
         public int? MaxHeight { get; set; }
 
+        /// <summary>
+        /// Gets or sets the actual offset for this <see cref="RowDefinition"/>.
+        /// </summary>
         public int ActualOffset { get; set; }
 
+        /// <summary>
+        /// Gets or sets the actual height for this <see cref="RowDefinition"/>.
+        /// </summary>
         public int ActualHeight { get; set; }
 
+        /// <summary>
+        /// Gets or sets the expected height for this <see cref="RowDefinition"/>.
+        /// </summary>
         public int ExpectedHeight { get; set; }
     }
 
+    /// <summary>
+    /// Specifies the available resize modes for rows and columns of a <see cref="Grid"/>.
+    /// </summary>
     public enum ResizeMode
     {
+        /// <summary>
+        /// Specifies the size to be fixed.
+        /// </summary>
         Fixed,
+        /// <summary>
+        /// Specifies the size to be determined automatically.
+        /// </summary>
         Auto,
+        /// <summary>
+        /// Specifies the size to be relative to other parts.
+        /// </summary>
         Parts,
+        /// <summary>
+        /// Specifies the size to fit its contents but be influenced by other parts.
+        /// </summary>
         FitParts
     }
 }

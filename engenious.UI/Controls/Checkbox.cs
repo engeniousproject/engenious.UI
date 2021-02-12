@@ -3,68 +3,58 @@
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Steuerelement, in das der Nutzer ein Häkchen setzen kann.
+    /// A ui control that can be either checked or unchecked.
     /// </summary>
     public class Checkbox : ContentControl
     {
         /// <summary>
-        /// Brush für das Kästchen.
+        /// Gets or sets the <see cref="Brush"/> for the <see cref="Checkbox"/>-box.
         /// </summary>
         public Brush BoxBrush { get; set; }
 
         /// <summary>
-        /// Brush für den inneren Bereich des Checkbox-Kästchens.
+        /// Gets or sets the <see cref="Brush"/> for the filling of the <see cref="Checkbox"/>-box.
         /// </summary>
         public Brush InnerBoxBrush { get; set; }
 
         /// <summary>
-        /// Brush für den Haken der Checkbox.
+        /// Gets or sets the <see cref="Brush"/> for hook of the <see cref="Checkbox"/>.
         /// </summary>
         public Brush HookBrush { get; set; }
 
-        private bool boxChecked = false;
+        private bool _boxChecked = false;
 
         /// <summary>
-        /// Gibt an, ob der Haken gesetzt ist.
+        /// Gets or sets whether the <see cref="Checkbox"/> is checked.
         /// </summary>
         public bool Checked
         {
-            get
-            {
-                return boxChecked;
-            }
-
+            get => _boxChecked;
             set
             {
-                boxChecked = value;
-                if (CheckedChanged != null)
-                    CheckedChanged.Invoke(boxChecked);
+                _boxChecked = value;
+                CheckedChanged?.Invoke(_boxChecked);
             }
         }
 
         /// <summary>
-        /// Wird aufgerufen, wenn sich der Status der Checkbox geändert hat.
+        /// Occurs when the <see cref="Checked"/> state changed.
         /// </summary>
         public event CheckedChangedDelegate CheckedChanged;
 
         /// <summary>
-        /// Erzeugt eine neue Instanz der Klasse Checkbox
+        /// Initializes a new instance of the <see cref="Checkbox"/> class.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
-        public Checkbox(BaseScreenComponent manager) : base(manager)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Checkbox(BaseScreenComponent manager, string style = "") : base(manager, style)
         {
             CanFocus = true;
             TabStop = true;
             ApplySkin(typeof(Checkbox));
         }
 
-        /// <summary>
-        /// Malt den Content des Controls.
-        /// </summary>
-        /// <param name="batch">Spritebatch</param>
-        /// <param name="contentArea">Bereich für den Content in absoluten Koordinaten</param>
-        /// <param name="gameTime">GameTime</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
+        /// <inheritdoc />
         protected override void OnDrawContent(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
             int innerDistanceX = contentArea.Width / 18;
@@ -81,29 +71,25 @@ namespace engenious.UI.Controls
                     contentArea.Width - hookDistanceX * 2, contentArea.Height - hookDistanceY * 2), alpha);
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn mit der linken Maustaste auf das Steuerelement geklickt wird.
-        /// </summary>
-        /// <param name="args">Weitere Informationen zum Ereignis.</param>
+
+        /// <inheritdoc />
         protected override void OnLeftMouseClick(MouseEventArgs args)
         {
             Checked = !Checked;
         }
 
-        /// <summary>
-        /// Wird aufgerufen, wenn eine Taste gedrückt wird.
-        /// </summary>
-        /// <param name="args">Zusätzliche Daten zum Event.</param>
+
+        /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs args)
         {
-            if (Focused == TreeState.Active && args.Key == engenious.Input.Keys.Enter)
+            if (Focused == TreeState.Active && args.Key == Input.Keys.Enter)
                 Checked = !Checked;
         }
 
         /// <summary>
-        /// Delegat für CheckedChanged-Events.
+        /// Represents the method that will handle the <see cref="Checkbox.CheckedChanged"/> event of a <see cref="Checkbox"/>.
         /// </summary>
-        /// <param name="Checked">Gibt an, ob das Steuerelement aktiviert ist.</param>
-        public delegate void CheckedChangedDelegate(bool Checked);
+        /// <param name="checked">Whether the <see cref="Checkbox"/> is now checked or not.</param>
+        public delegate void CheckedChangedDelegate(bool @checked);
     }
 }

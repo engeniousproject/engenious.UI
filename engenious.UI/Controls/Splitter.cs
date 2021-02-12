@@ -4,51 +4,55 @@ using engenious.Input;
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Container zur Aufslittung zweier Controls in zwei größenveränderbare Panels.
+    /// Ui container control to split a region into two resizeable sub panels.
     /// </summary>
     public class Splitter : Control
     {
-        private Control slot1;
+        private Control _slot1;
 
-        private int? slot1MinSize;
+        private int? _slot1MinSize;
 
-        private int? slot1MaxSize;
+        private int? _slot1MaxSize;
 
-        private Control slot2;
+        private Control _slot2;
 
-        private int? slot2MinSize;
+        private int? _slot2MinSize;
 
-        private int? slot2MaxSize;
+        private int? _slot2MaxSize;
 
-        private int splitterSize;
+        private int _splitterSize;
 
-        private int splitterPosition;
+        private int _splitterPosition;
 
         private readonly PropertyEventArgs<Control> _slot1ChangedEventArgs = new PropertyEventArgs<Control>();
+
         /// <summary>
-        /// Inhalt des ersten Panels (je nach Orientierung oben oder links)
+        /// Gets or sets the control for the first slot.
+        /// <remarks>
+        /// In orientation <see cref="UI.Orientation.Horizontal"/> the left one;
+        /// or <see cref="UI.Orientation.Horizontal"/> the top one.</remarks>
         /// </summary>
         public Control Slot1
         {
-            get { return slot1; }
+            get => _slot1;
             set
             {
-                if (slot1 == value) return;
+                if (_slot1 == value) return;
 
-                _slot1ChangedEventArgs.OldValue = slot1;
+                _slot1ChangedEventArgs.OldValue = _slot1;
                 _slot1ChangedEventArgs.NewValue = value;
                 _slot1ChangedEventArgs.Handled = false;
 
-                if (slot1 != null)
+                if (_slot1 != null)
                 {
-                    Children.Remove(slot1);
-                    slot1 = null;
+                    Children.Remove(_slot1);
+                    _slot1 = null;
                 }
 
                 if (value != null)
                 {
-                    slot1 = value;
-                    Children.Add(slot1);
+                    _slot1 = value;
+                    Children.Add(_slot1);
                 }
 
                 InvalidateDimensions();
@@ -59,20 +63,21 @@ namespace engenious.UI.Controls
         }
         private readonly PropertyEventArgs<int?> _slot1MinSizeChangedEventArgs = new PropertyEventArgs<int?>();
         /// <summary>
-        /// Mindestgröße des ersten Panels oder null, falls egal
+        /// Gets or sets the minimum required size for the first slot.
+        /// <remarks>Use <c>null</c> for no specific minimum size.</remarks>
         /// </summary>
         public int? Slot1MinSize
         {
-            get { return slot1MinSize; }
+            get => _slot1MinSize;
             set
             {
-                if (slot1MinSize == value) return;
+                if (_slot1MinSize == value) return;
 
-                _slot1MinSizeChangedEventArgs.OldValue = slot1MinSize;
+                _slot1MinSizeChangedEventArgs.OldValue = _slot1MinSize;
                 _slot1MinSizeChangedEventArgs.NewValue = value;
                 _slot1MinSizeChangedEventArgs.Handled = false;
 
-                slot1MinSize = value;
+                _slot1MinSize = value;
 
                 InvalidateDimensions();
 
@@ -83,20 +88,21 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int?> _slot1MaxSizeChangedEventArgs = new PropertyEventArgs<int?>();
         /// <summary>
-        /// Maximalgröße des ersten Panels oder null, falls egal.
+        /// Gets or sets the maximum required size for the first slot.
+        /// <remarks>Use <c>null</c> for no specific maximum size.</remarks>
         /// </summary>
         public int? Slot1MaxSize
         {
-            get { return slot1MaxSize; }
+            get => _slot1MaxSize;
             set
             {
-                if (slot1MaxSize == value) return;
+                if (_slot1MaxSize == value) return;
                 
-                _slot1MaxSizeChangedEventArgs.OldValue = slot1MaxSize;
+                _slot1MaxSizeChangedEventArgs.OldValue = _slot1MaxSize;
                 _slot1MaxSizeChangedEventArgs.NewValue = value;
                 _slot1MaxSizeChangedEventArgs.Handled = false;
 
-                slot1MaxSize = value;
+                _slot1MaxSize = value;
 
                 InvalidateDimensions();
 
@@ -105,30 +111,34 @@ namespace engenious.UI.Controls
             }
         }
         private readonly PropertyEventArgs<Control> _slot2ChangedEventArgs = new PropertyEventArgs<Control>();
+
         /// <summary>
-        /// Inhalt des zweiten Panels (je nach Orientierung unten oder rechts).
+        /// Gets or sets the control for the second slot.
+        /// <remarks>
+        /// In orientation <see cref="UI.Orientation.Horizontal"/> the right one;
+        /// or <see cref="UI.Orientation.Horizontal"/> the bottom one.</remarks>
         /// </summary>
         public Control Slot2
         {
-            get { return slot2; }
+            get => _slot2;
             set
             {
-                if (slot2 == value) return;
+                if (_slot2 == value) return;
 
-                _slot2ChangedEventArgs.OldValue = slot2;
+                _slot2ChangedEventArgs.OldValue = _slot2;
                 _slot2ChangedEventArgs.NewValue = value;
                 _slot2ChangedEventArgs.Handled = false;
 
-                if (slot2 != null)
+                if (_slot2 != null)
                 {
-                    Children.Remove(slot2);
-                    slot2 = null;
+                    Children.Remove(_slot2);
+                    _slot2 = null;
                 }
 
                 if (value != null)
                 {
-                    slot2 = value;
-                    Children.Add(slot2);
+                    _slot2 = value;
+                    Children.Add(_slot2);
                 }
 
                 InvalidateDimensions();
@@ -140,20 +150,21 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int?> _slot2MinSizeChangedEventArgs = new PropertyEventArgs<int?>();
         /// <summary>
-        /// Mindestgröße des zweiten Panels oder null, falls egal.
+        /// Gets or sets the minimum required size for the second slot.
+        /// <remarks>Use <c>null</c> for no specific minimal size.</remarks>
         /// </summary>
         public int? Slot2MinSize
         {
-            get { return slot2MinSize; }
+            get => _slot2MinSize;
             set
             {
-                if (slot2MinSize == value) return;
+                if (_slot2MinSize == value) return;
 
-                _slot2MinSizeChangedEventArgs.OldValue = slot2MinSize;
+                _slot2MinSizeChangedEventArgs.OldValue = _slot2MinSize;
                 _slot2MinSizeChangedEventArgs.NewValue = value;
                 _slot2MinSizeChangedEventArgs.Handled = false;
 
-                slot2MinSize = value;
+                _slot2MinSize = value;
 
                 InvalidateDimensions();
 
@@ -163,20 +174,21 @@ namespace engenious.UI.Controls
         }
         private readonly PropertyEventArgs<int?> _slot2MaxSizeChangedEventArgs = new PropertyEventArgs<int?>();
         /// <summary>
-        /// Maximalgröße des zweiten Panels oder null, falls egal.
+        /// Gets or sets the maximum required size for the second slot.
+        /// <remarks>Use <c>null</c> for no specific maximum size.</remarks>
         /// </summary>
         public int? Slot2MaxSize
         {
-            get { return slot2MaxSize; }
+            get => _slot2MaxSize;
             set
             {
-                if (slot2MaxSize == value) return;
+                if (_slot2MaxSize == value) return;
 
-                _slot2MaxSizeChangedEventArgs.OldValue = slot2MaxSize;
+                _slot2MaxSizeChangedEventArgs.OldValue = _slot2MaxSize;
                 _slot2MaxSizeChangedEventArgs.NewValue = value;
                 _slot2MaxSizeChangedEventArgs.Handled = false;
 
-                slot2MaxSize = value;
+                _slot2MaxSize = value;
 
                 InvalidateDimensions();
 
@@ -187,20 +199,20 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int> _splitterSizeChangedEventArgs = new PropertyEventArgs<int>();
         /// <summary>
-        /// Die Breite des Splitt-Bereichs.
+        /// Gets or sets the size of the splitter region.
         /// </summary>
         public int SplitterSize
         {
-            get { return splitterSize; }
+            get => _splitterSize;
             set
             {
-                if (splitterSize == value) return;
+                if (_splitterSize == value) return;
 
-                _splitterSizeChangedEventArgs.OldValue = splitterSize;
+                _splitterSizeChangedEventArgs.OldValue = _splitterSize;
                 _splitterSizeChangedEventArgs.NewValue = value;
                 _splitterSizeChangedEventArgs.Handled = false;
 
-                splitterSize = value;
+                _splitterSize = value;
 
                 InvalidateDimensions();
 
@@ -211,20 +223,20 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int> _splitterPositionChangedEventArgs = new PropertyEventArgs<int>();
         /// <summary>
-        /// Aktuelle Position des Splitters.
+        /// Gets or sets the position of the splitter region.
         /// </summary>
         public int SplitterPosition
         {
-            get { return splitterPosition; }
+            get => _splitterPosition;
             set
             {
-                if (splitterPosition == value) return;
+                if (_splitterPosition == value) return;
 
-                _splitterPositionChangedEventArgs.OldValue = splitterPosition;
+                _splitterPositionChangedEventArgs.OldValue = _splitterPosition;
                 _splitterPositionChangedEventArgs.NewValue = value;
                 _splitterPositionChangedEventArgs.Handled = false;
 
-                splitterPosition = value;
+                _splitterPosition = value;
                 InvalidateDimensions();
 
                 OnSplitterPositionChanged(_splitterPositionChangedEventArgs);
@@ -233,7 +245,7 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Gibt die tatsächliche Splitterposition zurück.
+        /// Gets the actual position of the splitter.
         /// </summary>
         public int ActualSplitterPosition
         {
@@ -241,20 +253,20 @@ namespace engenious.UI.Controls
             {
                 int result = SplitterPosition;
 
-                // Größenlimits des ersten Slots
-                if (Slot1MinSize.HasValue && result < Slot1MinSize.Value)
+                // size limits of the first slot
+                if (result < Slot1MinSize)
                     result = Slot1MinSize.Value;
-                if (Slot1MaxSize.HasValue && result > Slot1MaxSize.Value)
+                if (result > Slot1MaxSize)
                     result = Slot1MaxSize.Value;
 
-                // unterer / rechter Control-Rand
+                // bottom / right control boundary
                 if (Orientation == Orientation.Horizontal)
                 {
-                    // SLot2-Limits berücksichtigen
-                    int slot2width = ActualClientSize.X - SplitterSize - result;
-                    if (Slot2MinSize.HasValue && slot2width < Slot2MinSize.Value)
+                    // Slot2 constraints
+                    int slot2Width = ActualClientSize.X - SplitterSize - result;
+                    if (slot2Width < Slot2MinSize)
                         result = ActualClientSize.X - SplitterSize - Slot2MinSize.Value;
-                    if (Slot2MaxSize.HasValue && slot2width > Slot2MaxSize.Value)
+                    if (slot2Width > Slot2MaxSize)
                         result = ActualClientSize.X - SplitterSize - Slot2MaxSize.Value;
 
                     if (result >= ActualSize.X - SplitterSize)
@@ -262,18 +274,18 @@ namespace engenious.UI.Controls
                 }
                 else if (Orientation == Orientation.Vertical)
                 {
-                    // SLot2-Limits berücksichtigen
-                    int slot2height = ActualClientSize.Y - SplitterSize - result;
-                    if (Slot2MinSize.HasValue && slot2height < Slot2MinSize.Value)
+                    // Slot2 constraints
+                    int slot2Height = ActualClientSize.Y - SplitterSize - result;
+                    if (slot2Height < Slot2MinSize)
                         result = ActualClientSize.Y - SplitterSize - Slot2MinSize.Value;
-                    if (Slot2MaxSize.HasValue && slot2height > Slot2MaxSize.Value)
+                    if (slot2Height > Slot2MaxSize)
                         result = ActualClientSize.Y - SplitterSize - Slot2MaxSize.Value;
 
                     if (result >= ActualSize.Y - SplitterSize)
                         result = ActualSize.Y - SplitterSize;
                 }
 
-                // oberer / linker Control-Rand
+                // top / left control boundary
                 if (result < 0) result = 0;
 
                 return result;
@@ -281,24 +293,31 @@ namespace engenious.UI.Controls
         }
 
         /// <summary>
-        /// Gibt die Ausrichtung des Splitters an oder legt diese fest. Horizontal 
-        /// splittet den Bereich in Links (Slot1) und Rechts (Slot2), Vertikal 
-        /// hingegen in Oben (Slot1) und Unten (Slot2).
+        /// Gets or sets the <see cref="UI.Orientation"/> of the splitter.
+        /// <remarks>
+        /// <see cref="UI.Orientation.Horizontal"/> splits into a left side(<see cref="Slot1"/>)
+        /// and a right side(<see cref="Slot2"/>);
+        /// <see cref="UI.Orientation.Vertical"/> splits into a top side(<see cref="Slot1"/>)
+        /// and a bottom side(<see cref="Slot2"/>).
+        /// </remarks>
         /// </summary>
         public Orientation Orientation { get; set; }
 
         /// <summary>
-        /// Der Brush der für das Zeichnen des Splitters (bei horizontaler 
-        /// Orientierung) verwendet werden soll.
+        /// Gets or sets the <see cref="Brush"/> used for the splitter in <see cref="UI.Orientation.Horizontal"/> <see cref="Orientation"/>.
         /// </summary>
         public Brush SplitterBrushHorizontal { get; set; }
 
         /// <summary>
-        /// Der Brush der für das Zeichnen des Splitters (bei vertikaler 
-        /// Orientierung) verwendet werden soll.
+        /// Gets or sets the <see cref="Brush"/> used for the splitter in <see cref="UI.Orientation.Vertical"/> <see cref="Orientation"/>.
         /// </summary>
         public Brush SplitterBrushVertical { get; set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Splitter"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
         public Splitter(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
@@ -308,12 +327,14 @@ namespace engenious.UI.Controls
             ApplySkin(typeof(Splitter));
         }
 
+        /// <inheritdoc />
         public override Point GetExpectedSize(Point available)
         {
             if (!Visible) return Point.Zero;
             return GetMaxClientSize(available) + Borders;
         }
 
+        /// <inheritdoc />
         public override void SetActualSize(Point available)
         {
             if (!Visible)
@@ -328,9 +349,8 @@ namespace engenious.UI.Controls
             Rectangle client = ActualClientArea;
             if (Orientation == Orientation.Horizontal)
             {
-                // Trennung zwischen links und rechts
-                if (Slot1 != null)
-                    Slot1.SetActualSize(new Point(ActualSplitterPosition, client.Height));
+                // Split left and right
+                Slot1?.SetActualSize(new Point(ActualSplitterPosition, client.Height));
                 if (Slot2 != null)
                 {
                     Slot2.SetActualSize(new Point(client.Width - SplitterSize - ActualSplitterPosition, client.Height));
@@ -339,9 +359,8 @@ namespace engenious.UI.Controls
             }
             else if (Orientation == Orientation.Vertical)
             {
-                // Trennung zwischen oben und unten
-                if (Slot1 != null)
-                    Slot1.SetActualSize(new Point(client.Width, ActualSplitterPosition));
+                // Split top and bottom
+                Slot1?.SetActualSize(new Point(client.Width, ActualSplitterPosition));
                 if (Slot2 != null)
                 {
                     Slot2.SetActualSize(new Point(client.Width, client.Height - SplitterSize - ActualSplitterPosition));
@@ -350,8 +369,9 @@ namespace engenious.UI.Controls
             }
         }
 
-        private bool dragging = false;
+        private bool _dragging = false;
 
+        /// <inheritdoc />
         protected override void OnLeftMouseDown(MouseEventArgs args)
         {
             if (Orientation == Orientation.Horizontal)
@@ -359,7 +379,7 @@ namespace engenious.UI.Controls
                 if (args.LocalPosition.X > ActualSplitterPosition &&
                     args.LocalPosition.X <= ActualSplitterPosition + SplitterSize)
                 {
-                    dragging = true;
+                    _dragging = true;
                     args.Handled = true;
                 }
             }
@@ -368,24 +388,26 @@ namespace engenious.UI.Controls
                 if (args.LocalPosition.Y > ActualSplitterPosition &&
                     args.LocalPosition.Y <= ActualSplitterPosition + SplitterSize)
                 {
-                    dragging = true;
+                    _dragging = true;
                     args.Handled = true;
                 }
             }
         }
 
+        /// <inheritdoc />
         protected override void OnLeftMouseUp(MouseEventArgs args)
         {
-            if (dragging)
+            if (_dragging)
             {
-                dragging = false;
+                _dragging = false;
                 args.Handled = true;
             }
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs args)
         {
-            if (dragging)
+            if (_dragging)
             {
                 if (Orientation == Orientation.Horizontal)
                     SplitterPosition = args.LocalPosition.X;
@@ -395,11 +417,12 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <inheritdoc />
         protected override void OnDrawBackground(SpriteBatch batch, Rectangle backgroundArea, GameTime gameTime, float alpha)
         {
             base.OnDrawBackground(batch, backgroundArea, gameTime, alpha);
 
-            // Splitter Brush anwenden (Horizontal)
+            // Apply splitter Brush (Horizontal)
             if (Orientation == Orientation.Horizontal && SplitterBrushHorizontal != null)
             {
                 Rectangle area = new Rectangle(
@@ -408,7 +431,7 @@ namespace engenious.UI.Controls
                 SplitterBrushHorizontal.Draw(batch, area, alpha);
             }
 
-            // SPlitter Brush anwenden (Vertical)
+            // Apply splitter Brush (Vertical)
             if (Orientation == Orientation.Vertical && SplitterBrushVertical != null)
             {
                 Rectangle area = new Rectangle(
@@ -418,6 +441,7 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <inheritdoc />
         protected override void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
             if (Skin.Current.FocusFrameBrush != null)
@@ -440,6 +464,7 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {
             if (Focused == TreeState.Active)
@@ -474,59 +499,91 @@ namespace engenious.UI.Controls
             base.OnKeyPress(args);
         }
 
+        /// <summary>
+        /// Raises the <see cref="Slot1Changed"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Control}"/> that contains the event data.</param>
         protected virtual void OnSlot1Changed(PropertyEventArgs<Control> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Slot1MinSizeChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see><cref>PropertyEventArgs{Nullable{Int32}}</cref></see> that contains the event data.</param>
         protected virtual void OnSlot1MinSizeChanged(PropertyEventArgs<int?> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Slot1MaxSizeChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see><cref>PropertyEventArgs{Nullable{Int32}}</cref></see> that contains the event data.</param>
         protected virtual void OnSlot1MaxSizeChanged(PropertyEventArgs<int?> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Slot2Changed"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Control}"/> that contains the event data.</param>
         protected virtual void OnSlot2Changed(PropertyEventArgs<Control> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Slot2MinSizeChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see><cref>PropertyEventArgs{Nullable{Int32}}</cref></see> that contains the event data.</param>
         protected virtual void OnSlot2MinSizeChanged(PropertyEventArgs<int?> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="Slot2MaxSizeChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see><cref>PropertyEventArgs{Nullable{Int32}}</cref></see> that contains the event data.</param>
         protected virtual void OnSlot2MaxSizeChanged(PropertyEventArgs<int?> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="SplitterPositionChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnSplitterPositionChanged(PropertyEventArgs<int> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="SplitterSizeChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnSplitterSizeChanged(PropertyEventArgs<int> args) { }
 
         /// <summary>
-        /// Event signalisiert eine Änderung des Controls in Slot 1.
+        /// Occurs when the <see cref="Slot1"/> control was changed.
         /// </summary>
         public event PropertyChangedDelegate<Control> Slot1Changed;
 
         /// <summary>
-        /// Event signalisiert eine Änderung des Controls in Slot 2.
+        /// Occurs when the <see cref="Slot2"/> control was changed.
         /// </summary>
         public event PropertyChangedDelegate<Control> Slot2Changed;
 
         /// <summary>
-        /// Event signalisiert eine Änderung bei der minimalen Größe von Slot 1.
+        /// Occurs when the <see cref="Slot1MinSize"/> property was changed.
         /// </summary>
         public event PropertyChangedDelegate<int?> Slot1MinSizeChanged;
 
         /// <summary>
-        /// Event signalisiert eine Änderung bei der maximalen Größe von Slot 1.
+        /// Occurs when the <see cref="Slot1MaxSize"/> property was changed.
         /// </summary>
         public event PropertyChangedDelegate<int?> Slot1MaxSizeChanged;
 
         /// <summary>
-        /// Event signalisiert eine Änderung bei der minimalen Größe von Slot 2.
+        /// Occurs when the <see cref="Slot2MinSize"/> property was changed.
         /// </summary>
         public event PropertyChangedDelegate<int?> Slot2MinSizeChanged;
 
         /// <summary>
-        /// Event signalisiert eine Änderung bei der maximalen Größe von Slot 2.
+        /// Occurs when the <see cref="Slot2MaxSize"/> property was changed.
         /// </summary>
         public event PropertyChangedDelegate<int?> Slot2MaxSizeChanged;
 
         /// <summary>
-        /// Event signalisiert eine Änderung der aktuellen Splitter-Position.
+        /// Occurs when the <see cref="SplitterPosition"/> property was changed.
         /// </summary>
         public event PropertyChangedDelegate<int> SplitterPositionChanged;
 
         /// <summary>
-        /// Event signalisiert eine Änderung der Splitter-Größe.
+        /// Occurs when the <see cref="SplitterSize"/> property was changed.
         /// </summary>
         public event PropertyChangedDelegate<int> SplitterSizeChanged;
     }

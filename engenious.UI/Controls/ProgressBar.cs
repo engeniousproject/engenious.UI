@@ -3,33 +3,36 @@ using engenious.Graphics;
 
 namespace engenious.UI.Controls
 {
+    /// <summary>
+    /// Ui control for displaying visual progress using a bar. 
+    /// </summary>
     public class ProgressBar : Control
     {
-        private Orientation orientation = Orientation.Horizontal;
+        private Orientation _orientation = Orientation.Horizontal;
 
-        private int barvalue = 0;
+        private int _barValue = 0;
 
-        private int maximum = 100;
+        private int _maximum = 100;
 
-        private Brush barBrush = null;
+        private Brush _barBrush = null;
 
         private readonly PropertyEventArgs<Orientation> _orientationChangedEventArgs = new PropertyEventArgs<Orientation>();
         
         /// <summary>
-        /// Gibt die Ausrichtung der Progress-Bar zurück oder legt diese fest.
+        /// Gets or sets the <see cref="UI.Orientation"/> for this <see cref="ProgressBar"/>.
         /// </summary>
         public Orientation Orientation
         {
-            get { return orientation; }
+            get => _orientation;
             set
             {
-                if (orientation == value) return;
+                if (_orientation == value) return;
 
-                _orientationChangedEventArgs.OldValue = orientation;
+                _orientationChangedEventArgs.OldValue = _orientation;
                 _orientationChangedEventArgs.NewValue = value;
                 _orientationChangedEventArgs.Handled = false;
 
-                orientation = value;
+                _orientation = value;
                 InvalidateDimensions();
 
                 OnOrientationChanged(_orientationChangedEventArgs);
@@ -39,21 +42,21 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int> _valueChangedEventArgs = new PropertyEventArgs<int>();
         /// <summary>
-        /// Gibt den Fortschritt des Balkens an.
+        /// Gets or sets the current value of the progress.
         /// </summary>
         public int Value
         {
-            get { return barvalue; }
+            get => _barValue;
             set
             {
-                if (barvalue == value) return;
+                if (_barValue == value) return;
                 
                 
-                _valueChangedEventArgs.OldValue = barvalue;
+                _valueChangedEventArgs.OldValue = _barValue;
                 _valueChangedEventArgs.NewValue = value;
                 _valueChangedEventArgs.Handled = false;
 
-                barvalue = value;
+                _barValue = value;
                 InvalidateDrawing();
 
                 OnValueChanged(_valueChangedEventArgs);
@@ -62,20 +65,20 @@ namespace engenious.UI.Controls
         }
         private readonly PropertyEventArgs<int> _maximumChangedEventArgs = new PropertyEventArgs<int>();
         /// <summary>
-        /// Gibt den Maximalwert des Balkens an.
+        /// Gets or sets the maximum value of the progress.
         /// </summary>
         public int Maximum
         {
-            get { return maximum; }
+            get => _maximum;
             set
             {
-                if (maximum == value) return;
+                if (_maximum == value) return;
 
-                _maximumChangedEventArgs.OldValue = maximum;
+                _maximumChangedEventArgs.OldValue = _maximum;
                 _maximumChangedEventArgs.NewValue = value;
                 _maximumChangedEventArgs.Handled = false;
 
-                maximum = value;
+                _maximum = value;
                 InvalidateDrawing();
 
                 OnMaximumChanged(_maximumChangedEventArgs);
@@ -84,20 +87,20 @@ namespace engenious.UI.Controls
         }
         private readonly PropertyEventArgs<Brush> _barBrushChangedEventArgs = new PropertyEventArgs<Brush>();
         /// <summary>
-        /// Gibt den Brush an, mit dem der Inhalt des Balkens gemalt werden soll.
+        /// Gets or sets the brush used to draw the progress bar.
         /// </summary>
         public Brush BarBrush
         {
-            get { return barBrush; }
+            get => _barBrush;
             set
             {
-                if (barBrush == value) return;
+                if (_barBrush == value) return;
 
-                _barBrushChangedEventArgs.OldValue = barBrush;
+                _barBrushChangedEventArgs.OldValue = _barBrush;
                 _barBrushChangedEventArgs.NewValue = value;
                 _barBrushChangedEventArgs.Handled = false;
 
-                barBrush = value;
+                _barBrush = value;
                 InvalidateDrawing();
 
                 OnBarBrushChanged(_barBrushChangedEventArgs);
@@ -105,12 +108,18 @@ namespace engenious.UI.Controls
             }
         }
 
-        public ProgressBar(BaseScreenComponent manager, string style = "") :
-            base(manager, style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ProgressBar"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public ProgressBar(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
             ApplySkin(typeof(ProgressBar));
         }
 
+        /// <inheritdoc />
         protected override void OnDrawContent(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
             if (BarBrush == null) return;
@@ -128,18 +137,49 @@ namespace engenious.UI.Controls
                     contentArea.Width, (int)(contentArea.Height * part)), alpha);
             }
         }
-
+        
+        /// <summary>
+        /// Raises the <see cref="OrientationChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Orientation}"/> that contains the event data.</param>
         protected virtual void OnOrientationChanged(PropertyEventArgs<Orientation> args) { }
+
+        /// <summary>
+        /// Raises the <see cref="ValueChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnValueChanged(PropertyEventArgs<int> args) { }
+
+        /// <summary>
+        /// Raises the <see cref="MaximumChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnMaximumChanged(PropertyEventArgs<int> args) { }
+
+        /// <summary>
+        /// Raises the <see cref="BarBrushChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Brush}"/> that contains the event data.</param>
         protected virtual void OnBarBrushChanged(PropertyEventArgs<Brush> args) { }
 
+        /// <summary>
+        /// Occurs when the <see cref="Orientation"/> was changed.
+        /// </summary>
         public event PropertyChangedDelegate<Orientation> OrientationChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="Value"/> was changed.
+        /// </summary>
         public event PropertyChangedDelegate<int> ValueChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="Maximum"/> value was changed.
+        /// </summary>
         public event PropertyChangedDelegate<int> MaximumChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="BarBrush"/> was changed.
+        /// </summary>
         public event PropertyChangedDelegate<Brush> BarBrushChanged;
     }
 }

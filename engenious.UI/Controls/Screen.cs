@@ -1,84 +1,82 @@
 ﻿namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Bildschirmseite zur Aufnahme von Controls.
+    /// Screen container control page.
     /// </summary>
     public abstract class Screen : ContainerControl
     {
-        private bool isVisibleScreen = false;
+        private bool _isVisibleScreen = false;
 
-        private bool isActiveScreen = false;
+        private bool _isActiveScreen = false;
 
         /// <summary>
-        /// Gibt die Referenz auf den aktuellen Screen-Manager zurück.
+        /// Gets the current <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public BaseScreenComponent Manager { get; private set; }
+        public BaseScreenComponent Manager { get; }
 
         /// <summary>
-        /// Gibt den Titel des Screens zurück. Der Manager übernimmt diesen Titel 
-        /// standardmäßig in der Titelleiste des Fensters.
+        /// Gets the title of this screen.
+        /// <remarks>The <see cref="Manager"/> uses this <see cref="Title"/> as the window title.</remarks>
         /// </summary>
         public string Title { get; protected set; }
 
         /// <summary>
-        /// Gibt an, ob es sich bei diesem Screen lediglich um ein Overlay handelt. Dies 
-        /// sorgt dafür, dass der darunter liegende Screen weiterhin sichtbar bleibt und 
-        /// gerendert wird.
+        /// Gets whether this screen is an overlay.
+        /// <remarks>If this is set to <c>true</c> underlying screens will still be rendered.</remarks>
         /// </summary>
         public bool IsOverlay { get; protected set; }
 
         /// <summary>
-        /// Gibt an ob dieser Screen einen Eintrag im History Stack erhalten 
-        /// soll. ist diese Eigenschaft auf false, wird er bei der Zurück-Navigation 
-        /// übersprungen. Dies ist beispieslweise praktisch für Lade-Screens.
+        /// Gets whether this screen will be added in the <see cref="BaseScreenComponent.History"/> or not.
+        /// <remarks>
+        /// If this is set to <c>false</c> this screen will be skipped on <see cref="BaseScreenComponent.NavigateBack"/>.
+        /// E.g. this can be useful for loading screens.
+        /// </remarks>
         /// </summary>
         public bool InHistory { get; protected set; }
 
         /// <summary>
-        /// Gibt den Standard Mouse Mode für diesen Screen zurück. Er wird beim Navigieren 
-        /// zu diesem Screen angewendet.
+        /// Gets the default <see cref="MouseMode"/> for this screen.
+        /// <remarks>This <see cref="MouseMode"/> gets automatically set on navigating to this screen.</remarks>
         /// </summary>
         public MouseMode DefaultMouseMode { get; protected set; }
 
         private readonly PropertyEventArgs<bool> _isActiveScreenChangedEventArgs = new PropertyEventArgs<bool>();
         /// <summary>
-        /// Gibt an ob dieser Screen der aktive Screen ist.
+        /// Gets whether this <see cref="Screen"/> is currently active.
         /// </summary>
         public bool IsActiveScreen
         {
-            get
-            {
-                return isActiveScreen;
-            }
+            get => _isActiveScreen;
             internal set
             {
-                if (isActiveScreen == value) return;
+                if (_isActiveScreen == value) return;
 
                 _isActiveScreenChangedEventArgs.NewValue = value;
-                _isActiveScreenChangedEventArgs.OldValue = isActiveScreen;
+                _isActiveScreenChangedEventArgs.OldValue = _isActiveScreen;
                 _isActiveScreenChangedEventArgs.Handled = false;
 
-                isActiveScreen = value;
+                _isActiveScreen = value;
                 OnIsActiveScreenChanged(_isActiveScreenChangedEventArgs);
                 IsActiveScreenChanged?.Invoke(this, _isActiveScreenChangedEventArgs);
             }
         }
         private readonly PropertyEventArgs<bool> _isVisibleScreenChangedEventArgs = new PropertyEventArgs<bool>();
         /// <summary>
-        /// Gibt an ob dieser Screen im aktuellen Stack sichtbar ist.
+        /// Gets whether this screen is visible in the current screen rendering stack.
         /// </summary>
         public bool IsVisibleScreen
         {
-            get { return isVisibleScreen; }
+            get => _isVisibleScreen;
             internal set
             {
-                if (isVisibleScreen == value) return;
+                if (_isVisibleScreen == value) return;
 
-                _isVisibleScreenChangedEventArgs.OldValue = isVisibleScreen;
+                _isVisibleScreenChangedEventArgs.OldValue = _isVisibleScreen;
                 _isVisibleScreenChangedEventArgs.NewValue = value;
                 _isVisibleScreenChangedEventArgs.Handled = false;
 
-                isVisibleScreen = value;
+                _isVisibleScreen = value;
 
                 OnIsVisibleScreenChanged(_isVisibleScreenChangedEventArgs);
                 IsVisibleScreenChanged?.Invoke(this, _isVisibleScreenChangedEventArgs);
@@ -86,10 +84,12 @@
         }
 
         /// <summary>
-        /// Erzeugt einen neuen Screen.
+        /// Initializes a new instance of the <see cref="Image"/> class.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
-        public Screen(BaseScreenComponent manager) : base(manager)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Screen(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
             Manager = manager;
             IsOverlay = false;
@@ -126,47 +126,50 @@
         }
 
         /// <summary>
-        /// Signalisiert die Navigation hin zu diesem Screen. Der Screen kann hier noch entscheiden ob die
-        /// Navigation stattfinden soll oder nicht.
+        /// Gets called on trying to navigate to this screen.
+        /// <remarks>The actual navigation can still be canceled from here.</remarks>
         /// </summary>
+        /// <param name="args">A <see cref="NavigationEventArgs"/> that contains the event data.</param>
         protected virtual void OnNavigateTo(NavigationEventArgs args) { }
 
         /// <summary>
-        /// Signalisiert den abgeschlossenen Navigationsaufruf auf diese Seite.
+        /// Gets called when navigation to this screen occured.
         /// </summary>
+        /// <param name="args">A <see cref="NavigationEventArgs"/> that contains the event data.</param>
         protected virtual void OnNavigatedTo(NavigationEventArgs args) { }
 
         /// <summary>
-        /// Signalisiert den Versuch von dieser Seite weg zu navigieren. Die Seite kann diese Navigation unterbinden.
+        /// Gets called on trying to navigate away from this screen.
+        /// <remarks>The actual navigation can still be canceled from here.</remarks>
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">A <see cref="NavigationEventArgs"/> that contains the event data.</param>
         protected virtual void OnNavigateFrom(NavigationEventArgs args) { }
-
+        
         /// <summary>
-        /// Signalisiert den abgeschlossenen Navigationsaufruf von dieser Seite weg.
+        /// Gets called when navigation to this screen occured.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">A <see cref="NavigationEventArgs"/> that contains the event data.</param>
         protected virtual void OnNavigatedFrom(NavigationEventArgs args) { }
 
         /// <summary>
-        /// Signalisiert den Screenwechsel beim Navigationsaufruf an.
+        /// Raises the <see cref="IsActiveScreenChanged"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnIsActiveScreenChanged(PropertyEventArgs<bool> args) { }
 
         /// <summary>
-        /// Signalisiert den Sichtbarkeitswechsel des Screens.
+        /// Raises the <see cref="IsVisibleScreenChanged"/> event.
         /// </summary>
-        /// <param name="args"></param>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnIsVisibleScreenChanged(PropertyEventArgs<bool> args) { }
 
         /// <summary>
-        /// Signalisiert die Änderung in der Eigenschaft IsActiveScreen.
+        /// Occurs when the <see cref="IsActiveScreen"/> property got changed.
         /// </summary>
         public event PropertyChangedDelegate<bool> IsActiveScreenChanged;
 
         /// <summary>
-        /// Signalisiert die Änderung in der Eigenschaft IsVisibleScreen.
+        /// Occurs when the <see cref="IsVisibleScreen"/> property got changed.
         /// </summary>
         public event PropertyChangedDelegate<bool> IsVisibleScreenChanged;
     }

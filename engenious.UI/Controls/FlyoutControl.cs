@@ -1,11 +1,20 @@
 ﻿namespace engenious.UI.Controls
 {
+    /// <summary>
+    /// A ui control used for a flyout effect.
+    /// </summary>
     internal sealed class FlyoutControl : CanvasControl
     {
-        internal FlyoutControl(BaseScreenComponent manager) : base(manager) {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlyoutControl"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        internal FlyoutControl(BaseScreenComponent manager, string style = "") : base(manager, style) {
             ApplySkin(typeof(FlyoutControl));
         }
 
+        /// <inheritdoc />
         protected override void OnLeftMouseDown(MouseEventArgs args)
         {
             if (Hovered == TreeState.Active && Children.Count > 0)
@@ -14,12 +23,13 @@
             base.OnLeftMouseDown(args);
         }
 
+        /// <inheritdoc />
         protected override void OnRightMouseDown(MouseEventArgs args)
         {
             if (Hovered == TreeState.Active && Children.Count > 0)
                 Children.Clear();
 
-            base.OnRightMouseClick(args);
+            OnRightMouseClick(args);
         }
     }
 }

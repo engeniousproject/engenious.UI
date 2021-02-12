@@ -4,27 +4,29 @@ using engenious.Input;
 
 namespace engenious.UI.Controls
 {
+    /// <summary>
+    /// Ui container control used for scrolling out of bounds elements.
+    /// </summary>
     public class ScrollContainer : ContentControl
     {
+        private int _scrollerMinSize;
 
-        private int scrollerMinSize;
-
-        private Point virtualSize;
+        private Point _virtualSize;
 
         private readonly PropertyEventArgs<bool> _horizontalScrollbarEnabledChangedEventArgs = new PropertyEventArgs<bool>();
 
         #region Properties 
         /// <summary>
-        /// Legt die Scrollgeschwindigkeit fest
+        /// Gets or sets the scrolling speed.
         /// </summary>
         public int ScrollSpeed { get; set; } = 20;
 
         /// <summary>
-        /// Gibt an, ob es eine horizontale Scrollbar geben soll.
+        /// Gets or sets whether there should be a horizontal scroll bar.
         /// </summary>
         public bool HorizontalScrollbarEnabled
         {
-            get { return HorizontalScrollbar.Enabled; }
+            get => HorizontalScrollbar.Enabled;
             set
             {
                 if (HorizontalScrollbar.Enabled == value) return;
@@ -41,13 +43,13 @@ namespace engenious.UI.Controls
             }
         }
         private readonly PropertyEventArgs<bool> _verticalScrollbarEnabledChangedEventArgs = new PropertyEventArgs<bool>();
-
+        
         /// <summary>
-        /// Gibt an, ob es eine vertikale Scrollbar geben soll.
+        /// Gets or sets whether there should be a vertical scroll bar.
         /// </summary>
         public bool VerticalScrollbarEnabled
         {
-            get { return VerticalScrollbar.Enabled; }
+            get => VerticalScrollbar.Enabled;
             set
             {
                 if (VerticalScrollbar.Enabled == value) return;
@@ -65,13 +67,16 @@ namespace engenious.UI.Controls
         }
 
 
-        private ScrollbarVisibility horizontalScrollbarVisibility, verticalScrollbarVisibility;
+        private ScrollbarVisibility _horizontalScrollbarVisibility, _verticalScrollbarVisibility;
+        /// <summary>
+        /// Gets or sets the <see cref="ScrollbarVisibility"/> for the horizontal scrollbar.
+        /// </summary>
         public ScrollbarVisibility HorizontalScrollbarVisibility
         {
-            get => horizontalScrollbarVisibility;
+            get => _horizontalScrollbarVisibility;
             set
             {
-                horizontalScrollbarVisibility = value;
+                _horizontalScrollbarVisibility = value;
                 switch(value)
                 {
                     case ScrollbarVisibility.Always:
@@ -86,12 +91,15 @@ namespace engenious.UI.Controls
                 }
             }
         }
+        /// <summary>
+        /// Gets or sets the <see cref="ScrollbarVisibility"/> for the vertical scrollbar.
+        /// </summary>
         public ScrollbarVisibility VerticalScrollbarVisibility
         {
-            get => verticalScrollbarVisibility;
+            get => _verticalScrollbarVisibility;
             set
             {
-                verticalScrollbarVisibility = value;
+                _verticalScrollbarVisibility = value;
                 switch(value)
                 {
                     case ScrollbarVisibility.Always:
@@ -110,20 +118,20 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<Point> _virtualSizeChangedEventArgs = new PropertyEventArgs<Point>();
         /// <summary>
-        /// Gibt die Größe des virtuellen Client-Bereichs an.
+        /// Gets the size of the virtual client region.
         /// </summary>
         public Point VirtualSize
         {
-            get { return virtualSize; }
+            get => _virtualSize;
             private set
             {
-                if (virtualSize == value) return;
+                if (_virtualSize == value) return;
 
-                _virtualSizeChangedEventArgs.OldValue = virtualSize;
+                _virtualSizeChangedEventArgs.OldValue = _virtualSize;
                 _virtualSizeChangedEventArgs.NewValue = value;
                 _virtualSizeChangedEventArgs.Handled = false;
 
-                virtualSize = value;
+                _virtualSize = value;
                 
                 RecalculateScrollbars();
 
@@ -134,14 +142,11 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int> _verticalScrollPositionChangedEventArgs = new PropertyEventArgs<int>();
         /// <summary>
-        /// Gibt die Scroll-Position auf der virtuellen Achse an oder legt diese fest.
+        /// Gets or sets the scroll position on the vertical axis.
         /// </summary>
         public int VerticalScrollPosition
         {
-            get
-            {
-                return VerticalScrollbar.Value;
-            }
+            get => VerticalScrollbar.Value;
             set
             {
                 int scrollRange = VirtualSize.Y - ActualClientSize.Y;
@@ -162,14 +167,11 @@ namespace engenious.UI.Controls
 
         private readonly PropertyEventArgs<int> _horizontalScrollPositionChangedEventArgs = new PropertyEventArgs<int>();
         /// <summary>
-        /// Gibt die Scroll-Position auf der horizontalen Achse an oder legt diese fest.
+        /// Gets or sets the scroll position on the horizontal axis.
         /// </summary>
         public int HorizontalScrollPosition
         {
-            get
-            {
-                return HorizontalScrollbar.Value;
-            }
+            get => HorizontalScrollbar.Value;
             set
             {
                 int scrollRange = VirtualSize.X - ActualClientSize.X;
@@ -189,67 +191,68 @@ namespace engenious.UI.Controls
             }
         }
 
-        public Slider HorizontalScrollbar
-        {
-            get => horizontalScrollbar;
-        }
-
-        public Slider VerticalScrollbar
-        {
-            get => verticalScrollbar;
-        }
-
-     
         /// <summary>
-        /// Gibt die Mindestgröße für den greifbaren Scroller an.
+        /// Gets the horizontal scrollbar <see cref="Slider"/> control.
+        /// </summary>
+        public Slider HorizontalScrollbar => _horizontalScrollbar;
+
+        /// <summary>
+        /// Gets the vertical scrollbar <see cref="Slider"/> control.
+        /// </summary>
+        public Slider VerticalScrollbar => _verticalScrollbar;
+
+        /// <summary>
+        /// Gets the minimal size for the scrollbar grab region.
         /// </summary>
         public int ScrollerMinSize
         {
-            get { return scrollerMinSize; }
+            get => _scrollerMinSize;
             set
             {
-                if (scrollerMinSize != value)
+                if (_scrollerMinSize != value)
                 {
-                    scrollerMinSize = value;
+                    _scrollerMinSize = value;
                     InvalidateDimensions();
                 }
             }
         }
 
         /// <summary>
-        /// Gibt den aktuell sichtbaren Bereich zurück.
+        /// Gets the currently visible area.
         /// </summary>
-        public Rectangle VisibleArea
-        {
-            get
-            {
-                return new Rectangle(
-                    HorizontalScrollPosition, 
-                    VerticalScrollPosition, 
-                    Math.Min(VirtualSize.X, ActualSize.X), 
-                    Math.Min(VirtualSize.Y, ActualSize.Y));
-            }
-        }
+        public Rectangle VisibleArea =>
+            new Rectangle(
+                HorizontalScrollPosition, 
+                VerticalScrollPosition, 
+                Math.Min(VirtualSize.X, ActualSize.X), 
+                Math.Min(VirtualSize.Y, ActualSize.Y));
 
         #endregion
 
-        private Slider horizontalScrollbar, verticalScrollbar;
-        public ScrollContainer(BaseScreenComponent manager)
-            : base(manager)
+        private readonly Slider _horizontalScrollbar;
+        private readonly Slider _verticalScrollbar;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScrollContainer"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public ScrollContainer(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
 
-            horizontalScrollbar = new Slider(manager)
+            _horizontalScrollbar = new Slider(manager)
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 SmallStep = ScrollSpeed,
             };
-            horizontalScrollbar.ValueChanged += (val) =>
+            _horizontalScrollbar.ValueChanged += (val) =>
             {
                 HorizontalScrollPosition = val;
             };
 
-            verticalScrollbar = new Slider(manager)
+            _verticalScrollbar = new Slider(manager)
             {
                 VerticalAlignment = VerticalAlignment.Stretch,
                 HorizontalAlignment = HorizontalAlignment.Right,
@@ -257,7 +260,7 @@ namespace engenious.UI.Controls
                 SmallStep = ScrollSpeed,
                 Invert = true,
             };
-            verticalScrollbar.ValueChanged += (val) =>
+            _verticalScrollbar.ValueChanged += (val) =>
             {
                 VerticalScrollPosition = val;
             };
@@ -265,7 +268,7 @@ namespace engenious.UI.Controls
             VerticalScrollbarEnabled = true;
 
             //Children.Add(horizontalScrollbar);
-            Children.Add(verticalScrollbar);
+            Children.Add(_verticalScrollbar);
 
             CanFocus = false;
             TabStop = false;
@@ -297,15 +300,16 @@ namespace engenious.UI.Controls
         }
 
 
+        /// <inheritdoc />
         public override Point GetExpectedSize(Point available)
         {
-            // Bereich ermitteln, der für die Scrollbars verwendet wird
+            // Determine region used for the scrollbars
             Point scrollCut = new Point(VerticalScrollbar.Visible ? VerticalScrollbar.Width.Value : 0, HorizontalScrollbar.Visible ? HorizontalScrollbar.Height.Value : 0);
 
             Point availableContentSize = GetMaxClientSize(available) - scrollCut;
             Point result = GetMinClientSize(available);
 
-            // Client-Bereich erweitern, wenn entsprechende Scrollbars aktiv sind
+            // expands the client area, for specific active scroll bars
             if (HorizontalScrollbarEnabled)
                 availableContentSize.X = int.MaxValue;
             if (VerticalScrollbarEnabled)
@@ -326,6 +330,7 @@ namespace engenious.UI.Controls
             return result;
         }
 
+        /// <inheritdoc />
         public override void SetActualSize(Point available)
         {
             Point scrollCut = new Point(VerticalScrollbar.Visible ? VerticalScrollbar.Width.Value : 0, HorizontalScrollbar.Visible ? HorizontalScrollbar.Height.Value : 0);
@@ -343,8 +348,8 @@ namespace engenious.UI.Controls
 
             RecalculateScrollbars();
 
-            horizontalScrollbar.SetActualSize(ActualClientSize);
-            verticalScrollbar.SetActualSize(ActualClientSize);
+            _horizontalScrollbar.SetActualSize(ActualClientSize);
+            _verticalScrollbar.SetActualSize(ActualClientSize);
             
             // Placement
             if (Content != null)
@@ -360,11 +365,12 @@ namespace engenious.UI.Controls
             }
         }
 
+        /// <inheritdoc />
         protected override void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
             if (Skin.Current.FocusFrameBrush != null)
             {
-                // Rahmen um die vertikale Scrollbar
+                // border around the vertical scrollbar
                 /*Rectangle? vArea = VerticalScrollbarArea;
                 if (vArea.HasValue)
                 {
@@ -375,7 +381,7 @@ namespace engenious.UI.Controls
                     Skin.Current.FocusFrameBrush.Draw(batch, area, alpha);
                 }
 
-                // Rahmen um die horizontale Scrollbar
+                // border around the horizontal scrollbar
                 Rectangle? hArea = HorizontalScrollbarArea;
                 if (hArea.HasValue)
                 {
@@ -389,6 +395,8 @@ namespace engenious.UI.Controls
         }
         
         #region Interaction
+
+        /// <inheritdoc />
         protected override void OnMouseScroll(MouseScrollEventArgs args)
         {
             VerticalScrollPosition -= args.Steps * ScrollSpeed;
@@ -397,6 +405,7 @@ namespace engenious.UI.Controls
             base.OnMouseScroll(args);
         }
 
+        /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {
             if (Focused != TreeState.None)
@@ -417,41 +426,59 @@ namespace engenious.UI.Controls
         #endregion
 
         #region Scroll Methods
+        /// <summary>
+        /// Scrolls up.
+        /// </summary>
         public void VerticalScrollUp()
         {
             VerticalScrollPosition -= 20;
         }
-
+        /// <summary>
+        /// Scrolls up by a page.
+        /// </summary>
         public void VerticalScrollPageUp()
         {
             VerticalScrollPosition -= (int)(ActualClientSize.Y * 0.7f);
         }
-
+        /// <summary>
+        /// Scrolls down.
+        /// </summary>
         public void VerticalScrollDown()
         {
             VerticalScrollPosition += 20;
         }
-
+        /// <summary>
+        /// Scrolls down by a page.
+        /// </summary>
         public void VerticalScrollPageDown()
         {
             VerticalScrollPosition += (int)(ActualClientSize.Y * 0.7f);
         }
-
+        /// <summary>
+        /// Scrolls left.
+        /// </summary>
         public void HorizontalScrollUp()
         {
             HorizontalScrollPosition -= 20;
         }
-
+        /// <summary>
+        /// Scrolls left by a page.
+        /// </summary>
         public void HorizontalScrollPageUp()
         {
             HorizontalScrollPosition -= (int)(ActualClientSize.X * 0.7f);
         }
 
+        /// <summary>
+        /// Scrolls right.
+        /// </summary>
         public void HorizontalScrollDown()
         {
             HorizontalScrollPosition += 20;
         }
-
+        /// <summary>
+        /// Scrolls right by a page.
+        /// </summary>
         public void HorizontalScrollPageDown()
         {
             HorizontalScrollPosition += (int)(ActualClientSize.X * 0.7f);
@@ -459,32 +486,81 @@ namespace engenious.UI.Controls
         #endregion
 
         #region Events
-
+        
+        /// <summary>
+        /// Raises the <see cref="HorizontalScrollbarEnabledChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnHorizontalScrollbarEnabledChanged(PropertyEventArgs<bool> args) { }
+                
+        /// <summary>
+        /// Raises the <see cref="VerticalScrollbarEnabledChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Boolean}"/> that contains the event data.</param>
         protected virtual void OnVerticalScrollbarEnabledChanged(PropertyEventArgs<bool> args) { }
-
+                
+        /// <summary>
+        /// Raises the <see cref="HorizontalScrollPositionChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnHorizontalScrollPositionChanged(PropertyEventArgs<int> args) { }
-
+        
+        /// <summary>
+        /// Raises the <see cref="VerticalScrollPositionChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Int32}"/> that contains the event data.</param>
         protected virtual void OnVerticalScrollPositionChanged(PropertyEventArgs<int> args) { }
 
+        /// <summary>
+        /// Raises the <see cref="VirtualSizeChanged"/> event.
+        /// </summary>
+        /// <param name="args">A <see cref="PropertyEventArgs{Point}"/> that contains the event data.</param>
         protected virtual void OnVirtualSizeChanged(PropertyEventArgs<Point> args) { }
 
+        /// <summary>
+        /// Occurs when the <see cref="HorizontalScrollbarEnabled"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<bool> HorizontalScrollbarEnabledChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="VerticalScrollbarEnabled"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<bool> VerticalScrollbarEnabledChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="HorizontalScrollPosition"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<int> HorizontalScrollPositionChanged;
+
+        /// <summary>
+        /// Occurs when the <see cref="VerticalScrollPosition"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<int> VerticalScrollPositionChanged;
 
+        /// <summary>
+        /// Occurs when the <see cref="VirtualSize"/> property was changed.
+        /// </summary>
         public event PropertyChangedDelegate<Point> VirtualSizeChanged;
 
         #endregion
     }
 
+    /// <summary>
+    /// Specifies the 
+    /// </summary>
     public enum ScrollbarVisibility
     {
+        /// <summary>
+        /// Shows the scrollbar when necessary.
+        /// </summary>
         Auto,
+        /// <summary>
+        /// Always shows the scrollbar.
+        /// </summary>
         Always,
+        /// <summary>
+        /// Never shows the scrollbar.
+        /// </summary>
         Never
     }
 }

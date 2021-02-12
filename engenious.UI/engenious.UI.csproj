@@ -7,12 +7,23 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
         <Authors>fnawratil, jvbsl, tomwendel</Authors>
-        <PackageLicenseUrl>https://github.com/engeniousproject/engenious.UI/blob/develop/LICENSE</PackageLicenseUrl>
+
+        <PackageLicenseFile>licenses\LICENSE</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/engeniousproject/engenious.UI</PackageProjectUrl>
         <RepositoryUrl>https://github.com/engeniousproject/engenious.UI</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>engeniousproject 2019</Copyright>
     </PropertyGroup>
+    <PropertyGroup>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Content Include="..\LICENSE">
+            <Pack>True</Pack>
+            <PackagePath>licenses</PackagePath>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
     <PropertyGroup>
 	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
     </PropertyGroup>

@@ -3,26 +3,32 @@
 namespace engenious.UI
 {
     /// <summary>
-    /// Abstrakte Basisklasse für alle Sorten von Brushes.
+    /// Base class for rendering brushes.
     /// </summary>
     public abstract class Brush
     {
         /// <summary>
-        /// Gibt die Minimale Breite des Brushs um noch gut auszusehen.
+        /// Gets the minimum width for the <see cref="Brush"/> to be rendered correctly.
         /// </summary>
         public int MinWidth { get; protected set; }
 
         /// <summary>
-        /// Gibt die minimale Höhe des Brushes um noch gut auszusehen.
+        /// Gets the minimum height for the <see cref="Brush"/> to be rendered correctly.
         /// </summary>
         public int MinHeight { get; protected set; }
 
         /// <summary>
-        /// Draw-Methode für den Brush.
+        /// Renders the brush into a <see cref="SpriteBatch"/> in a specified area using an alpha value.
         /// </summary>
-        /// <param name="batch">Der (bereits gestartete) SpriteBatch</param>
-        /// <param name="area">Render-Bereich</param>
-        /// <param name="alpha">Alpha-Blending</param>
+        /// <param name="batch">
+        /// The spritebatch to draw to.
+        /// <remarks>
+        /// The spritebatch needs to be in drawing mode. Meaning <see cref="SpriteBatch.Begin"/> was called but
+        /// <see cref="SpriteBatch.End"/> was not yet called (again) after the <see cref="SpriteBatch.Begin"/>.
+        /// </remarks>
+        /// </param>
+        /// <param name="area">The area to render the brush to.</param>
+        /// <param name="alpha">The transparency value to render the brush width.</param>
         public abstract void Draw(SpriteBatch batch, Rectangle area, float alpha);
     }
 }

@@ -3,46 +3,37 @@
 namespace engenious.UI.Controls
 {
     /// <summary>
-    /// Steuerelement, das ein Bild darstellt.
+    /// Ui control to display an image.
     /// </summary>
     public class Image : Control
     {
-        // TODO: Skalierung als Parameter (also stretch, scale, fill,...)
+        // TODO: Scaling parameter (e.g. stretch, scale, fill,...)
 
         /// <summary>
-        /// Das darzustellende Bild als Textur.
+        /// Gets or sets the image to display as a <see cref="Texture2D"/>.
         /// </summary>
         public Texture2D Texture { get; set; }
 
         /// <summary>
-        /// Erzeugt eine neue Instanz eines Bildsteuerlements.
+        /// Initializes a new instance of the <see cref="Image"/> class.
         /// </summary>
-        /// <param name="manager">Der verwendete <see cref="BaseScreenComponent"/></param>
-        /// <param name="style">(Optional) Der zu verwendende Style.</param>
-        public Image(BaseScreenComponent manager, string style = "") :
-            base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Image(BaseScreenComponent manager, string style = "")
+            : base(manager, style)
         {
             ApplySkin(typeof(Image));
         }
 
-        /// <summary>
-        /// Ist für die Berechnung des Client-Contents zuständig und erleichtert das automatische Alignment.
-        /// </summary>
-        /// <returns></returns>
-        public override Point CalculcateRequiredClientSpace(Point available)
+        /// <inheritdoc />
+        public override Point CalculateRequiredClientSpace(Point available)
         {
             if (Texture != null)
                 return new Point(Texture.Width, Texture.Height);
-            return base.CalculcateRequiredClientSpace(available);
+            return base.CalculateRequiredClientSpace(available);
         }
 
-        /// <summary>
-        /// Malt den Content des Controls.
-        /// </summary>
-        /// <param name="batch">Spritebatch.</param>
-        /// <param name="area">Bereich für den Content in absoluten Koordinaten.</param>
-        /// <param name="gameTime">GameTime.</param>
-        /// <param name="alpha">Die Transparenz des Controls.</param>
+        /// <inheritdoc />
         protected override void OnDrawContent(SpriteBatch batch, Rectangle area, GameTime gameTime, float alpha)
         {
             if (Texture != null)
