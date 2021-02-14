@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace engenious.UI
+﻿namespace engenious.UI
 {
     /// <summary>
     /// Helper class for operating system specific code.
@@ -23,6 +21,6 @@ namespace engenious.UI
         /// Gets the current clipboard text.
         /// </summary>
         /// <returns>The current clipboard text.</returns>
-        public static string GetClipboardText() => Clipboard.GetText();
+        public static string? GetClipboardText() => Clipboard.GetText();
     }
 }

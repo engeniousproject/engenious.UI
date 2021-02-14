@@ -107,7 +107,7 @@ namespace engenious.UI
         /// <summary>
         /// Occurs when the transition was finished.
         /// </summary>
-        public event TransitionDelegate Finished;
+        public event TransitionDelegate? Finished;
 
         #region Transition Curves
 

@@ -3,12 +3,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using engenious.Content;
 using engenious.Graphics;
 using engenious.Input;
 using engenious.UI.Controls;
-using Vector2 = engenious.Vector2;
 
 namespace engenious.UI
 {
@@ -22,7 +20,7 @@ namespace engenious.UI
         /// </summary>
         public const int DefaultDoubleClickDelay = 500;
 
-        private ContainerControl _root;
+        private ContainerControl _root = null!;
 
         private FlyoutControl _flyout;
 
@@ -70,12 +68,12 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the default transition to use to navigate to a screen.
         /// </summary>
-        public Transition NavigateToTransition { get; set; }
+        public Transition? NavigateToTransition { get; set; }
 
         /// <summary>
         /// Gets or sets the default transition to use to navigate away from a screen.
         /// </summary>
-        public Transition NavigateFromTransition { get; set; }
+        public Transition? NavigateFromTransition { get; set; }
 
         /// <summary>
         /// Gets the engenious ContentManager used for loading game content.
@@ -148,7 +146,10 @@ namespace engenious.UI
             : base(game)
         {
             Content = game.Content;
-
+            _root = null!;
+            Frame = null!;
+            _flyout = null!;
+            _batch = null!;
             KeyboardEnabled = true;
             MouseEnabled = true;
             GamePadEnabled = true;
@@ -175,6 +176,8 @@ namespace engenious.UI
             {
                 ClientSizeChanged?.Invoke(s, e);
             };
+
+            ScreenTarget = null!;
         }
         
         /// <inheritdoc />
@@ -231,7 +234,7 @@ namespace engenious.UI
 
         private int? _draggingId = null;
 
-        internal DragEventArgs DraggingArgs { get; private set; }
+        internal DragEventArgs? DraggingArgs { get; private set; }
 
         //private Dictionary<Keys, double> pressedKeys = new Dictionary<Keys, double>();
 
@@ -368,22 +371,25 @@ namespace engenious.UI
                         if (_lastLeftMouseButtonPressed)
                         {
                             // Handle Drop
-                            if (DraggingArgs != null && DraggingArgs.Handled)
+                            if (DraggingArgs != null)
                             {
-                                DragEventArgs args = DragEventArgsPool.Instance.Take();
-                                args.GlobalPosition = mousePosition;
-                                args.LocalPosition = mousePosition;
-                                args.Content = DraggingArgs.Content;
-                                args.Icon = DraggingArgs.Icon;
-                                args.Sender = DraggingArgs.Sender;
+                                if (DraggingArgs.Handled)
+                                {
+                                    DragEventArgs args = DragEventArgsPool.Instance.Take();
+                                    args.GlobalPosition = mousePosition;
+                                    args.LocalPosition = mousePosition;
+                                    args.Content = DraggingArgs.Content;
+                                    args.Icon = DraggingArgs.Icon;
+                                    args.Sender = DraggingArgs.Sender;
 
-                                _root.InternalEndDrop(args);
-                                if (!args.Handled)
-                                    EndDrop?.Invoke(args);
+                                    _root.InternalEndDrop(args);
+                                    if (!args.Handled)
+                                        EndDrop?.Invoke(args);
+                                }
+                                // Discard Dragging Infos
+                                DragEventArgsPool.Instance.Release(DraggingArgs);
                             }
-
-                            // Discard Dragging Infos
-                            DragEventArgsPool.Instance.Release(DraggingArgs);
+                            
                             DraggingArgs = null;
                             _draggingId = null;
 
@@ -810,15 +816,15 @@ namespace engenious.UI
         /// </summary>
         public bool CanGoBack => _historyStack.Count > 1;
 
-        private Screen _activeScreen = null;
+        private Screen? _activeScreen = null;
         private bool _titleDirty;
-        private string _lastActiveScreenTitle;
-        private string _titlePrefix;
+        private string? _lastActiveScreenTitle;
+        private string _titlePrefix = string.Empty;
 
         /// <summary>
         /// Gets a reference to the currently active <see cref="Screen"/>.
         /// </summary>
-        public Screen ActiveScreen
+        public Screen? ActiveScreen
         {
             get => _activeScreen;
             private set
@@ -842,7 +848,7 @@ namespace engenious.UI
         /// <param name="screen">The <see cref="Screen"/> to navigate to.</param>
         /// <param name="parameter">A parameter passed to the screen on navigation.</param>
         /// <returns>Gets a value indicating whether the navigation was executed.</returns>
-        public bool NavigateToScreen(Screen screen, object parameter = null)
+        public bool NavigateToScreen(Screen screen, object? parameter = null)
         {
             return Navigate(screen, false, parameter);
         }
@@ -852,11 +858,12 @@ namespace engenious.UI
         /// </summary>
         /// <param name="parameter">A parameter passed to the screen on navigation.</param>
         /// <returns>Gets a value indicating whether the navigation was executed.</returns>
-        public bool NavigateBack(object parameter = null)
+        public bool NavigateBack(object? parameter = null)
         {
             if (CanGoBack)
             {
-                _historyStack.Remove(ActiveScreen);
+                if (ActiveScreen != null)
+                    _historyStack.Remove(ActiveScreen);
                 Screen screen = _historyStack[0];
                 Navigate(screen, true, parameter);
             }
@@ -864,7 +871,7 @@ namespace engenious.UI
             return false;
         }
 
-        private bool Navigate(Screen screen, bool isBackNavigation, object parameter = null)
+        private bool Navigate(Screen? screen, bool isBackNavigation, object? parameter = null)
         {
             bool overlayed = false;
 
@@ -906,7 +913,7 @@ namespace engenious.UI
                             ScreenTarget.Controls.Remove(e);
                             ((Screen)e).IsVisibleScreen = false;
                         };
-                        _activeScreen.StartTransition(trans);
+                        ActiveScreen.StartTransition(trans);
                     }
                     else
                     {
@@ -1020,96 +1027,96 @@ namespace engenious.UI
         /// <summary>
         /// Occurs when the mouse was moved on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate MouseMove;
+        public event MouseEventBaseDelegate? MouseMove;
 
         /// <summary>
         /// Occurs when a drag event was started on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event DragEventBaseDelegate StartDrag;
+        public event DragEventBaseDelegate? StartDrag;
 
         /// <summary>
         /// Occurs when the mouse was moved while dragging on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event DragEventBaseDelegate DropMove;
+        public event DragEventBaseDelegate? DropMove;
 
         /// <summary>
         /// Occurs when the drag event was stopped on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event DragEventBaseDelegate EndDrop;
+        public event DragEventBaseDelegate? EndDrop;
 
         /// <summary>
         /// Occurs when the left mouse button was released on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate LeftMouseUp;
+        public event MouseEventBaseDelegate? LeftMouseUp;
 
         /// <summary>
         /// Occurs when the left mouse button was pressed on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate LeftMouseDown;
+        public event MouseEventBaseDelegate? LeftMouseDown;
 
         /// <summary>
         /// Occurs when the left mouse button was clicked on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate LeftMouseClick;
+        public event MouseEventBaseDelegate? LeftMouseClick;
 
         /// <summary>
         /// Occurs when the left mouse button was double clicked on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate LeftMouseDoubleClick;
+        public event MouseEventBaseDelegate? LeftMouseDoubleClick;
 
         /// <summary>
         /// Occurs when the right mouse button was released on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate RightMouseUp;
+        public event MouseEventBaseDelegate? RightMouseUp;
 
         /// <summary>
         /// Occurs when the right mouse button was pressed on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate RightMouseDown;
+        public event MouseEventBaseDelegate? RightMouseDown;
 
         /// <summary>
         /// Occurs when the right mouse button was clicked on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate RightMouseClick;
+        public event MouseEventBaseDelegate? RightMouseClick;
 
         /// <summary>
         /// Occurs when the right mouse button was double clicked on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseEventBaseDelegate RightMouseDoubleClick;
+        public event MouseEventBaseDelegate? RightMouseDoubleClick;
 
         /// <summary>
         /// Occurs when the right mouse scroll wheel was scrolled on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event MouseScrollEventBaseDelegate MouseScroll;
+        public event MouseScrollEventBaseDelegate? MouseScroll;
 
-        //public event TouchEventBaseDelegate TouchDown;
+        //public event TouchEventBaseDelegate? TouchDown;
 
-        //public event TouchEventBaseDelegate TouchMove;
+        //public event TouchEventBaseDelegate? TouchMove;
 
-        //public event TouchEventBaseDelegate TouchUp;
+        //public event TouchEventBaseDelegate? TouchUp;
 
-        //public event TouchEventBaseDelegate TouchTap;
+        //public event TouchEventBaseDelegate? TouchTap;
 
-        //public event TouchEventBaseDelegate TouchDoubleTap;
+        //public event TouchEventBaseDelegate? TouchDoubleTap;
 
         /// <summary>
         /// Occurs when a key on the keyboard was pressed on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event KeyEventBaseDelegate KeyDown;
+        public event KeyEventBaseDelegate? KeyDown;
 
         /// <summary>
         /// Occurs when a key on the keyboard is pressed on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event KeyEventBaseDelegate KeyPress;
+        public event KeyEventBaseDelegate? KeyPress;
 
         /// <summary>
         /// Occurs when a key on the keyboard was released on this <see cref="BaseScreenComponent"/>.
         /// </summary>
-        public event KeyEventBaseDelegate KeyUp;
+        public event KeyEventBaseDelegate? KeyUp;
 
         /// <summary>
         /// Occurs when the client(e.g. a window) size was changed.
         /// </summary>
-        public event EventHandler ClientSizeChanged;
+        public event EventHandler? ClientSizeChanged;
     }
 }

@@ -7,7 +7,7 @@ namespace engenious.UI
     /// </summary>
     public class BorderBrush : Brush
     {
-        private Texture2D _tex;
+        private Texture2D? _tex;
 
         private int _lineWidth;
 

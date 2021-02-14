@@ -12,7 +12,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets or sets the image to display as a <see cref="Texture2D"/>.
         /// </summary>
-        public Texture2D Texture { get; set; }
+        public Texture2D? Texture { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class.

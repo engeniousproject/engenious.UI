@@ -13,6 +13,7 @@
         <RepositoryUrl>https://github.com/engeniousproject/engenious.UI</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>engeniousproject 2019</Copyright>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
     <PropertyGroup>
     </PropertyGroup>

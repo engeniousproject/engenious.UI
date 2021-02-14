@@ -15,7 +15,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets or sets the font used to render the <see cref="Text"/>.
         /// </summary>
-        SpriteFont Font { get; set; }
+        SpriteFont? Font { get; set; }
 
         /// <summary>
         /// Gets or sets the color used to render the <see cref="Text"/>.

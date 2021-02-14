@@ -76,7 +76,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="Value"/> property was changed.
         /// </summary>
-        public event ValueChangedDelegate ValueChanged;
+        public event ValueChangedDelegate? ValueChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Slider"/> class.
@@ -92,7 +92,11 @@ namespace engenious.UI.Controls
             Range = 100;
             Value = 0;
 
+            KnobBrush = null!;
+
             ApplySkin(typeof(Slider));
+            
+            CheckStyleInitialized(nameof(KnobBrush), KnobBrush);
         }
 
         /// <inheritdoc />

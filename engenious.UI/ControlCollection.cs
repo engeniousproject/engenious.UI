@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace engenious.UI
 {
@@ -10,7 +9,7 @@ namespace engenious.UI
     public class ControlCollection : ItemCollection<Control>
     {
         internal readonly ItemCollection<Control> InZOrder;
-        internal readonly ReverseItemCollectionEnumerable<Control> AgainstZOrder = new ReverseItemCollectionEnumerable<Control>();
+        internal readonly ReverseItemCollectionEnumerable<Control> AgainstZOrder;
 
         /// <summary>
         /// The <see cref="Control"/> that owns this collection.
@@ -22,11 +21,10 @@ namespace engenious.UI
         /// </summary>
         /// <param name="owner">The <see cref="Control"/> that owns this collection.</param>
         public ControlCollection(Control owner)
-            : base()
         {
             Owner = owner;
             InZOrder = new ItemCollection<Control>();
-            AgainstZOrder.BaseList = InZOrder;
+            AgainstZOrder = new ReverseItemCollectionEnumerable<Control>(InZOrder);
         }
 
         /// <inheritdoc />
@@ -163,7 +161,7 @@ namespace engenious.UI
 
         private class TabOrderComparer : IComparer<Control>
         {
-            public int Compare(Control x, Control y) =>x.TabOrder.CompareTo(y.TabOrder);
+            public int Compare(Control? x, Control? y) => x == null || y == null ? 0 : x.TabOrder.CompareTo(y.TabOrder);
         }
 
         private static readonly IComparer<Control> _tabOrderComparer = new TabOrderComparer();
@@ -185,7 +183,7 @@ namespace engenious.UI
 
         private class ZOrderComparer : IComparer<Control>
         {
-            public int Compare(Control x, Control y)
+            public int Compare(Control? x, Control? y)
             {
                 if (x == null || y == null)
                     return 0;
@@ -194,7 +192,7 @@ namespace engenious.UI
         }
         private readonly ZOrderComparer _zOrderComparer = new ZOrderComparer();
         private bool _isDoingUpdate = false;
-        private void ReorderZ(Control control)
+        private void ReorderZ(Control? control)
         {
             if (_isDoingUpdate) return; // Cancel if we are already reordering
 

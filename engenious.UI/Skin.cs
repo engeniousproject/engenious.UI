@@ -14,6 +14,12 @@ namespace engenious.UI
     {
         #region Singleton
 
+        static Skin()
+        {
+            Pix = null!;
+            Current = null!;
+        }
+        
         /// <summary>
         /// Gets a simple <see cref="Color.White"/> pixel used for drawing plain colored regions.
         /// </summary>
@@ -48,9 +54,9 @@ namespace engenious.UI
 
             try
             {
-                HeadlineFont = content.Load<SpriteFont>("engenious.UI:///Fonts/HeadlineFont");
-                TextFont = content.Load<SpriteFont>("engenious.UI:///Fonts/GameFont");
-                BoldFont = content.Load<SpriteFont>("engenious.UI:///Fonts/BoldFont");
+                HeadlineFont = content.Load<SpriteFont>("engenious.UI:///Fonts/HeadlineFont") ?? throw new Exception("Could not load font.");;
+                TextFont = content.Load<SpriteFont>("engenious.UI:///Fonts/GameFont") ?? throw new Exception("Could not load font.");
+                BoldFont = content.Load<SpriteFont>("engenious.UI:///Fonts/BoldFont") ?? throw new Exception("Could not load font.");
             }
             catch(Exception e)
             {
@@ -85,7 +91,7 @@ namespace engenious.UI
             // Control
             ControlSkins.Add(typeof(Control), (c) =>
             {
-                Control control = c as Control;
+                Control control = c;
                 control.Margin = Border.All(0);
                 control.Padding = Border.All(0);
                 control.HorizontalAlignment = HorizontalAlignment.Center;
@@ -95,10 +101,10 @@ namespace engenious.UI
             // Label
             ControlSkins.Add(typeof(Label), (c) =>
             {
-                Label label = c as Label;
+                var label = (Label)c;
                 label.VerticalTextAlignment = VerticalAlignment.Center;
                 label.HorizontalTextAlignment = HorizontalAlignment.Left;
-                label.Font = Current.TextFont;
+                label.Font = Current!.TextFont;
                 label.TextColor = Current.TextColorBlack;
                 label.Padding = Border.All(5);
             });
@@ -106,10 +112,10 @@ namespace engenious.UI
             // Button
             ControlSkins.Add(typeof(Button), (c) =>
             {
-                Button button = c as Button;
+                var button = (Button)c;
                 button.Margin = Border.All(2);
                 button.Padding = Border.All(5);
-                button.Background = Current.ButtonBrush;
+                button.Background = Current!.ButtonBrush;
                 button.HoveredBackground = Current.ButtonHoverBrush;
                 button.PressedBackground = Current.ButtonPressedBrush;
                 button.DisabledBackground = Current.ButtonDisabledBrush;
@@ -118,7 +124,7 @@ namespace engenious.UI
             // Textbox
             ControlSkins.Add(typeof(Textbox), (c) =>
             {
-                Textbox tb = c as Textbox;
+                var tb = (Textbox)c;
                 tb.Background = TextboxBackgroundBrush;
                 tb.Padding = Border.All(5);
                 tb.TextColor = Color.Black;
@@ -127,11 +133,11 @@ namespace engenious.UI
             // Splitter
             ControlSkins.Add(typeof(Splitter), (c) =>
             {
-                Splitter splitter = c as Splitter;
+                var splitter = (Splitter)c;
                 splitter.HorizontalAlignment = HorizontalAlignment.Stretch;
                 splitter.VerticalAlignment = VerticalAlignment.Stretch;
                 splitter.Orientation = Orientation.Horizontal;
-                splitter.SplitterSize = Current.SplitterWidth;
+                splitter.SplitterSize = Current!.SplitterWidth;
                 splitter.SplitterPosition = 200;
                 splitter.SplitterBrushHorizontal = Current.HorizontalSplitterBrush;
                 splitter.SplitterBrushVertical = Current.VerticalSplitterBrush;
@@ -143,7 +149,7 @@ namespace engenious.UI
                 c.Background = new BorderBrush(Color.LightGray);
                 c.DrawFocusFrame = true;
 
-                var listbox = c as IListControl;
+                var listbox = (IListControl)c;
                 listbox.SelectedItemBrush = new BorderBrush(Color.LightSkyBlue);
             });
 
@@ -155,7 +161,7 @@ namespace engenious.UI
                 c.Height = 30;
                 c.Padding = Border.All(5);
 
-                var combobox = c as ICombobox;
+                var combobox = (ICombobox)c;
                 combobox.SelectedItemBrush = new BorderBrush(Color.LightSkyBlue);
                 combobox.DropdownBackgroundBrush = new BorderBrush(Color.LightSlateGray);
             });
@@ -163,8 +169,8 @@ namespace engenious.UI
             // Scrollcontainer
             ControlSkins.Add(typeof(ScrollContainer), (c) =>
             {
-                ScrollContainer scrollContainer = c as ScrollContainer;
-                scrollContainer.HorizontalScrollbar.Height = Current.ScrollbarWidth;
+                var scrollContainer = (ScrollContainer)c;
+                scrollContainer.HorizontalScrollbar.Height = Current!.ScrollbarWidth;
                 scrollContainer.VerticalScrollbar.Width = Current.ScrollbarWidth;
                 scrollContainer.ScrollerMinSize = Current.ScrollerMinSize;
                 scrollContainer.VerticalScrollbar.Background = Current.VerticalScrollBackgroundBrush;
@@ -176,22 +182,22 @@ namespace engenious.UI
             // StackPanel
             ControlSkins.Add(typeof(StackPanel), (c) =>
             {
-                StackPanel stackPanel = c as StackPanel;
+                var stackPanel = (StackPanel)c;
             });
 
 
             // Progressbar
             ControlSkins.Add(typeof(ProgressBar), (c) =>
             {
-                ProgressBar progressBar = c as ProgressBar;
-                progressBar.BarBrush = Current.ProgressBarBrush;
+                var progressBar = (ProgressBar)c;
+                progressBar.BarBrush = Current!.ProgressBarBrush;
                 progressBar.Background = new BorderBrush(Current.BackgroundColor);
             });
 
             //Slider
             ControlSkins.Add(typeof(Slider), (c) =>
             {
-                Slider s = c as Slider;
+                var s = (Slider)c;
                 s.Orientation = Orientation.Horizontal;
                 s.Background = new BorderBrush(Color.LightGray);
                 s.KnobBrush = new BorderBrush(Color.SlateGray);
@@ -200,7 +206,7 @@ namespace engenious.UI
 
             ControlSkins.Add(typeof(Checkbox), (c) =>
             {
-                Checkbox checkbox = c as Checkbox;
+                var checkbox = (Checkbox)c;
                 checkbox.BoxBrush = new BorderBrush(Color.Black);
                 checkbox.InnerBoxBrush = new BorderBrush(Color.LightGray);
                 checkbox.HookBrush = new BorderBrush(Color.LawnGreen);
@@ -210,7 +216,7 @@ namespace engenious.UI
 
             ControlSkins.Add(typeof(TabControl), (c) =>
             {
-                TabControl tabControl = c as TabControl;
+                var tabControl = (TabControl)c;
                 tabControl.TabBrush = new BorderBrush(Color.LightGray);
                 tabControl.TabActiveBrush = new BorderBrush(Color.Gray);
                 tabControl.TabPageBackground = new BorderBrush(Color.Gray);
@@ -219,7 +225,7 @@ namespace engenious.UI
             
             ControlSkins.Add(typeof(Panel), (c) =>
             {
-                Panel panel = c as Panel;
+                var panel = (Panel)c;
                 panel.Background = PanelBrush;
             });
         }

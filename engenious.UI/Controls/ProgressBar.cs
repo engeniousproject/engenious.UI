@@ -14,7 +14,7 @@ namespace engenious.UI.Controls
 
         private int _maximum = 100;
 
-        private Brush _barBrush = null;
+        private Brush? _barBrush;
 
         private readonly PropertyEventArgs<Orientation> _orientationChangedEventArgs = new PropertyEventArgs<Orientation>();
         
@@ -89,7 +89,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets or sets the brush used to draw the progress bar.
         /// </summary>
-        public Brush BarBrush
+        public Brush? BarBrush
         {
             get => _barBrush;
             set
@@ -165,21 +165,21 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="Orientation"/> was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Orientation> OrientationChanged;
+        public event PropertyChangedDelegate<Orientation>? OrientationChanged;
 
         /// <summary>
         /// Occurs when the <see cref="Value"/> was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int> ValueChanged;
+        public event PropertyChangedDelegate<int>? ValueChanged;
 
         /// <summary>
         /// Occurs when the <see cref="Maximum"/> value was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int> MaximumChanged;
+        public event PropertyChangedDelegate<int>? MaximumChanged;
 
         /// <summary>
         /// Occurs when the <see cref="BarBrush"/> was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Brush> BarBrushChanged;
+        public event PropertyChangedDelegate<Brush>? BarBrushChanged;
     }
 }

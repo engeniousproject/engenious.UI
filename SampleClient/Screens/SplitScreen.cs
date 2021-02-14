@@ -68,6 +68,8 @@ namespace SampleClient.Screens
             };
             list.TemplateGenerator = (item) =>                          //Template Generator festlegen
             {
+                if (item == null)
+                    return null;
                 return new Label(manager) { Text = item, Padding = new Border(15,5,15,5), HorizontalAlignment = HorizontalAlignment.Stretch };              //Control (Label) erstellen
             };
             panel.Controls.Add(list);                                   //Liste zu Panel hinzufügen
@@ -87,10 +89,7 @@ namespace SampleClient.Screens
                 ButtonBrushOpen = new TextureBrush(Manager.Content.Load<Texture2D>("arrow_down"), TextureBrushMode.Stretch),
                 ButtonBrushClose = new TextureBrush(Manager.Content.Load<Texture2D>("arrow_up"), TextureBrushMode.Stretch),
             };
-            combobox.TemplateGenerator = (item) =>                      //Template Generator festlegen
-            {
-                return new Label(manager) { Text = item };              //Control (Label) erstellen
-            };
+
             panel.Controls.Add(combobox);                               //Combobox zu Panel  hinzufügen
 
             combobox.Items.Add("Item 1");                                    //Items zur Liste hinzufügen

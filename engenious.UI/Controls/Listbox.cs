@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using engenious.Graphics;
+﻿using engenious.Graphics;
 
 namespace engenious.UI.Controls
 {
@@ -49,14 +48,14 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets the container control containing the <see cref="ListControl{T}.SelectedItem"/>.
         /// </summary>
-        private Control SelectedItemContainer => GetItemContainer(SelectedItem);
+        private Control? SelectedItemContainer => GetItemContainer(SelectedItem);
 
         /// <summary>
         /// Gets the container control containing a specific list element.
         /// </summary>
         /// <param name="item">The list element to get the associated control of.</param>
         /// <returns>The container control containing the given list item.</returns>
-        private Control GetItemContainer(T item)
+        private Control? GetItemContainer(T? item)
         {
             if (item != null)
                 foreach (var c in StackPanel.Controls)
@@ -94,7 +93,7 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         protected override void OnInsert(T item, int index)
         {
-            Control control = TemplateGenerator(item);
+            Control? control = TemplateGenerator(item);
             ContentControl wrapper = new ContentControl(ScreenManager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -108,7 +107,7 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         protected override void OnRemove(T item, int index)
         {
-            Control control = GetItemContainer(item);
+            Control? control = GetItemContainer(item);
             if (control != null)
                 StackPanel.Controls.Remove(control);
             if (StackPanel.Controls.Count == 0)
@@ -121,10 +120,10 @@ namespace engenious.UI.Controls
             base.OnDrawBackground(batch, backgroundArea, gameTime, alpha);
 
             // Draw background brush for selected item
-            Control control = SelectedItemContainer;
+            Control? control = SelectedItemContainer;
             if (control != null)
             {
-                SelectedItemBrush?.Draw(batch,
+                SelectedItemBrush.Draw(batch,
                     new Rectangle(control.AbsolutePosition, control.ActualSize), alpha);
             }
         }
@@ -144,7 +143,9 @@ namespace engenious.UI.Controls
         /// <param name="item">The item to show in visible range.</param>
         public void EnsureVisibility(T item)
         {
-            Control container = GetItemContainer(item);
+            Control? container = GetItemContainer(item);
+            if (container == null)
+                return;
             Rectangle visibleArea = ScrollContainer.VisibleArea;
 
             // Element too far down -> scroll up
@@ -171,7 +172,7 @@ namespace engenious.UI.Controls
         {
             base.OnLeftMouseClick(args);
 
-            Control nextSelected = null;
+            Control? nextSelected = null;
             foreach (var item in StackPanel.Controls)
             {
                 if (item.Hovered != TreeState.None)

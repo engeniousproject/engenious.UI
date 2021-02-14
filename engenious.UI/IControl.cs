@@ -16,12 +16,12 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the sound to be played on click.
         /// </summary>
-        SoundEffect ClickSound { get; set; }
+        SoundEffect? ClickSound { get; set; }
 
         /// <summary>
         /// Gets or sets the sound to be played on hover.
         /// </summary>
-        SoundEffect HoverSound { get; set; }
+        SoundEffect? HoverSound { get; set; }
 
         /// <summary>
         /// Gets or sets the background <see cref="Brush"/> for this control.
@@ -61,7 +61,7 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets arbitrary user data.
         /// </summary>
-        object Tag { get; set; }
+        object? Tag { get; set; }
 
         /// <summary>
         /// Gets the style name of the control.
@@ -101,7 +101,7 @@ namespace engenious.UI
         /// <summary>
         /// Gets the parent control this control is a child of.
         /// </summary>
-        Control Parent { get; }
+        Control? Parent { get; }
 
         /// <summary>
         /// Gets or sets the local transformation for this control.

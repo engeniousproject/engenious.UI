@@ -5,7 +5,6 @@ using System.Reflection;
 
 using engenious.Audio;
 using engenious.Graphics;
-using engenious.UI.Controls;
 
 namespace engenious.UI
 {
@@ -16,27 +15,27 @@ namespace engenious.UI
     {
         private bool _invalidDrawing;
 
-        private Brush _background = null;
+        private Brush _background = null!;
 
-        private Brush _hoveredBackground = null;
+        private Brush _hoveredBackground = null!;
 
-        private Brush _pressedBackground = null;
+        private Brush _pressedBackground = null!;
 
-        private Brush _disabledBackground = null;
+        private Brush _disabledBackground = null!;
 
         private Border _margin = Border.All(0);
 
         private Border _padding = Border.All(0);
 
-        private SoundEffect _clickSound = null;
+        private SoundEffect? _clickSound = null;
 
-        private SoundEffect _hoverSound = null;
+        private SoundEffect? _hoverSound = null;
         
         /// <inheritdoc />
         public BaseScreenComponent ScreenManager { get; }
 
         /// <inheritdoc />
-        public SoundEffect ClickSound
+        public SoundEffect? ClickSound
         {
             get => _clickSound;
             set
@@ -49,7 +48,7 @@ namespace engenious.UI
         }
 
         /// <inheritdoc />
-        public SoundEffect HoverSound
+        public SoundEffect? HoverSound
         {
             get => _hoverSound;
             set
@@ -149,7 +148,7 @@ namespace engenious.UI
         public bool DrawFocusFrame { get; set; }
 
         /// <inheritdoc />
-        public object Tag { get; set; }
+        public object? Tag { get; set; }
 
         /// <inheritdoc />
         public string Style { get; }
@@ -168,8 +167,7 @@ namespace engenious.UI
             _children.OnInserted += ControlCollectionInsert;
             _children.OnRemove += ControlCollectionRemove;
             _rootPathTemp = new List<Control>();
-            _rootPath = new ReverseEnumerable<Control>();
-            _rootPath.BaseList = _rootPathTemp;
+            _rootPath = new ReverseEnumerable<Control>(_rootPathTemp);
 
             manager.ClientSizeChanged += (s, e) =>
             {
@@ -177,6 +175,13 @@ namespace engenious.UI
             };
 
             ApplySkin(typeof(Control));
+        }
+        
+        
+        internal static void CheckStyleInitialized<T>(string name, T value) where T : class
+        {
+            if (value == null)
+                throw new Exception($"{name} was not set in Checkbox style initialization!");
         }
 
         /// <summary>
@@ -186,8 +191,7 @@ namespace engenious.UI
         protected void ApplySkin(Type type)
         {
             // ControlSkin loader
-            if (Skin.Current != null &&
-                Skin.Current.ControlSkins != null)
+            if (Skin.Current != null)
             {
                 TypeInfo info = type.GetTypeInfo();
                 if (info.IsGenericType && Skin.Current.ControlSkins.ContainsKey(type.GetGenericTypeDefinition())) // For generic types
@@ -200,7 +204,6 @@ namespace engenious.UI
             if (!string.IsNullOrEmpty(Style) && // Only when the style is set
                 type == GetType() &&            // Only when type == type of the control (in this case the control that calls this method)
                 Skin.Current != null &&
-                Skin.Current.StyleSkins != null &&
                 Skin.Current.StyleSkins.TryGetValue(Style, out var styleSkin))
             {
                 styleSkin(this);
@@ -359,7 +362,7 @@ namespace engenious.UI
         /// <param name="alpha">The transparency value to draw the background with.</param>
         protected virtual void OnDrawFocusFrame(SpriteBatch batch, Rectangle frameArea, GameTime gameTime, float alpha)
         {
-            if (Skin.Current.FocusFrameBrush != null && DrawFocusFrame)
+            if (Skin.Current?.FocusFrameBrush != null && DrawFocusFrame)
                 Skin.Current.FocusFrameBrush.Draw(batch, frameArea, AbsoluteAlpha);
         }
 
@@ -375,7 +378,7 @@ namespace engenious.UI
 
         private bool _visible = true;
 
-        private Control _parent = null;
+        private Control? _parent = null;
 
         private readonly ControlCollection _children;
 
@@ -496,7 +499,7 @@ namespace engenious.UI
                 {
                     // Collect Path
                     _rootPathTemp.Clear();
-                    Control pointer = this;
+                    Control? pointer = this;
                     do
                     {
                         _rootPathTemp.Add(pointer);
@@ -513,7 +516,7 @@ namespace engenious.UI
 
         private readonly PropertyEventArgs<Control> _parentChangedEventArgs = new PropertyEventArgs<Control>();
         /// <inheritdoc />
-        public Control Parent
+        public Control? Parent
         {
             get => _parent;
             internal set
@@ -569,17 +572,17 @@ namespace engenious.UI
         /// <summary>
         /// Occurs when the controls <see cref="Parent"/> was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Control> ParentChanged;
+        public event PropertyChangedDelegate<Control>? ParentChanged;
 
         /// <summary>
         /// Occurs when the controls <see cref="Enabled"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<bool> EnableChanged;
+        public event PropertyChangedDelegate<bool>? EnableChanged;
 
         /// <summary>
         /// Occurs when the controls <see cref="Visible"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<bool> VisibleChanged;
+        public event PropertyChangedDelegate<bool>? VisibleChanged;
 
         #endregion
 
@@ -793,7 +796,7 @@ namespace engenious.UI
                 if (Parent != null)
                 {
                     result += Parent.AbsolutePosition;
-                    result += _parent.ActualClientArea.Location;
+                    result += Parent.ActualClientArea.Location;
                 }
                 result += ActualPosition;
                 return result;
@@ -1682,58 +1685,58 @@ namespace engenious.UI
         protected virtual void OnHoveredChanged(PropertyEventArgs<TreeState> args) { }
 
         /// <inheritdoc />
-        public event MouseEventDelegate MouseEnter;
+        public event MouseEventDelegate? MouseEnter;
 
         /// <inheritdoc />
-        public event MouseEventDelegate MouseLeave;
+        public event MouseEventDelegate? MouseLeave;
 
         /// <inheritdoc />
-        public event MouseEventDelegate MouseMove;
+        public event MouseEventDelegate? MouseMove;
 
         /// <inheritdoc />
-        public event MouseEventDelegate LeftMouseDown;
+        public event MouseEventDelegate? LeftMouseDown;
 
         /// <inheritdoc />
-        public event MouseEventDelegate LeftMouseUp;
+        public event MouseEventDelegate? LeftMouseUp;
 
         /// <inheritdoc />
-        public event MouseEventDelegate LeftMouseClick;
+        public event MouseEventDelegate? LeftMouseClick;
 
         /// <inheritdoc />
-        public event MouseEventDelegate LeftMouseDoubleClick;
+        public event MouseEventDelegate? LeftMouseDoubleClick;
 
         /// <inheritdoc />
-        public event MouseEventDelegate RightMouseDown;
+        public event MouseEventDelegate? RightMouseDown;
 
         /// <inheritdoc />
-        public event MouseEventDelegate RightMouseUp;
+        public event MouseEventDelegate? RightMouseUp;
 
         /// <inheritdoc />
-        public event MouseEventDelegate RightMouseClick;
+        public event MouseEventDelegate? RightMouseClick;
 
         /// <inheritdoc />
-        public event MouseEventDelegate RightMouseDoubleClick;
+        public event MouseEventDelegate? RightMouseDoubleClick;
 
         /// <inheritdoc />
-        public event MouseScrollEventDelegate MouseScroll;
+        public event MouseScrollEventDelegate? MouseScroll;
 
         /// <inheritdoc />
-        public event TouchEventDelegate TouchDown;
+        public event TouchEventDelegate? TouchDown;
 
         /// <inheritdoc />
-        public event TouchEventDelegate TouchMove;
+        public event TouchEventDelegate? TouchMove;
 
         /// <inheritdoc />
-        public event TouchEventDelegate TouchUp;
+        public event TouchEventDelegate? TouchUp;
 
         /// <inheritdoc />
-        public event TouchEventDelegate TouchTap;
+        public event TouchEventDelegate? TouchTap;
 
         /// <inheritdoc />
-        public event TouchEventDelegate TouchDoubleTap;
+        public event TouchEventDelegate? TouchDoubleTap;
 
         /// <inheritdoc />
-        public event PropertyChangedDelegate<TreeState> HoveredChanged;
+        public event PropertyChangedDelegate<TreeState>? HoveredChanged;
 
         #endregion
 
@@ -1839,16 +1842,16 @@ namespace engenious.UI
         }
 
         /// <inheritdoc />
-        public event KeyEventDelegate KeyDown;
+        public event KeyEventDelegate? KeyDown;
 
         /// <inheritdoc />
-        public event KeyEventDelegate KeyUp;
+        public event KeyEventDelegate? KeyUp;
 
         /// <inheritdoc />
-        public event KeyEventDelegate KeyPress;
+        public event KeyEventDelegate? KeyPress;
 
         /// <inheritdoc />
-        public event KeyTextEventDelegate KeyTextPress;
+        public event KeyTextEventDelegate? KeyTextPress;
 
         #endregion
 
@@ -1986,7 +1989,7 @@ namespace engenious.UI
         /// Visual Tree down from this control.
         /// </summary>
         /// <param name="control">The control to set the focus of.</param>
-        internal void SetFocus(Control control)
+        internal void SetFocus(Control? control)
         {
             // Set focus on child controls
             foreach (var child in Children.InZOrder)
@@ -2139,22 +2142,22 @@ namespace engenious.UI
         protected virtual void OnLostFocus(EventArgs args) { }
 
         /// <inheritdoc />
-        public event PropertyChangedDelegate<bool> TabStopChanged;
+        public event PropertyChangedDelegate<bool>? TabStopChanged;
 
         /// <inheritdoc />
-        public event PropertyChangedDelegate<bool> CanFocusChanged;
+        public event PropertyChangedDelegate<bool>? CanFocusChanged;
 
         /// <inheritdoc />
-        public event PropertyChangedDelegate<int> TabOrderChanged;
+        public event PropertyChangedDelegate<int>? TabOrderChanged;
 
         /// <inheritdoc />
-        public event PropertyChangedDelegate<int> ZOrderChanged;
+        public event PropertyChangedDelegate<int>? ZOrderChanged;
 
         /// <inheritdoc />
-        public event EventDelegate GotFocus;
+        public event EventDelegate? GotFocus;
 
         /// <inheritdoc />
-        public event EventDelegate LostFocus;
+        public event EventDelegate? LostFocus;
 
         #endregion
 
@@ -2307,19 +2310,19 @@ namespace engenious.UI
         protected virtual void OnEndDrop(DragEventArgs args) { }
 
         /// <inheritdoc />
-        public event DragEventDelegate StartDrag;
+        public event DragEventDelegate? StartDrag;
 
         /// <inheritdoc />
-        public event DragEventDelegate DropMove;
+        public event DragEventDelegate? DropMove;
 
         /// <inheritdoc />
-        public event DragEventDelegate DropEnter;
+        public event DragEventDelegate? DropEnter;
 
         /// <inheritdoc />
-        public event DragEventDelegate DropLeave;
+        public event DragEventDelegate? DropLeave;
 
         /// <inheritdoc />
-        public event DragEventDelegate EndDrop;
+        public event DragEventDelegate? EndDrop;
 
         #endregion
     }

@@ -91,6 +91,7 @@
         public Screen(BaseScreenComponent manager, string style = "")
             : base(manager, style)
         {
+            Title = string.Empty;
             Manager = manager;
             IsOverlay = false;
             InHistory = true;
@@ -166,11 +167,11 @@
         /// <summary>
         /// Occurs when the <see cref="IsActiveScreen"/> property got changed.
         /// </summary>
-        public event PropertyChangedDelegate<bool> IsActiveScreenChanged;
+        public event PropertyChangedDelegate<bool>? IsActiveScreenChanged;
 
         /// <summary>
         /// Occurs when the <see cref="IsVisibleScreen"/> property got changed.
         /// </summary>
-        public event PropertyChangedDelegate<bool> IsVisibleScreenChanged;
+        public event PropertyChangedDelegate<bool>? IsVisibleScreenChanged;
     }
 }

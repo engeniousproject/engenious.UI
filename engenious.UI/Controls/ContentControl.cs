@@ -1,18 +1,16 @@
-﻿using System.Linq;
-
-namespace engenious.UI.Controls
+﻿namespace engenious.UI.Controls
 {
     /// <summary>
     /// A ui element base class for a control containing another control.
     /// </summary>
     public class ContentControl : Control
     {
-        private Control _content;
+        private Control? _content;
 
         /// <summary>
         /// Gets or sets the <see cref="Control"/> contained in this control.
         /// </summary>
-        public Control Content
+        public Control? Content
         {
             get => _content;
             set

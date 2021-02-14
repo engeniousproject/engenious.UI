@@ -304,7 +304,7 @@ namespace engenious.UI.Controls
         public override Point GetExpectedSize(Point available)
         {
             // Determine region used for the scrollbars
-            Point scrollCut = new Point(VerticalScrollbar.Visible ? VerticalScrollbar.Width.Value : 0, HorizontalScrollbar.Visible ? HorizontalScrollbar.Height.Value : 0);
+            Point scrollCut = new Point(VerticalScrollbar.Visible ? VerticalScrollbar.Width ?? Skin.Current.ScrollbarWidth : 0, HorizontalScrollbar.Visible ? HorizontalScrollbar.Height ?? Skin.Current.ScrollbarWidth : 0);
 
             Point availableContentSize = GetMaxClientSize(available) - scrollCut;
             Point result = GetMinClientSize(available);
@@ -321,9 +321,11 @@ namespace engenious.UI.Controls
                 result.Y = Math.Max(result.Y, expected.Y) - scrollCut.Y;
                 result.X = Math.Max(result.X, expected.X) - scrollCut.X;
                 //TODO: min size should consider scrollbar sizes!
+                
+                
+                Content.SetActualSize(result);
             }
 
-            Content.SetActualSize(result);
             result += scrollCut + Borders;
 
             result = new Point(Math.Min(available.X, result.X), Math.Min(available.Y, result.Y));
@@ -333,7 +335,7 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         public override void SetActualSize(Point available)
         {
-            Point scrollCut = new Point(VerticalScrollbar.Visible ? VerticalScrollbar.Width.Value : 0, HorizontalScrollbar.Visible ? HorizontalScrollbar.Height.Value : 0);
+            Point scrollCut = new Point(VerticalScrollbar.Visible ? VerticalScrollbar.Width ??  0 : 0, HorizontalScrollbar.Visible ? HorizontalScrollbar.Height ?? 0 : 0);
 
             Point minSize = GetExpectedSize(available);
 
@@ -368,7 +370,7 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         protected override void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
-            if (Skin.Current.FocusFrameBrush != null)
+            if (Skin.Current?.FocusFrameBrush != null)
             {
                 // border around the vertical scrollbar
                 /*Rectangle? vArea = VerticalScrollbarArea;
@@ -520,27 +522,27 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="HorizontalScrollbarEnabled"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<bool> HorizontalScrollbarEnabledChanged;
+        public event PropertyChangedDelegate<bool>? HorizontalScrollbarEnabledChanged;
 
         /// <summary>
         /// Occurs when the <see cref="VerticalScrollbarEnabled"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<bool> VerticalScrollbarEnabledChanged;
+        public event PropertyChangedDelegate<bool>? VerticalScrollbarEnabledChanged;
 
         /// <summary>
         /// Occurs when the <see cref="HorizontalScrollPosition"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int> HorizontalScrollPositionChanged;
+        public event PropertyChangedDelegate<int>? HorizontalScrollPositionChanged;
 
         /// <summary>
         /// Occurs when the <see cref="VerticalScrollPosition"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int> VerticalScrollPositionChanged;
+        public event PropertyChangedDelegate<int>? VerticalScrollPositionChanged;
 
         /// <summary>
         /// Occurs when the <see cref="VirtualSize"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Point> VirtualSizeChanged;
+        public event PropertyChangedDelegate<Point>? VirtualSizeChanged;
 
         #endregion
     }

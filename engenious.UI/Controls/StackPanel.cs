@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 
 namespace engenious.UI.Controls
 {
@@ -118,6 +117,6 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="Orientation"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Orientation> OrientationChanged;
+        public event PropertyChangedDelegate<Orientation>? OrientationChanged;
     }
 }

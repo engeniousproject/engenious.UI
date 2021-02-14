@@ -36,7 +36,7 @@ namespace engenious.UI
     }
     internal class EventArgsPool : EventArgsPool<EventArgs>
     {
-        private static EventArgsPool _instance;
+        private static EventArgsPool? _instance;
         public static EventArgsPool Instance => _instance ??= new EventArgsPool();
 
         protected override void ResetVariable(EventArgs arr)
@@ -46,22 +46,22 @@ namespace engenious.UI
     }
     internal class DragEventArgsPool : EventArgsPool<DragEventArgs>
     {
-        private static DragEventArgsPool _instance;
+        private static DragEventArgsPool? _instance;
         public static DragEventArgsPool Instance => _instance ??= new DragEventArgsPool();
 
         protected override void ResetVariable(DragEventArgs arr)
         {
             arr.Handled = false;
-            arr.Sender = null;
+            arr.Sender = null!;
             arr.Icon = null;
             arr.IconSize = Point.Zero;
-            arr.Content = null;
+            arr.Content = null!;
         }
     }
     
     internal class MouseEventArgsPool : EventArgsPool<MouseEventArgs>
     {
-        private static MouseEventArgsPool _instance;
+        private static MouseEventArgsPool? _instance;
         public static MouseEventArgsPool Instance => _instance ??= new MouseEventArgsPool();
 
         protected override void ResetVariable(MouseEventArgs arr)
@@ -76,7 +76,7 @@ namespace engenious.UI
     
     internal class KeyEventArgsPool : EventArgsPool<KeyEventArgs>
     {
-        private static KeyEventArgsPool _instance;
+        private static KeyEventArgsPool? _instance;
         public static KeyEventArgsPool Instance => _instance ??= new KeyEventArgsPool();
 
         protected override void ResetVariable(KeyEventArgs arr)

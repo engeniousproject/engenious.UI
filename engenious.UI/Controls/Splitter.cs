@@ -8,13 +8,13 @@ namespace engenious.UI.Controls
     /// </summary>
     public class Splitter : Control
     {
-        private Control _slot1;
+        private Control? _slot1;
 
         private int? _slot1MinSize;
 
         private int? _slot1MaxSize;
 
-        private Control _slot2;
+        private Control? _slot2;
 
         private int? _slot2MinSize;
 
@@ -32,7 +32,7 @@ namespace engenious.UI.Controls
         /// In orientation <see cref="UI.Orientation.Horizontal"/> the left one;
         /// or <see cref="UI.Orientation.Horizontal"/> the top one.</remarks>
         /// </summary>
-        public Control Slot1
+        public Control? Slot1
         {
             get => _slot1;
             set
@@ -118,7 +118,7 @@ namespace engenious.UI.Controls
         /// In orientation <see cref="UI.Orientation.Horizontal"/> the right one;
         /// or <see cref="UI.Orientation.Horizontal"/> the bottom one.</remarks>
         /// </summary>
-        public Control Slot2
+        public Control? Slot2
         {
             get => _slot2;
             set
@@ -306,12 +306,12 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> used for the splitter in <see cref="UI.Orientation.Horizontal"/> <see cref="Orientation"/>.
         /// </summary>
-        public Brush SplitterBrushHorizontal { get; set; }
+        public Brush? SplitterBrushHorizontal { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> used for the splitter in <see cref="UI.Orientation.Vertical"/> <see cref="Orientation"/>.
         /// </summary>
-        public Brush SplitterBrushVertical { get; set; }
+        public Brush? SplitterBrushVertical { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Splitter"/> class.
@@ -444,7 +444,7 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         protected override void OnDrawFocusFrame(SpriteBatch batch, Rectangle contentArea, GameTime gameTime, float alpha)
         {
-            if (Skin.Current.FocusFrameBrush != null)
+            if (Skin.Current?.FocusFrameBrush != null)
             {
                 if (Orientation == Orientation.Horizontal)
                 {
@@ -550,41 +550,41 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="Slot1"/> control was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Control> Slot1Changed;
+        public event PropertyChangedDelegate<Control>? Slot1Changed;
 
         /// <summary>
         /// Occurs when the <see cref="Slot2"/> control was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Control> Slot2Changed;
+        public event PropertyChangedDelegate<Control>? Slot2Changed;
 
         /// <summary>
         /// Occurs when the <see cref="Slot1MinSize"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int?> Slot1MinSizeChanged;
+        public event PropertyChangedDelegate<int?>? Slot1MinSizeChanged;
 
         /// <summary>
         /// Occurs when the <see cref="Slot1MaxSize"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int?> Slot1MaxSizeChanged;
+        public event PropertyChangedDelegate<int?>? Slot1MaxSizeChanged;
 
         /// <summary>
         /// Occurs when the <see cref="Slot2MinSize"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int?> Slot2MinSizeChanged;
+        public event PropertyChangedDelegate<int?>? Slot2MinSizeChanged;
 
         /// <summary>
         /// Occurs when the <see cref="Slot2MaxSize"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int?> Slot2MaxSizeChanged;
+        public event PropertyChangedDelegate<int?>? Slot2MaxSizeChanged;
 
         /// <summary>
         /// Occurs when the <see cref="SplitterPosition"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int> SplitterPositionChanged;
+        public event PropertyChangedDelegate<int>? SplitterPositionChanged;
 
         /// <summary>
         /// Occurs when the <see cref="SplitterSize"/> property was changed.
         /// </summary>
-        public event PropertyChangedDelegate<int> SplitterSizeChanged;
+        public event PropertyChangedDelegate<int>? SplitterSizeChanged;
     }
 }

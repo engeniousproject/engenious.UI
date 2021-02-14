@@ -23,12 +23,12 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the control which raised the event containing the event data.
         /// </summary>
-        public Control Sender { get; set; }
+        public Control Sender { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets a optional <see cref="Texture2D"/> containing the texture that should be rendered while dragging.
         /// </summary>
-        public Texture2D Icon { get; set; }
+        public Texture2D? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets the size of the <see cref="Icon"/> to show while dragging.
@@ -38,7 +38,7 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the content that is dragged.
         /// </summary>
-        public object Content { get; set; }
+        public object Content { get; set; } = null!;
     }
 
     /// <summary>
@@ -71,12 +71,12 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the old value of the changed property.
         /// </summary>
-        public T OldValue { get; set; }
+        public T? OldValue { get; set; }
 
         /// <summary>
         /// Gets or sets the new value of the changed property.
         /// </summary>
-        public T NewValue { get; set; }
+        public T? NewValue { get; set; }
     }
     
     /// <summary>
@@ -157,12 +157,12 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the previously selected element.
         /// </summary>
-        public T OldItem { get; set; }
+        public T? OldItem { get; set; }
 
         /// <summary>
         /// Gets or sets the newly selected element.
         /// </summary>
-        public T NewItem { get; set; }
+        public T? NewItem { get; set; }
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the control that was affected.
         /// </summary>
-        public Control Control { get; set; }
+        public Control Control { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the index of the element that was affected.
@@ -194,12 +194,12 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the parameter given by the previous screen.
         /// </summary>
-        public object Parameter { get; set; }
+        public object? Parameter { get; set; }
 
         /// <summary>
         /// Gets or sets the secondary <see cref="UI.Controls.Screen"/> that takes part in the navigation.
         /// </summary>
-        public Screen Screen { get; set; }
+        public Screen? Screen { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether it is a navigation backwards.

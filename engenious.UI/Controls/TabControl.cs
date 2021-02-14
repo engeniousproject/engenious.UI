@@ -15,7 +15,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets or sets the content of the <see cref="TabControl"/>.
         /// </summary>
-        private Control Content
+        private Control? Content
         {
             get => Children.FirstOrDefault();
             set
@@ -164,7 +164,17 @@ namespace engenious.UI.Controls
             _tabPage.Background = TabPageBackground;
             tabControlGrid.AddControl(_tabPage, 0, 1);
 
+            _tabBrush = null!;
+            _tabActiveBrush = null!;
+            _tabPageBackground = null!;
+            _tabListBackground = null!;
+
             ApplySkin(typeof(TabControl));
+            
+            CheckStyleInitialized(nameof(TabBrush), TabBrush);
+            CheckStyleInitialized(nameof(TabActiveBrush), TabActiveBrush);
+            CheckStyleInitialized(nameof(TabPageBackground), TabPageBackground);
+            CheckStyleInitialized(nameof(TabListBackground), TabListBackground);
         }
 
         /// <summary>
@@ -246,7 +256,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="SelectedTab"/> changed.
         /// </summary>
-        public event SelectionChangedDelegate SelectedTabChanged;
+        public event SelectionChangedDelegate? SelectedTabChanged;
 
         /// <summary>
         /// Represents the method that will handle the <see cref="TabControl.SelectedTabChanged"/> event of a <see cref="TabControl"/>.

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace engenious.UI.Controls
+﻿namespace engenious.UI.Controls
 {
     /// <summary>
     /// A ui control base class for all container controls.

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using engenious.Input;
+﻿using engenious.Input;
 
 namespace engenious.UI.Controls
 {
@@ -8,9 +7,9 @@ namespace engenious.UI.Controls
     /// </summary>
     public abstract class ListControl<T> : Control, IListControl where T : class
     {
-        private Brush _selectedItemBrush = null;
+        private Brush _selectedItemBrush;
 
-        private T _selectedItem = null;
+        private T? _selectedItem = null;
 
         /// <summary>
         /// Gets a list of all contained elements.
@@ -20,7 +19,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets or sets the currently selected item.
         /// </summary>
-        public T SelectedItem
+        public T? SelectedItem
         {
             get => _selectedItem;
             set
@@ -68,8 +67,9 @@ namespace engenious.UI.Controls
         /// Initializes a new instance of the <see cref="ListControl{T}"/> class.
         /// </summary>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="templateGenerator">The template generator to use for generating shown controls for items.</param>
         /// <param name="style">The style to use for this control.</param>
-        public ListControl(BaseScreenComponent manager, string style = "")
+        public ListControl(BaseScreenComponent manager, GenerateTemplateDelegate<T> templateGenerator, string style = "")
             : base(manager, style)
         {
             CanFocus = true;
@@ -84,8 +84,30 @@ namespace engenious.UI.Controls
                 OnRemove(item, index);
             };
             Items = collection;
+            TemplateGenerator = templateGenerator;
+
+            _selectedItemBrush = null!;
 
             ApplySkin(typeof(ListControl<T>));
+            
+            CheckStyleInitialized(nameof(SelectedItemBrush), SelectedItemBrush);
+        }
+
+        internal static Control? DefaultGenerateControl(BaseScreenComponent component, string style,T? item)
+        {
+            if (item == null) 
+                return null;
+            return new Label(component, style) { Text = item.ToString() ?? string.Empty };
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ListControl{T}"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public ListControl(BaseScreenComponent manager, string style = "")
+            : this(manager, item => DefaultGenerateControl(manager, style, item), style)
+        {
         }
 
         /// <summary>
@@ -192,12 +214,12 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="SelectedItem"/> was changed.
         /// </summary>
-        public event SelectionDelegate<T> SelectedItemChanged;
+        public event SelectionDelegate<T>? SelectedItemChanged;
 
         /// <summary>
         /// Occurs when the <see cref="SelectedItemBrushChanged"/> was changed.
         /// </summary>
-        public event PropertyChangedDelegate<Brush> SelectedItemBrushChanged;
+        public event PropertyChangedDelegate<Brush>? SelectedItemBrushChanged;
 
         /// <summary>
         /// Gets or sets the <see cref="GenerateTemplateDelegate{T}"/> used for generating the container controls for
@@ -211,5 +233,5 @@ namespace engenious.UI.Controls
     /// </summary>
     /// <param name="item">The item to generate the templated <see cref="Control"/> for.</param>
     /// <typeparam name="T">The type of the item to be templated.</typeparam>
-    public delegate Control GenerateTemplateDelegate<in T>(T item);
+    public delegate Control? GenerateTemplateDelegate<in T>(T? item);
 }

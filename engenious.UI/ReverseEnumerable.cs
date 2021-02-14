@@ -10,10 +10,17 @@ namespace engenious.UI
     /// <typeparam name="T">The type of the items in the <see cref="List{T}"/>.</typeparam>
     public class ReverseEnumerable<T> : IEnumerable<T>
     {
+        private readonly List<T> _baseList;
+        
         /// <summary>
-        /// Sets the base <see cref="List{T}"/> to iterate through.
+        /// Initializes a new instance of the <see cref="ReverseEnumerable{T}"/> class.
         /// </summary>
-        public List<T> BaseList { private get; set; }
+        /// <param name="baseList">The list to make reverse iterable.</param>
+        public ReverseEnumerable(List<T> baseList)
+        {
+            _baseList = baseList;
+        }
+
         /// <summary>
         /// The enumerator used to enumerate backwards through a <see cref="List{T}"/>.
         /// </summary>
@@ -22,13 +29,13 @@ namespace engenious.UI
         {
             private readonly List<T> _list;
             private int _index;
-            private T _current;
+            private T? _current;
 
             internal ReverseEnumerator(List<T> list)
             {
                 _list = list;
                 _index = list.Count-1;
-                _current = default(T);
+                _current = default;
             }
 
             /// <inheritdoc />
@@ -59,7 +66,7 @@ namespace engenious.UI
             }
 
             /// <inheritdoc />
-            public T Current => _current;
+            public T Current => _current!;
 
             object IEnumerator.Current
             {
@@ -70,14 +77,14 @@ namespace engenious.UI
                         throw new InvalidOperationException("enumeration operation not possible");
                     }
 
-                    return Current;
+                    return Current!;
                 }
             }
 
             void IEnumerator.Reset()
             {
                 _index = _list.Count - 1;
-                _current = default(T);
+                _current = default;
             }
         }
 
@@ -87,7 +94,7 @@ namespace engenious.UI
         /// <returns>The <see cref="ReverseEnumerator"/>.</returns>
         public ReverseEnumerator GetEnumerator()
         {
-            return new ReverseEnumerator(BaseList);
+            return new ReverseEnumerator(_baseList);
         }
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {

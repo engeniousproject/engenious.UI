@@ -1,9 +1,4 @@
 ﻿using engenious.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace engenious.UI.Controls
 {
@@ -15,12 +10,12 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Gets the label containing the button text.
         /// </summary>
-        public Label Label => (Label)Content;
+        public Label Label => (Label)Content!;
 
         /// <summary>
         /// Gets or sets the font used for rendering the button text.
         /// </summary>
-        public SpriteFont Font
+        public SpriteFont? Font
         {
             get => Label.Font;
             set => Label.Font = value;

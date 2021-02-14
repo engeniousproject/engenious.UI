@@ -64,7 +64,18 @@ namespace engenious.UI.Controls
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
         public Combobox(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+            : this(manager,item => DefaultGenerateControl(manager, style, item), style)
+        {
+            
+        }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Combobox{T}"/> class.
+        /// </summary>
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        /// <param name="templateGenerator">The template generator to use for generating shown controls for items.</param>
+        /// <param name="style">The style to use for this control.</param>
+        public Combobox(BaseScreenComponent manager, GenerateTemplateDelegate<T> templateGenerator, string style = "")
+            : base(manager, templateGenerator, style)
         { 
             _mainControl = new ContentControl(manager)
             {
@@ -99,12 +110,18 @@ namespace engenious.UI.Controls
             Selector.TemplateGenerator = GenerateControl;
             Selector.SelectedItemChanged += Selector_SelectedItemChanged;
 
+            _buttonBrushOpen = null!;
+            _buttonBrushClose = null!;
+
             ApplySkin(typeof(Combobox<T>));
 
             Selector.ParentChanged += (s,e) =>
             {
                 _imageControl.Background = IsOpen ? ButtonBrushClose : ButtonBrushOpen;
             };
+            
+            CheckStyleInitialized(nameof(ButtonBrushOpen), ButtonBrushOpen);
+            CheckStyleInitialized(nameof(ButtonBrushClose), ButtonBrushClose);
         }
 
         private void Selector_SelectedItemChanged(Control sender, SelectionEventArgs<T> args)
@@ -117,7 +134,7 @@ namespace engenious.UI.Controls
             Focus();
         }
 
-        private Control GenerateControl(T item)
+        private Control? GenerateControl(T? item)
         {
             return TemplateGenerator(item);
         }

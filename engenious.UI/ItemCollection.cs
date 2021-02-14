@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 
 namespace engenious.UI
@@ -278,7 +277,7 @@ namespace engenious.UI
                 if (writeOrPostpone.WasPostponed)
                     _postponedActions.Enqueue(new PostponedAction(){Type=PostponedAction.ActionType.Remove, Item =item});
                 else
-                    RemoveInternal(item);
+                    return RemoveInternal(item);
             }
 
             return true;
@@ -324,17 +323,17 @@ namespace engenious.UI
         /// <summary>
         /// Occurs when an item is going to be inserted into the collection.
         /// </summary>
-        public event ItemCollectionDelegate<T> OnInsert;
+        public event ItemCollectionDelegate<T>? OnInsert;
 
         /// <summary>
         /// Occurs when an item was inserted into the collection.
         /// </summary>
-        public event ItemCollectionIndexedDelegate<T> OnInserted;
+        public event ItemCollectionIndexedDelegate<T>? OnInserted;
 
         /// <summary>
         /// Occurs when an item is going to be removed from the collection.
         /// </summary>
-        public event ItemCollectionIndexedDelegate<T> OnRemove;
+        public event ItemCollectionIndexedDelegate<T>? OnRemove;
 
         /// <summary>
         /// A locking enumerator for the <see cref="ItemCollection{T}"/> class.

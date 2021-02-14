@@ -79,6 +79,6 @@ namespace engenious.UI.Controls
         /// a <see cref="Control.KeyPress"/> using <see cref="Keys.Enter"/> or <see cref="Keys.Space"/>,
         /// or a <see cref="Control.TouchTap"/> got executed.
         /// </summary>
-        public event EventDelegate Executed;
+        public event EventDelegate? Executed;
     }
 }

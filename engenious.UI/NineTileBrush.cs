@@ -62,8 +62,17 @@ namespace engenious.UI
         /// <summary>
         /// Initializes a new instance of the <see cref="NineTileBrush"/> class.
         /// </summary>
-        public NineTileBrush()
+        public NineTileBrush(Texture2D centerTexture, Texture2D leftTexture, Texture2D rightTexture, Texture2D topTexture, Texture2D bottomTexture, Texture2D upperLeftTexture, Texture2D upperRightTexture, Texture2D lowerLeftTexture, Texture2D lowerRightTexture)
         {
+            CenterTexture = centerTexture;
+            LeftTexture = leftTexture;
+            RightTexture = rightTexture;
+            TopTexture = topTexture;
+            BottomTexture = bottomTexture;
+            UpperLeftTexture = upperLeftTexture;
+            UpperRightTexture = upperRightTexture;
+            LowerLeftTexture = lowerLeftTexture;
+            LowerRightTexture = lowerRightTexture;
             Color = Color.White;
         }
 
@@ -131,9 +140,6 @@ namespace engenious.UI
             if (2 * cutY >= texture.Height)
                 throw new ArgumentException("cutY is too large.");
 
-            NineTileBrush brush = new NineTileBrush();
-            brush.MinWidth = (cutX * 2) + 1;
-            brush.MinHeight = (cutY * 2) + 1;
 
             #region Corners
 
@@ -141,24 +147,24 @@ namespace engenious.UI
             uint[] buffer1 = new uint[cutX * cutY];
 
             // Upper Left
-            brush.UpperLeftTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
+            var upperLeftTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
             texture.GetData(0, new Rectangle(0, 0, cutX, cutY), buffer1, 0, cutX * cutY);
-            brush.UpperLeftTexture.SetData(buffer1);
+            upperLeftTexture.SetData(buffer1);
 
             // Upper Right
-            brush.UpperRightTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
+            var upperRightTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
             texture.GetData(0, new Rectangle(texture.Width - cutX, 0, cutX, cutY), buffer1, 0, cutX * cutY);
-            brush.UpperRightTexture.SetData(buffer1);
+            upperRightTexture.SetData(buffer1);
 
             // Lower Left
-            brush.LowerLeftTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
+            var lowerLeftTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
             texture.GetData(0, new Rectangle(0, texture.Height - cutY, cutX, cutY), buffer1, 0, cutX * cutY);
-            brush.LowerLeftTexture.SetData(buffer1);
+            lowerLeftTexture.SetData(buffer1);
 
             // Lower Right
-            brush.LowerRightTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
+            var lowerRightTexture = new Texture2D(texture.GraphicsDevice, cutX, cutY);
             texture.GetData(0, new Rectangle(texture.Width - cutX, texture.Height - cutY, cutX, cutY), buffer1, 0, cutX * cutY);
-            brush.LowerRightTexture.SetData(buffer1);
+            lowerRightTexture.SetData(buffer1);
 
             #endregion
 
@@ -169,14 +175,14 @@ namespace engenious.UI
             uint[] buffer2 = new uint[buffer2SizeX * buffer2SizeY];
 
             // Upper Border
-            brush.TopTexture = new Texture2D(texture.GraphicsDevice, buffer2SizeX, buffer2SizeY);
+            var topTexture = new Texture2D(texture.GraphicsDevice, buffer2SizeX, buffer2SizeY);
             texture.GetData(0, new Rectangle(cutX, 0, buffer2SizeX, buffer2SizeY), buffer2, 0, buffer2SizeX * buffer2SizeY);
-            brush.TopTexture.SetData(buffer2);
+            topTexture.SetData(buffer2);
 
             // Lower Border
-            brush.BottomTexture = new Texture2D(texture.GraphicsDevice, buffer2SizeX, buffer2SizeY);
+            var bottomTexture = new Texture2D(texture.GraphicsDevice, buffer2SizeX, buffer2SizeY);
             texture.GetData(0, new Rectangle(cutX, texture.Height - cutY, buffer2SizeX, buffer2SizeY), buffer2, 0, buffer2SizeX * buffer2SizeY);
-            brush.BottomTexture.SetData(buffer2);
+            bottomTexture.SetData(buffer2);
 
             #endregion
 
@@ -187,14 +193,14 @@ namespace engenious.UI
             uint[] buffer3 = new uint[buffer3SizeX * buffer3SizeY];
 
             // Left Border
-            brush.LeftTexture = new Texture2D(texture.GraphicsDevice, buffer3SizeX, buffer3SizeY);
+            var leftTexture = new Texture2D(texture.GraphicsDevice, buffer3SizeX, buffer3SizeY);
             texture.GetData(0, new Rectangle(0, cutY, buffer3SizeX, buffer3SizeY), buffer3, 0, buffer3SizeX * buffer3SizeY);
-            brush.LeftTexture.SetData(buffer3);
+            leftTexture.SetData(buffer3);
 
             // Right Border
-            brush.RightTexture = new Texture2D(texture.GraphicsDevice, buffer3SizeX, buffer3SizeY);
+            var rightTexture = new Texture2D(texture.GraphicsDevice, buffer3SizeX, buffer3SizeY);
             texture.GetData(0, new Rectangle(texture.Width - cutX, cutY, buffer3SizeX, buffer3SizeY), buffer3, 0, buffer3SizeX * buffer3SizeY);
-            brush.RightTexture.SetData(buffer3);
+            rightTexture.SetData(buffer3);
 
             #endregion
 
@@ -205,11 +211,17 @@ namespace engenious.UI
             uint[] buffer4 = new uint[buffer4SizeX * buffer4SizeY];
 
             // Left Border
-            brush.CenterTexture = new Texture2D(texture.GraphicsDevice, buffer4SizeX, buffer4SizeY);
+            var centerTexture = new Texture2D(texture.GraphicsDevice, buffer4SizeX, buffer4SizeY);
             texture.GetData(0, new Rectangle(cutX, cutY, buffer4SizeX, buffer4SizeY), buffer4, 0, buffer4SizeX * buffer4SizeY);
-            brush.CenterTexture.SetData(buffer4);
+            centerTexture.SetData(buffer4);
 
             #endregion
+
+
+            NineTileBrush brush = new NineTileBrush(centerTexture, leftTexture, rightTexture, topTexture, bottomTexture,
+                upperLeftTexture, upperRightTexture, lowerLeftTexture, lowerRightTexture);
+            brush.MinWidth = (cutX * 2) + 1;
+            brush.MinHeight = (cutY * 2) + 1;
 
             return brush;
         }

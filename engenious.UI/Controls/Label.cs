@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Text;
-
 using engenious.Graphics;
 
 namespace engenious.UI.Controls
@@ -34,9 +31,9 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="Text"/> got changed.
         /// </summary>
-        public event PropertyChangedDelegate<string> TextChanged;
+        public event PropertyChangedDelegate<string>? TextChanged;
 
-        private SpriteFont _font = null;
+        private SpriteFont? _font;
 
         private Color _textColor = Color.Black;
         private Color _disabledTextColor = Color.LightGray;
@@ -52,7 +49,7 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         public string Text
         {
-            get => _text ?? string.Empty;
+            get => _text;
             set
             {
                 if (_text == value) return;
@@ -67,7 +64,7 @@ namespace engenious.UI.Controls
         }
 
         /// <inheritdoc />
-        public SpriteFont Font
+        public SpriteFont? Font
         {
             get => _font;
             set
@@ -302,6 +299,7 @@ namespace engenious.UI.Controls
 
         private void WrapWordsAndLines(Point available)
         {
+            if (Font == null) return;
             int iBefore = 0;
             do
             {

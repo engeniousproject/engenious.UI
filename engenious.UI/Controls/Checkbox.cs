@@ -40,7 +40,7 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Occurs when the <see cref="Checked"/> state changed.
         /// </summary>
-        public event CheckedChangedDelegate CheckedChanged;
+        public event CheckedChangedDelegate? CheckedChanged;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Checkbox"/> class.
@@ -51,7 +51,16 @@ namespace engenious.UI.Controls
         {
             CanFocus = true;
             TabStop = true;
+
+            BoxBrush = null!;
+            InnerBoxBrush = null!;
+            HookBrush = null!;
+            
             ApplySkin(typeof(Checkbox));
+
+            CheckStyleInitialized(nameof(BoxBrush), BoxBrush);
+            CheckStyleInitialized(nameof(InnerBoxBrush), InnerBoxBrush);
+            CheckStyleInitialized(nameof(HookBrush), HookBrush);
         }
 
         /// <inheritdoc />
