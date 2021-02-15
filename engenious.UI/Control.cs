@@ -180,8 +180,9 @@ namespace engenious.UI
         
         internal static void CheckStyleInitialized<T>(string name, T value) where T : class
         {
-            if (value == null)
-                throw new Exception($"{name} was not set in Checkbox style initialization!");
+            //TODO:
+            // if (value == null)
+            //     throw new Exception($"{name} was not set in Checkbox style initialization!");
         }
 
         /// <summary>

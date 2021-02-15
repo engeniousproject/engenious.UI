@@ -89,8 +89,6 @@ namespace engenious.UI.Controls
             _selectedItemBrush = null!;
 
             ApplySkin(typeof(ListControl<T>));
-            
-            CheckStyleInitialized(nameof(SelectedItemBrush), SelectedItemBrush);
         }
 
         internal static Control? DefaultGenerateControl(BaseScreenComponent component, string style,T? item)

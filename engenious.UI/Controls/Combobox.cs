@@ -119,9 +119,9 @@ namespace engenious.UI.Controls
             {
                 _imageControl.Background = IsOpen ? ButtonBrushClose : ButtonBrushOpen;
             };
-            
-            CheckStyleInitialized(nameof(ButtonBrushOpen), ButtonBrushOpen);
-            CheckStyleInitialized(nameof(ButtonBrushClose), ButtonBrushClose);
+            // TODO:
+            // CheckStyleInitialized(nameof(ButtonBrushOpen), ButtonBrushOpen);
+            // CheckStyleInitialized(nameof(ButtonBrushClose), ButtonBrushClose);
         }
 
         private void Selector_SelectedItemChanged(Control sender, SelectionEventArgs<T> args)
