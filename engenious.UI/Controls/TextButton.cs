@@ -65,7 +65,11 @@ namespace engenious.UI.Controls
         /// <param name="style">The style to use for this control.</param>
         public TextButton(BaseScreenComponent manager, string text, string style = ""): base(manager, style)
         {
-            Content = new Label(manager) { Text = text };
+            Content = new Label(manager)
+            {
+                Text = text, VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalTextAlignment = HorizontalAlignment.Center, VerticalTextAlignment = VerticalAlignment.Center
+            };
 
             ApplySkin(typeof(TextButton));
         }

@@ -44,6 +44,7 @@ namespace engenious.UI.Controls
 
         private bool _wordWrap = false;
         private bool _lineWrap;
+        private bool _fitText;
         private readonly PropertyEventArgs<string> _textChangedEventArgs = new PropertyEventArgs<string>();
 
         /// <inheritdoc />
@@ -165,7 +166,21 @@ namespace engenious.UI.Controls
                 }
             }
         }
-        
+
+        /// <inheritdoc />
+        public bool FitText
+        {
+            get => _fitText;
+            set
+            {
+                if (_fitText != value)
+                {
+                    _fitText = value;
+                    InvalidateDimensions();
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Label"/> class.
         /// </summary>
@@ -186,6 +201,9 @@ namespace engenious.UI.Controls
 
             Vector2 offset = new Vector2(area.X, area.Y);
 
+            if (string.IsNullOrEmpty(Text))
+                return;
+            
             if (WordWrap || _lineWrap)
             {
                 int totalHeight = 0;
@@ -228,8 +246,41 @@ namespace engenious.UI.Controls
             }
             else
             {
-                if (!string.IsNullOrEmpty(Text))
-                    batch.DrawString(Font, Text, offset, color * alpha);
+                float scale = 1f;
+                Vector2 textSize = Font.MeasureString(Text);
+                if (FitText)
+                {
+                    Vector2 lineScale = new Vector2(area.Width == 0 ? textSize.X : area.Width, area.Height == 0 ? textSize.Y : area.Height) / textSize;
+                    scale = Math.Min(lineScale.X, lineScale.Y);
+                    textSize *= scale;
+                }
+                switch (VerticalTextAlignment)
+                {
+                    case VerticalAlignment.Top:
+                        break;
+                    case VerticalAlignment.Bottom:
+                        offset.Y = area.Y + area.Height - textSize.Y;
+                        break;
+                    case VerticalAlignment.Center:
+                    case VerticalAlignment.Stretch:
+                        offset.Y = area.Y + (area.Height - textSize.Y) / 2;
+                        break;
+                }
+                switch (HorizontalTextAlignment)
+                {
+                    case HorizontalAlignment.Left:
+                        offset.X = area.X;
+                        break;
+                    case HorizontalAlignment.Center:
+                    case HorizontalAlignment.Stretch:
+                        offset.X = area.X + (area.Width - textSize.X) / 2;
+                        break;
+                    case HorizontalAlignment.Right:
+                        offset.X = area.X + area.Width - textSize.X;
+                        break;
+                }
+                
+                batch.DrawString(Font, Text, offset, color * alpha, scale: scale);
             }
         }
 
@@ -242,6 +293,9 @@ namespace engenious.UI.Controls
 
             int width = 0;
             int height = 0;
+            
+            if (FitText)
+                return Point.Zero;
 
             if (WordWrap || _lineWrap)
             {
@@ -268,6 +322,9 @@ namespace engenious.UI.Controls
 
         private void AnalyzeText(Point available)
         {
+            if (FitText)
+                return;
+            
             _lines.Clear();
             if (Font == null) return;
 

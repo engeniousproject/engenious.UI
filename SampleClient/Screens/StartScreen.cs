@@ -24,6 +24,9 @@ namespace SampleClient.Screens
             // Button zur Mouse Capture Demo
             Button capturedMouseButton = new TextButton(manager, "Captured Mouse", "special");
             capturedMouseButton.LeftMouseClick += (s, e) => manager.NavigateToScreen(new MouseCaptureScreen(manager));
+            ((TextButton) capturedMouseButton).Label.FitText = true;
+            capturedMouseButton.MinHeight = 100;
+            capturedMouseButton.MinWidth = 300;
             stack.Controls.Add(capturedMouseButton);
 
             Button tabDemoScreen = new TextButton(manager, "Tab Demo", "special");

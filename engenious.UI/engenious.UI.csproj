@@ -35,7 +35,7 @@
 	<ItemGroup>
         <None Remove="engenious.UI.nuget.props.template" />
         <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
-        <PackageReference Include="LiCo" Version="0.1.8-alpha" />
+        <PackageReference Include="LiCo" Version="0.1.10-alpha" PrivateAssets="all" />
         <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 

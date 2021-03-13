@@ -81,6 +81,9 @@ namespace engenious.UI.Controls
         /// <inheritdoc />
         public bool LineWrap { get => _label.LineWrap; set => _label.LineWrap = value; }
 
+        /// <inheritdoc />
+        public bool FitText { get => _label.FitText; set => _label.FitText = value; }
+
         /// <summary>
         /// Occurs when the <see cref="Text"/> was changed.
         /// </summary>

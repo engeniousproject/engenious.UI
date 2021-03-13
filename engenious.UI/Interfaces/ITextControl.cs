@@ -42,5 +42,10 @@ namespace engenious.UI.Controls
         /// Gets or sets a value indicating whether the <see cref="Text"/> should be wrapped at new line escape characters.
         /// </summary>
         bool LineWrap { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="Text"/> should be resized to fit the available space.
+        /// </summary>
+        bool FitText { get; set; }
     }
 }
