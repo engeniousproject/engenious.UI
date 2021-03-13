@@ -255,7 +255,7 @@ namespace engenious.UI.Controls
             {
                 if (string.IsNullOrEmpty(Text))
                 {
-                    return new Point(0, Font.LineSpacing);
+                    return new Point(0, (int)Math.Ceiling(Font.LineSpacing));
                 }
 
                 Vector2 lineSize = Font.MeasureString(Text);

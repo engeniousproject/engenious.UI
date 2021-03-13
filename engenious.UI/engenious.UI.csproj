@@ -24,6 +24,9 @@
             <PackagePath>licenses</PackagePath>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <EmbeddedResource Include="Fonts\BoldFont.ego" />
+        <EmbeddedResource Include="Fonts\GameFont.ego" />
+        <EmbeddedResource Include="Fonts\HeadlineFont.ego" />
     </ItemGroup>
     <PropertyGroup>
 	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
@@ -32,11 +35,11 @@
 	<ItemGroup>
         <None Remove="engenious.UI.nuget.props.template" />
         <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
-        <PackageReference Include="LiCo" Version="0.1.7-alpha" />
+        <PackageReference Include="LiCo" Version="0.1.8-alpha" />
         <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-        <PackageReference Include="engenious" Version="0.5.0.42-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+        <PackageReference Include="engenious" Version="0.5.1.1-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
         <PackageReference Include="LitGit" Version="0.2.0.18-alpha" PrivateAssets="all" />
         <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
             <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
@@ -44,11 +47,8 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Fonts\HeadlineFont.ego" />
-	  <EmbeddedResource Include="Fonts\HeadlineFont.ego" />
 	  <None Remove="Fonts\GameFont.ego" />
-	  <EmbeddedResource Include="Fonts\GameFont.ego" />
 	  <None Remove="Fonts\BoldFont.ego" />
-	  <EmbeddedResource Include="Fonts\BoldFont.ego" />
 	</ItemGroup>
 	<Import Project="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')" />
 <!--        -->
