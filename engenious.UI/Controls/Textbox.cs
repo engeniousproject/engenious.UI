@@ -155,7 +155,7 @@ namespace engenious.UI.Controls
                 if (_cursorBlinkTime % 1000 < 500)
                 {
                     var selectionSize = Font.MeasureString(Text.Substring(0, CursorPosition));
-                    batch.Draw(Skin.Pix, new Rectangle(area.X + (int)selectionSize.X - _scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
+                    batch.Draw(Skin.Pix, new RectangleF(area.X + (int)selectionSize.X - _scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
                 }
                 _cursorBlinkTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
             }
