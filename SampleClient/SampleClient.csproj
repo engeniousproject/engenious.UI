@@ -9,6 +9,7 @@
         <Description>UI Framework for engenious</Description>
         <ApplicationIcon />
         <OutputType>WinExe</OutputType>
+        <IsPackable>false</IsPackable>
         <StartupObject />
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

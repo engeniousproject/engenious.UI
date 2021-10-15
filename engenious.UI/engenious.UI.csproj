@@ -2,7 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
@@ -11,19 +10,16 @@
         <PackageLicenseFile>licenses\LICENSE</PackageLicenseFile>
         <PackageProjectUrl>https://github.com/engeniousproject/engenious.UI</PackageProjectUrl>
         <RepositoryUrl>https://github.com/engeniousproject/engenious.UI</RepositoryUrl>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <Copyright>engeniousproject 2019</Copyright>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
-    <PropertyGroup>
+
+        <LiCoOutput>NOTICE</LiCoOutput>
+        <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="..\LICENSE">
-            <Pack>True</Pack>
-            <PackagePath>licenses</PackagePath>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
+        <None Include="..\LICENSE" Pack="true" PackagePath="" />
         <EmbeddedResource Include="Fonts\BoldFont.ego" />
         <EmbeddedResource Include="Fonts\GameFont.ego" />
         <EmbeddedResource Include="Fonts\HeadlineFont.ego" />
@@ -31,25 +27,17 @@
     <PropertyGroup>
 	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
     </PropertyGroup>
-	<!-- LitGit -->
 	<ItemGroup>
-        <None Remove="engenious.UI.nuget.props.template" />
-        <LitGitTemplateReference Include="engenious.UI.nuget.props.template" />
-        <PackageReference Include="LiCo" Version="0.1.10-alpha" PrivateAssets="all" />
+        <PackageReference Include="LiCo" Version="0.1.11.9-alpha" PrivateAssets="all" />
         <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-        <PackageReference Include="engenious" Version="0.5.1.1-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
-        <PackageReference Include="LitGit" Version="0.2.0.18-alpha" PrivateAssets="all" />
-        <None Update="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')">
-            <DependentUpon>engenious.UI.nuget.props.template</DependentUpon>
-        </None>
+        <PackageReference Include="engenious" Version="0.6.0.4-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+        <PackageReference Include="LitGit" Version="0.2.0.52-alpha" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Fonts\HeadlineFont.ego" />
 	  <None Remove="Fonts\GameFont.ego" />
 	  <None Remove="Fonts\BoldFont.ego" />
 	</ItemGroup>
-	<Import Project="engenious.UI.nuget.props" Condition="Exists('engenious.UI.nuget.props')" />
-<!--        -->
 </Project>

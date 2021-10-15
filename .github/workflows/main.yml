@@ -5,6 +5,10 @@ on:
     branches:
       - master
       - develop
+  pull_request:
+    branches:
+      - master
+      - develop
 jobs:
   build:
     env:
@@ -40,4 +44,4 @@ jobs:
     - name: Deploy Nuget Package
       run: dotnet nuget push ./artifacts/*.nupkg -k $NUGET_API_KEY -s https://api.nuget.org/v3/index.json
       shell: bash
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-latest' && github.event_name == 'push'
