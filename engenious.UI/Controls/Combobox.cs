@@ -61,23 +61,23 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Combobox{T}"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Combobox(BaseScreenComponent manager, string style = "")
-            : this(manager,item => DefaultGenerateControl(manager, style, item), style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Combobox(string style = "", BaseScreenComponent? manager = null)
+            : this(item => DefaultGenerateControl(manager, style, item), style, manager)
         {
             
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="Combobox{T}"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="templateGenerator">The template generator to use for generating shown controls for items.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Combobox(BaseScreenComponent manager, GenerateTemplateDelegate<T> templateGenerator, string style = "")
-            : base(manager, templateGenerator, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Combobox(GenerateTemplateDelegate<T> templateGenerator, string style = "", BaseScreenComponent? manager = null)
+            : base(templateGenerator, style, manager)
         { 
-            _mainControl = new ContentControl(manager)
+            _mainControl = new ContentControl(manager: manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
@@ -85,7 +85,7 @@ namespace engenious.UI.Controls
                 Padding = Border.All(0)
             };
 
-            var grid = new Grid(manager)
+            var grid = new Grid(manager: manager)
             {
                 //HorizontalAlignment = HorizontalAlignment.Stretch,
                 //VerticalAlignment = VerticalAlignment.Stretch,
@@ -96,14 +96,14 @@ namespace engenious.UI.Controls
             Children.Add(grid);
 
             grid.AddControl(_mainControl, 0, 0);
-            _imageControl = new Image(manager)
+            _imageControl = new Image(manager: manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
             grid.AddControl(_imageControl, 1, 0);
 
-            Selector = new Listbox<T>(manager);
+            Selector = new Listbox<T>(manager: manager);
             Selector.HorizontalAlignment = HorizontalAlignment.Left;
             Selector.VerticalAlignment = VerticalAlignment.Top;
             Selector.MaxHeight = 100;

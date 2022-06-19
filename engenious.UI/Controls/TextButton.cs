@@ -38,7 +38,7 @@ namespace engenious.UI.Controls
             get => Label.HorizontalTextAlignment;
             set => Label.HorizontalTextAlignment = value;
         }
-        
+
         /// <summary>
         /// Gets or sets the <see cref="VerticalAlignment"/> of the text.
         /// </summary>
@@ -60,15 +60,18 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="TextButton"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="text">The text of this button.</param>
         /// <param name="style">The style to use for this control.</param>
-        public TextButton(BaseScreenComponent manager, string text, string style = ""): base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public TextButton(string text, string style = "", BaseScreenComponent? manager = null) : base(style, manager)
         {
-            Content = new Label(manager)
+            Content = new Label(manager: manager)
             {
-                Text = text, VerticalAlignment = VerticalAlignment.Stretch, HorizontalAlignment = HorizontalAlignment.Stretch,
-                HorizontalTextAlignment = HorizontalAlignment.Center, VerticalTextAlignment = VerticalAlignment.Center
+                Text = text,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                HorizontalTextAlignment = HorizontalAlignment.Center,
+                VerticalTextAlignment = VerticalAlignment.Center
             };
 
             ApplySkin(typeof(TextButton));

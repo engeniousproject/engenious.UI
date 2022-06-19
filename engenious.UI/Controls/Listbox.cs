@@ -69,19 +69,19 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Listbox{T}"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Listbox(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Listbox(string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
-            ScrollContainer = new ScrollContainer(manager)
+            ScrollContainer = new ScrollContainer(manager: manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
             Children.Add(ScrollContainer);
 
-            StackPanel = new StackPanel(manager);
+            StackPanel = new StackPanel(manager: manager);
             Orientation = Orientation.Vertical;
             ScrollContainer.Content = StackPanel;
 
@@ -94,7 +94,7 @@ namespace engenious.UI.Controls
         protected override void OnInsert(T item, int index)
         {
             Control? control = TemplateGenerator(item);
-            ContentControl wrapper = new ContentControl(ScreenManager)
+            ContentControl wrapper = new ContentControl(manager: ScreenManager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 Content = control

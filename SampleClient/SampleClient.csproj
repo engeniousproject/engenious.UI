@@ -24,7 +24,7 @@
       <None Remove="Content\obj\**" />
     </ItemGroup>
     <ItemGroup>
-<!--      <PackageReference Include="engenious.ContentTool" Version="0.5.0.27-alpha" />-->
+      <PackageReference Include="engenious.ContentTool" Version="0.6.1.11-alpha" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\engenious.UI\engenious.UI.csproj" />

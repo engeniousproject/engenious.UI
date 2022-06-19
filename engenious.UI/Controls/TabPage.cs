@@ -13,10 +13,10 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="title">The title for this page.</param>
         /// <param name="style">The style to use for this control.</param>
-        public TabPage(BaseScreenComponent manager, string title, string style = "") : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public TabPage(string title, string style = "", BaseScreenComponent? manager = null) : base(style, manager)
         {
             Title = title;
         }

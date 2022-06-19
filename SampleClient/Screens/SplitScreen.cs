@@ -13,11 +13,11 @@ namespace SampleClient.Screens
     {
         private Textbox textbox;
 
-        public SplitScreen(BaseScreenComponent manager) : base(manager)
+        public SplitScreen(BaseScreenComponent manager) : base(manager: manager)
         {
             Background = new BorderBrush(Color.Gray);                       //Hintergrundfarbe festlegen
 
-            Button backButton = new TextButton(manager, "Back") //Neuen TextButton erzeugen
+            Button backButton = new TextButton("Back") //Neuen TextButton erzeugen
             {
                 HorizontalAlignment = HorizontalAlignment.Left,          //Links
                 VerticalAlignment = VerticalAlignment.Top               //Oben
@@ -28,7 +28,7 @@ namespace SampleClient.Screens
 
 
             //ScrollContainer
-            ScrollContainer scrollContainer = new ScrollContainer(manager)  //Neuen ScrollContainer erzeugen
+            ScrollContainer scrollContainer = new ScrollContainer()  //Neuen ScrollContainer erzeugen
             {
                 VerticalAlignment = VerticalAlignment.Stretch,              // 100% Höhe
                 HorizontalAlignment = HorizontalAlignment.Stretch           //100% Breite
@@ -38,21 +38,21 @@ namespace SampleClient.Screens
 
 
             //Stackpanel - SubControls werden Horizontal oder Vertikal gestackt
-            StackPanel panel = new StackPanel(manager);                 //Neues Stackpanel erzeugen
+            StackPanel panel = new StackPanel();                 //Neues Stackpanel erzeugen
             panel.VerticalAlignment = VerticalAlignment.Stretch;        //100% Höhe
             scrollContainer.Content = panel;                            //Ein Scroll Container kann nur ein Control beherbergen
             panel.ControlSpacing = 20;
 
             //Label
-            Label label = new Label(manager) { Text = "Control Showcase" }; //Neues Label erzeugen
+            Label label = new Label() { Text = "Control Showcase" }; //Neues Label erzeugen
             panel.Controls.Add(label);                                      //Label zu Panel hinzufügen
 
             //Button
-            Button button = new TextButton(manager, "Dummy Button"); //Neuen TextButton erzeugen
+            Button button = new TextButton("Dummy Button"); //Neuen TextButton erzeugen
             panel.Controls.Add(button);                                 //Button zu Panel hinzufügen
 
             //Progressbar
-            ProgressBar pr = new ProgressBar(manager)                   //Neue ProgressBar erzeugen
+            ProgressBar pr = new ProgressBar()                   //Neue ProgressBar erzeugen
             {
                 Value = 80,                                            //Aktueller Wert
                 Height = 20,                                            //Höhe
@@ -61,7 +61,7 @@ namespace SampleClient.Screens
             panel.Controls.Add(pr);                                     //ProgressBar zu Panel hinzufügen
                         
             //ListBox
-            Listbox<string> list = new Listbox<string>(manager)
+            Listbox<string> list = new Listbox<string>()
             {
                 MaxHeight = 100,
                 HorizontalAlignment = HorizontalAlignment.Stretch
@@ -70,7 +70,7 @@ namespace SampleClient.Screens
             {
                 if (item == null)
                     return null;
-                return new Label(manager) { Text = item, Padding = new Border(15,5,15,5), HorizontalAlignment = HorizontalAlignment.Stretch };              //Control (Label) erstellen
+                return new Label() { Text = item, Padding = new Border(15,5,15,5), HorizontalAlignment = HorizontalAlignment.Stretch };              //Control (Label) erstellen
             };
             panel.Controls.Add(list);                                   //Liste zu Panel hinzufügen
 
@@ -83,11 +83,11 @@ namespace SampleClient.Screens
             list.Items.Add("Item 7");                                     //...
 
             //Combobox
-            Combobox<string> combobox = new Combobox<string>(manager)   //Neue Combobox erstellen
+            Combobox<string> combobox = new Combobox<string>()   //Neue Combobox erstellen
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,       //Breite
-                ButtonBrushOpen = new TextureBrush(Manager.Content.Load<Texture2D>("arrow_down"), TextureBrushMode.Stretch),
-                ButtonBrushClose = new TextureBrush(Manager.Content.Load<Texture2D>("arrow_up"), TextureBrushMode.Stretch),
+                ButtonBrushOpen = new TextureBrush(manager.Content.Load<Texture2D>("arrow_down"), TextureBrushMode.Stretch),
+                ButtonBrushClose = new TextureBrush(manager.Content.Load<Texture2D>("arrow_up"), TextureBrushMode.Stretch),
             };
 
             panel.Controls.Add(combobox);                               //Combobox zu Panel  hinzufügen
@@ -101,10 +101,10 @@ namespace SampleClient.Screens
             combobox.Items.Add("Item 7");                                     //...
 
             //Slider Value Label
-             Label labelSliderHorizontal = new Label(manager);
+             Label labelSliderHorizontal = new Label();
 
              //Horizontaler Slider
-             Slider sliderHorizontal = new Slider(manager)
+             Slider sliderHorizontal = new Slider()
              {
                  Width = 150,
                  Height = 20,
@@ -116,10 +116,10 @@ namespace SampleClient.Screens
              panel.Controls.Add(labelSliderHorizontal);
 
              //Slider Value Label
-             Label labelSliderVertical = new Label(manager);
+             Label labelSliderVertical = new Label();
 
              //Vertikaler Slider
-             Slider sliderVertical = new Slider(manager)
+             Slider sliderVertical = new Slider()
              {
                  Range = 100,
                  Height = 200,
@@ -134,19 +134,19 @@ namespace SampleClient.Screens
              labelSliderVertical.Text = "Value: " + sliderVertical.Value;
              panel.Controls.Add(labelSliderVertical);
 
-             Checkbox checkbox = new Checkbox(manager);
+             Checkbox checkbox = new Checkbox();
              panel.Controls.Add(checkbox);
 
 
              //Textbox   
-             textbox = new Textbox(manager)                      //Neue TextBox erzeugen
+             textbox = new Textbox()                      //Neue TextBox erzeugen
              {
                  HorizontalAlignment = HorizontalAlignment.Stretch,          //100% Breite,
                  MaxWidth = 200,
                  Text = "TEXTBOX!",                                      //Voreingestellter text
              };
 
-             Button clearTextbox = new TextButton(manager, "Clear Textbox");
+             Button clearTextbox = new TextButton("Clear Textbox");
              clearTextbox.LeftMouseClick += (s, e) =>
              {
                  textbox.SelectionStart = 0;
@@ -155,7 +155,7 @@ namespace SampleClient.Screens
              panel.Controls.Add(clearTextbox);
              panel.Controls.Add(textbox);                                //Textbox zu Panel hinzufügen
 
-            var but = new TextButton(manager, "Hello World");
+            var but = new TextButton("Hello World");
             but.LeftMouseClick += (e, a) =>
             {
                 var t = new Thread(() => {

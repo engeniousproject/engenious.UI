@@ -96,12 +96,12 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Textbox"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Textbox(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Textbox(string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
-            _label = new Label(manager, style)
+            _label = new Label(style, manager)
             {
                 HorizontalTextAlignment = HorizontalAlignment.Left,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -110,7 +110,7 @@ namespace engenious.UI.Controls
                 DrawFocusFrame = false
             };
 
-            _scrollContainer = new ScrollContainer(manager)
+            _scrollContainer = new ScrollContainer(manager: manager)
             {
                 HorizontalScrollbarVisibility = ScrollbarVisibility.Never,
                 VerticalScrollbarVisibility = ScrollbarVisibility.Never,

@@ -26,6 +26,7 @@ namespace SampleClient
         {
             ScreenComponent screenComponent = new ScreenComponent(this);
             Components.Add(screenComponent);
+            engenious.UI.Control.SetScreenManager(screenComponent);
 
             screenComponent.KeyDown += (args) =>
             {

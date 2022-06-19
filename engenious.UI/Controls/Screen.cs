@@ -10,13 +10,8 @@
         private bool _isActiveScreen = false;
 
         /// <summary>
-        /// Gets the current <see cref="BaseScreenComponent"/>.
-        /// </summary>
-        public BaseScreenComponent Manager { get; }
-
-        /// <summary>
         /// Gets the title of this screen.
-        /// <remarks>The <see cref="Manager"/> uses this <see cref="Title"/> as the window title.</remarks>
+        /// <remarks>The <see cref="Control.ScreenManager"/> uses this <see cref="Title"/> as the window title.</remarks>
         /// </summary>
         public string Title { get; protected set; }
 
@@ -86,13 +81,12 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="Image"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Screen(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Screen(string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
             Title = string.Empty;
-            Manager = manager;
             IsOverlay = false;
             InHistory = true;
             IsVisibleScreen = false;

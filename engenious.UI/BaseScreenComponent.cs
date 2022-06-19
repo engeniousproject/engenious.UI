@@ -189,20 +189,20 @@ namespace engenious.UI
             Skin.Current = new Skin(Content);
             _batch = new SpriteBatch(GraphicsDevice);
 
-            _root = new ContainerControl(this)
+            _root = new ContainerControl(manager: this)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
 
-            Frame = new ContentControl(this)
+            Frame = new ContentControl(manager: this)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
             };
             _root.Controls.Add(Frame);
 
-            ContainerControl screenContainer = new ContainerControl(this)
+            ContainerControl screenContainer = new ContainerControl(manager: this)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
@@ -210,7 +210,7 @@ namespace engenious.UI
             Frame.Content = screenContainer;
             ScreenTarget = screenContainer;
 
-            _flyout = new FlyoutControl(this)
+            _flyout = new FlyoutControl(manager: this)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch

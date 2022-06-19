@@ -10,17 +10,17 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Button"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Button(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Button(string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
             TabStop = true;
             CanFocus = true;
 
             ApplySkin(typeof(Button));
         }
-        
+
         /// <inheritdoc />
         protected override void OnKeyPress(KeyEventArgs args)
         {

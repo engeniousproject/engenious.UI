@@ -8,9 +8,9 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="FlyoutControl"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        internal FlyoutControl(BaseScreenComponent manager, string style = "") : base(manager, style) {
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        internal FlyoutControl(string style = "", BaseScreenComponent? manager = null) : base(style, manager) {
             ApplySkin(typeof(FlyoutControl));
         }
 

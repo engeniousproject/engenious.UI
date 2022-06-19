@@ -11,22 +11,22 @@ namespace SampleClient.Screens
 
         private Label output;
 
-        public MouseCaptureScreen(BaseScreenComponent manager) : base(manager)
+        public MouseCaptureScreen(BaseScreenComponent manager) : base(manager: manager)
         {
             DefaultMouseMode = MouseMode.Captured;
 
             Background = new BorderBrush(Color.Green);
 
-            StackPanel stack = new StackPanel(manager);
+            StackPanel stack = new StackPanel();
             Controls.Add(stack);
 
-            Label title = new Label(manager)
+            Label title = new Label()
             {
                 TextColor = Color.White,
                 Text = "Press ESC to return to Main Screen",
             };
 
-            output = new Label(manager)
+            output = new Label()
             {
                 TextColor = Color.White,
                 Text = position.ToString(),
@@ -41,7 +41,7 @@ namespace SampleClient.Screens
             if (args.Key == Keys.Escape)
             {
                 args.Handled = true;
-                Manager.NavigateBack();
+                ScreenManager.NavigateBack();
             }
 
             base.OnKeyPress(args);
