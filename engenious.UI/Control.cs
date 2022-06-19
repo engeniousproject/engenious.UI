@@ -13,13 +13,13 @@ namespace engenious.UI
     /// </summary>
     public abstract class Control : IControl
     {
+        private static BaseScreenComponent? _screenManager = null;
         /// <summary>
         /// Set the screen manager once instead of setting 
         /// it in every controls constructor.
         /// Will not set screen manager of existing control instances.
         /// </summary>
-        public static void SetScreenManager(BaseScreenComponent? screenManager) => Control.screenManager = screenManager;
-        private static BaseScreenComponent? screenManager = null;
+        public static void SetScreenManager(BaseScreenComponent? screenManager) => _screenManager = screenManager;
 
         private bool _invalidDrawing;
 
@@ -169,7 +169,7 @@ namespace engenious.UI
         public Control(string style = "", BaseScreenComponent? manager = null)
         {
             Style = style;
-            ScreenManager = manager ?? screenManager ?? throw new ArgumentNullException(nameof(manager));
+            ScreenManager = manager ?? _screenManager ?? throw new ArgumentNullException(nameof(manager));
 
             _children = new ControlCollection(this);
             _children.OnInserted += ControlCollectionInsert;
