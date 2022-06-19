@@ -13,6 +13,14 @@ namespace engenious.UI
     /// </summary>
     public abstract class Control : IControl
     {
+        /// <summary>
+        /// Set the screen manager once instead of setting 
+        /// it in every controls constructor.
+        /// Will not set screen manager of existing control instances.
+        /// </summary>
+        public static void SetScreenManager(BaseScreenComponent? screenManager) => Control.screenManager = screenManager;
+        private static BaseScreenComponent? screenManager = null;
+
         private bool _invalidDrawing;
 
         private Brush _background = null!;
@@ -156,12 +164,12 @@ namespace engenious.UI
         /// <summary>
         /// Initializes a new instance of the <see cref="Control"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Control(BaseScreenComponent manager, string style = "")
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Control(string style = "", BaseScreenComponent? manager = null)
         {
-            ScreenManager = manager ?? throw new ArgumentNullException(nameof(manager));
             Style = style;
+            ScreenManager = manager ?? screenManager ?? throw new ArgumentNullException(nameof(manager));
 
             _children = new ControlCollection(this);
             _children.OnInserted += ControlCollectionInsert;
@@ -169,7 +177,7 @@ namespace engenious.UI
             _rootPathTemp = new List<Control>();
             _rootPath = new ReverseEnumerable<Control>(_rootPathTemp);
 
-            manager.ClientSizeChanged += (s, e) =>
+            ScreenManager.ClientSizeChanged += (s, e) =>
             {
                 OnResolutionChanged();
             };

@@ -28,11 +28,11 @@
 	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
     </PropertyGroup>
 	<ItemGroup>
-        <PackageReference Include="LiCo" Version="0.1.11.10-alpha" PrivateAssets="all" />
+        <PackageReference Include="LiCo" Version="0.1.11.13-alpha" PrivateAssets="all" />
         <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-        <PackageReference Include="engenious" Version="0.6.0.4-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+	    <PackageReference Include="engenious" Version="0.6.1.10-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
         <PackageReference Include="LitGit" Version="0.2.0.55-alpha" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>

@@ -111,10 +111,10 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ProgressBar"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public ProgressBar(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public ProgressBar(string style = "", BaseScreenComponent? manager= null)
+            : base(style, manager)
         {
             ApplySkin(typeof(ProgressBar));
         }

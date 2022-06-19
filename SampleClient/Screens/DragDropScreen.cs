@@ -14,9 +14,9 @@ namespace SampleClient.Screens
 
         private Texture2D dragIcon;
 
-        public DragDropScreen(BaseScreenComponent manager) : base(manager)
+        public DragDropScreen(BaseScreenComponent manager) : base(manager: manager)
         {
-            Button backButton = new TextButton(manager, "Back")
+            Button backButton = new TextButton("Back")
             {
                 HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Top
@@ -26,7 +26,7 @@ namespace SampleClient.Screens
 
             dragIcon = manager.Content.Load<Texture2D>("drag");
 
-            Grid grid = new Grid(manager)
+            Grid grid = new Grid()
             {
                 Width = 600,
                 Height = 400,
@@ -40,13 +40,13 @@ namespace SampleClient.Screens
             grid.Columns.Add(new ColumnDefinition() { ResizeMode = ResizeMode.Parts, Width = 1 });
             grid.Rows.Add(new RowDefinition() { ResizeMode = ResizeMode.Parts, Height = 1 });
 
-            StackPanel buttons = new StackPanel(manager)
+            StackPanel buttons = new StackPanel()
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
             };
 
-            Button button1 = new TextButton(manager, "Button 1");
+            Button button1 = new TextButton("Button 1");
             button1.StartDrag += (sender, args) =>
             {
                 args.Handled = true;
@@ -55,8 +55,8 @@ namespace SampleClient.Screens
                 args.Icon = dragIcon;
                 args.IconSize = new Point(16, 16);
             };
-            Button button2 = new TextButton(manager, "Button 2");
-            Button button3 = new TextButton(manager, "Button 3");
+            Button button2 = new TextButton("Button 2");
+            Button button3 = new TextButton("Button 3");
             button3.StartDrag += (sender, args) =>
             {
                 args.Handled = true;
@@ -64,7 +64,7 @@ namespace SampleClient.Screens
                 args.Sender = button3;
                 args.Icon = dragIcon;
             };
-            Button button4 = new TextButton(manager, "Button 4");
+            Button button4 = new TextButton("Button 4");
             buttons.Controls.Add(button1);
             buttons.Controls.Add(button2);
             buttons.Controls.Add(button3);
@@ -72,14 +72,14 @@ namespace SampleClient.Screens
 
             grid.AddControl(buttons, 0, 0);
 
-            Panel panel = new Panel(manager)
+            Panel panel = new Panel()
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch,
                 Background = defaultBrush
             };
 
-            Label output = new Label(manager)
+            Label output = new Label()
             {
                 HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center,

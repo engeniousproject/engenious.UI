@@ -235,13 +235,13 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ScrollContainer"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public ScrollContainer(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public ScrollContainer(string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
 
-            _horizontalScrollbar = new Slider(manager)
+            _horizontalScrollbar = new Slider()
             {
                 VerticalAlignment = VerticalAlignment.Bottom,
                 HorizontalAlignment = HorizontalAlignment.Stretch,
@@ -252,7 +252,7 @@ namespace engenious.UI.Controls
                 HorizontalScrollPosition = val;
             };
 
-            _verticalScrollbar = new Slider(manager)
+            _verticalScrollbar = new Slider()
             {
                 VerticalAlignment = VerticalAlignment.Stretch,
                 HorizontalAlignment = HorizontalAlignment.Right,

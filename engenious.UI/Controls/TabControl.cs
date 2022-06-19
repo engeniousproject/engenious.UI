@@ -133,15 +133,15 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="TabControl"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public TabControl(BaseScreenComponent manager, string style = "") : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public TabControl(string style = "", BaseScreenComponent? manager = null) : base(style, manager)
         {
             Pages = new ItemCollection<TabPage>();
             Pages.OnInserted += OnInserted;
             Pages.OnRemove += OnRemove;
 
-            var tabControlGrid = new Grid(manager)
+            var tabControlGrid = new Grid(manager: manager)
             {
                 HorizontalAlignment = HorizontalAlignment.Stretch,
                 VerticalAlignment = VerticalAlignment.Stretch
@@ -152,13 +152,13 @@ namespace engenious.UI.Controls
             Content = tabControlGrid;
 
 
-            _tabListStack = new StackPanel(manager);
+            _tabListStack = new StackPanel(manager: manager);
             _tabListStack.HorizontalAlignment = HorizontalAlignment.Stretch;
             _tabListStack.Orientation = Orientation.Horizontal;
             _tabListStack.Background = TabListBackground;
             tabControlGrid.AddControl(_tabListStack, 0, 0);
 
-            _tabPage = new ContentControl(manager);
+            _tabPage = new ContentControl(manager: manager);
             _tabPage.HorizontalAlignment = HorizontalAlignment.Stretch;
             _tabPage.VerticalAlignment = VerticalAlignment.Stretch;
             _tabPage.Background = TabPageBackground;
@@ -182,7 +182,7 @@ namespace engenious.UI.Controls
         /// </summary>
         private void OnInserted(TabPage item, int index)
         {
-            Label title = new Label(ScreenManager);
+            Label title = new Label(manager: ScreenManager);
             title.Text = item.Title;
             title.Padding = Border.All(10);
             title.Background = TabBrush;

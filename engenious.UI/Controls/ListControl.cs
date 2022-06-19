@@ -66,11 +66,11 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="ListControl{T}"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="templateGenerator">The template generator to use for generating shown controls for items.</param>
         /// <param name="style">The style to use for this control.</param>
-        public ListControl(BaseScreenComponent manager, GenerateTemplateDelegate<T> templateGenerator, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public ListControl(GenerateTemplateDelegate<T> templateGenerator, string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
             CanFocus = true;
             TabStop = true;
@@ -91,20 +91,20 @@ namespace engenious.UI.Controls
             ApplySkin(typeof(ListControl<T>));
         }
 
-        internal static Control? DefaultGenerateControl(BaseScreenComponent component, string style,T? item)
+        internal static Control? DefaultGenerateControl(BaseScreenComponent? component, string style,T? item)
         {
             if (item == null) 
                 return null;
-            return new Label(component, style) { Text = item.ToString() ?? string.Empty };
+            return new Label(style, component) { Text = item.ToString() ?? string.Empty };
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ListControl{T}"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public ListControl(BaseScreenComponent manager, string style = "")
-            : this(manager, item => DefaultGenerateControl(manager, style, item), style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public ListControl(string style = "", BaseScreenComponent? manager = null)
+            : this(item => DefaultGenerateControl(manager, style, item), style, manager)
         {
         }
 

@@ -316,10 +316,10 @@ namespace engenious.UI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Splitter"/> class.
         /// </summary>
-        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         /// <param name="style">The style to use for this control.</param>
-        public Splitter(BaseScreenComponent manager, string style = "")
-            : base(manager, style)
+        /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
+        public Splitter(string style = "", BaseScreenComponent? manager = null)
+            : base(style, manager)
         {
             CanFocus = true;
             TabStop = true;
