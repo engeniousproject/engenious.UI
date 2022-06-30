@@ -375,11 +375,6 @@ namespace engenious.UI.Controls
             base.OnKeyPress(args);
         }
 
-        internal static int GetKerningKey(char first, char second)
-        {
-            return first << 16 | second;
-        }
-
         private int FindClosestPosition(Point pt)
         {
             if (Font == null) return -1;

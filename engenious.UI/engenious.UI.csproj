@@ -32,7 +32,7 @@
         <PackageReference Include="TextCopy" Version="4.2.1" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-	    <PackageReference Include="engenious" Version="0.6.1.10-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+	    <PackageReference Include="engenious" Version="0.6.2-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
         <PackageReference Include="LitGit" Version="0.2.0.55-alpha" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>

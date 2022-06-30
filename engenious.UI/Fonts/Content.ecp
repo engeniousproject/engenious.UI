@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Content>
+  <Name>Fonts</Name>
+  <Configuration>Release</Configuration>
+  <OutputDir>bin/{Configuration}</OutputDir>
+  <Contents>
+    <ContentFile>
+      <Name>BoldFont.spritefont</Name>
+      <Processor>SpriteFontProcessor</Processor>
+      <Importer>SpriteFontImporter</Importer>
+      <Settings />
+    </ContentFile>
+    <ContentFile>
+      <Name>GameFont.spritefont</Name>
+      <Processor>SpriteFontProcessor</Processor>
+      <Importer>SpriteFontImporter</Importer>
+      <Settings />
+    </ContentFile>
+    <ContentFile>
+      <Name>HeadlineFont.spritefont</Name>
+      <Processor>SpriteFontProcessor</Processor>
+      <Importer>SpriteFontImporter</Importer>
+      <Settings />
+    </ContentFile>
+  </Contents>
+</Content>
