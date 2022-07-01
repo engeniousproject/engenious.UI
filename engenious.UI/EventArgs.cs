@@ -1,4 +1,5 @@
-﻿using engenious.Graphics;
+﻿using System.Text;
+using engenious.Graphics;
 using engenious.Input;
 using engenious.UI.Controls;
 
@@ -146,7 +147,7 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the typed character.
         /// </summary>
-        public char Character { get; set; }
+        public Rune Character { get; set; }
     }
 
     /// <summary>

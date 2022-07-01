@@ -11,9 +11,9 @@ namespace engenious.UI.Controls
     /// </summary>
     public class Textbox : ContentControl, ITextControl
     {
-        private int _cursorPosition;
-
-        private int _selectionStart;
+        private int _cursorPosition, _cursorPositionAbsolute;
+        private int _selectionStart, _selectionStartAbsolute;
+        private int _runeTextLength;
 
         private readonly Label _label;
 
@@ -27,18 +27,19 @@ namespace engenious.UI.Controls
             get => _cursorPosition;
             set
             {
-                if (value < 0 || value > Text.Length || Font == null)
+                if (value < 0 || value > _runeTextLength || Font == null)
                     return;
 
                 _cursorBlinkTime = 0;
                 if (_cursorPosition != value)
                 {
-                    var cursorOffset = (int)Font.MeasureString(Text.Substring(0, value)).X;
+                    _cursorPositionAbsolute = FindAbsolute(Text, _cursorPosition, value, _cursorPositionAbsolute);
+                    var cursorOffset = (int)Font.MeasureString(Text.AsSpan()[.._cursorPositionAbsolute]).X;
                     if (cursorOffset < _scrollContainer.HorizontalScrollPosition)
                         _scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset);
                     else if (cursorOffset > _scrollContainer.HorizontalScrollPosition + _scrollContainer.ActualClientArea.Width)
                         _scrollContainer.HorizontalScrollPosition = Math.Max(0, cursorOffset - _scrollContainer.ActualClientArea.Width);
-                    _cursorPosition = Math.Min(_label.Text.Length, value);
+                    _cursorPosition = Math.Min(_runeTextLength, value);
                     InvalidateDrawing();
                 }
             }
@@ -54,6 +55,7 @@ namespace engenious.UI.Controls
             {
                 if (_selectionStart != value)
                 {
+                    _selectionStartAbsolute = FindAbsolute(Text, _selectionStart, value, _selectionStartAbsolute);
                     _selectionStart = value;
                     InvalidateDrawing();
                 }
@@ -61,7 +63,15 @@ namespace engenious.UI.Controls
         }
 
         /// <inheritdoc />
-        public string Text { get => _label.Text; set => _label.Text = value; }
+        public string Text
+        {
+            get => _label.Text;
+            set
+            {
+                _label.Text = value;
+                _runeTextLength = FindRuneLength(value);
+            }
+        }
 
         /// <inheritdoc />
         public SpriteFont? Font { get => _label.Font; set => _label.Font = value; }
@@ -134,18 +144,18 @@ namespace engenious.UI.Controls
         {
             if (Font == null)
                 return;
-            if (CursorPosition > Text.Length)
-                CursorPosition = Text.Length;
-            if (SelectionStart > Text.Length)
+            if (CursorPosition > _runeTextLength)
+                CursorPosition = _runeTextLength;
+            if (SelectionStart > _runeTextLength)
                 SelectionStart = CursorPosition;
 
             // Selection range
             if (SelectionStart != CursorPosition)
             {
-                int from = Math.Min(SelectionStart, CursorPosition);
-                int to = Math.Max(SelectionStart, CursorPosition);
-                var selectFrom = Font.MeasureString(Text.Substring(0, from));
-                var selectTo = Font.MeasureString(Text.Substring(from, to - from));
+                int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
+                var selectFrom = Font.MeasureString(Text.AsSpan()[..from]);
+                var selectTo = Font.MeasureString(Text.AsSpan(from, to - from));
                 var rect = new Rectangle(area.X + (int)selectFrom.X - _scrollContainer.HorizontalScrollPosition, area.Y, (int)selectTo.X, (int)selectTo.Y);
                 batch.Draw(Skin.Pix, rect, Color.LightBlue);
             }
@@ -157,7 +167,7 @@ namespace engenious.UI.Controls
             {
                 if (_cursorBlinkTime % 1000 < 500)
                 {
-                    var selectionSize = Font.MeasureString(Text.Substring(0, CursorPosition));
+                    var selectionSize = Font.MeasureString(Text.AsSpan(0, _cursorPositionAbsolute));
                     batch.Draw(Skin.Pix, new RectangleF(area.X + (int)selectionSize.X - _scrollContainer.HorizontalScrollPosition, area.Y, 1, Font.LineSpacing), TextColor);
                 }
                 _cursorBlinkTime += (int)gameTime.ElapsedGameTime.TotalMilliseconds;
@@ -171,30 +181,29 @@ namespace engenious.UI.Controls
             if (Focused != TreeState.Active) return;
 
             // Ignore control character
-            if (args.Character == '\b' || args.Character == '\t' || args.Character == '\n' || args.Character == '\r')
+            if (args.Character.Plane == '\b' || args.Character.Plane == '\t' || args.Character.Plane == '\n' || args.Character.Plane == '\r')
                 return;
 
             // Ignore ctrl hotkeys (A, X, C, V)
-            if (args.Character == '\u0001' ||
-                args.Character == '\u0003' ||
-                args.Character == '\u0016' ||
-                args.Character == '\u0018')
+            if (args.Character.Plane == '\u0001' ||
+                args.Character.Plane == '\u0003' ||
+                args.Character.Plane == '\u0016' ||
+                args.Character.Plane == '\u0018')
                 return;
 
             // Ignore Escape
-            if (args.Character == '\u001b')
+            if (args.Character.Plane == '\u001b')
                 return;
 
             if (SelectionStart != CursorPosition)
             {
-                int from = Math.Min(SelectionStart, CursorPosition);
-                int to = Math.Max(SelectionStart, CursorPosition);
-                Text = Text.Substring(0, from) + Text.Substring(to);
-                CursorPosition = from;
-                SelectionStart = from;
+                int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
+                Text = Text[..from] + Text[to..];
+                SelectionStart = CursorPosition = Math.Min(SelectionStart, CursorPosition);
             }
 
-            Text = Text.Substring(0, CursorPosition) + args.Character + Text.Substring(CursorPosition);
+            Text = Text[.._cursorPositionAbsolute] + args.Character + Text[_cursorPositionAbsolute..];
             CursorPosition++;
             SelectionStart++;
             args.Handled = true;
@@ -211,14 +220,22 @@ namespace engenious.UI.Controls
             {
                 if (args.Ctrl)
                 {
-                    int x = Math.Min(CursorPosition - 1, Text.Length - 1);
-                    while (x > 0 && Text[x] != ' ') x--;
-                    CursorPosition = x;
+                    int x = Math.Min(_cursorPositionAbsolute, Text.Length);
+                    int diffC = 0, oneLess;
+                    do
+                    {
+                        oneLess = FindAbsolute(Text, CursorPosition - diffC, CursorPosition - diffC - 1, x);
+                        diffC++;
+                        //TODO: x -= runeLength;
+                    } while (oneLess > 0 && Text[oneLess] != ' ');
+
+                    if (oneLess > 0)
+                        diffC--;
+                    CursorPosition = Math.Max(CursorPosition - diffC, 0);
                 }
                 else
                 {
-                    CursorPosition--;
-                    CursorPosition = Math.Max(CursorPosition, 0);
+                    CursorPosition = Math.Max(CursorPosition - 1, 0);
                 }
 
                 if (!args.Shift)
@@ -231,14 +248,20 @@ namespace engenious.UI.Controls
             {
                 if (args.Ctrl)
                 {
-                    int x = CursorPosition;
-                    while (x < Text.Length && Text[x] != ' ') x++;
-                    CursorPosition = Math.Min(x + 1, Text.Length);
+                    int x = _cursorPositionAbsolute;
+                    int diffC = 0, oneMore;
+                    do
+                    {
+                        oneMore = FindAbsolute(Text, CursorPosition + diffC, CursorPosition + diffC + 1, x);
+                        diffC++;
+                        //TODO: x += runeLength;
+                    } while (oneMore < Text.Length && Text[oneMore] != ' ');
+                    
+                    CursorPosition = Math.Min(CursorPosition + diffC, _runeTextLength);
                 }
                 else
                 {
-                    CursorPosition++;
-                    CursorPosition = Math.Min(Text.Length, CursorPosition);
+                    CursorPosition = Math.Min(_runeTextLength, CursorPosition + 1);
                 }
                 if (!args.Shift)
                     SelectionStart = CursorPosition;
@@ -257,7 +280,7 @@ namespace engenious.UI.Controls
             // End key
             if (args.Key == Keys.End)
             {
-                CursorPosition = Text.Length;
+                CursorPosition = _runeTextLength;
                 if (!args.Shift)
                     SelectionStart = CursorPosition;
                 args.Handled = true;
@@ -268,15 +291,15 @@ namespace engenious.UI.Controls
             {
                 if (SelectionStart != CursorPosition)
                 {
-                    int from = Math.Min(SelectionStart, CursorPosition);
-                    int to = Math.Max(SelectionStart, CursorPosition);
-                    Text = Text.Substring(0, from) + Text.Substring(to);
-                    CursorPosition = from;
-                    SelectionStart = from;
+                    int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                    int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
+                    Text = Text[..from] + Text[to..];
+                    SelectionStart = CursorPosition = Math.Min(SelectionStart, CursorPosition);
                 }
                 else if (CursorPosition > 0)
                 {
-                    Text = Text.Substring(0, CursorPosition - 1) + Text.Substring(CursorPosition);
+                    int oneRuneLess = FindAbsolute(Text, CursorPosition, CursorPosition - 1, _cursorPositionAbsolute);
+                    Text = Text[..oneRuneLess] + Text[_cursorPositionAbsolute..];
                     CursorPosition--;
                     SelectionStart--;
                 }
@@ -288,15 +311,15 @@ namespace engenious.UI.Controls
             {
                 if (SelectionStart != CursorPosition)
                 {
-                    int from = Math.Min(SelectionStart, CursorPosition);
-                    int to = Math.Max(SelectionStart, CursorPosition);
-                    Text = Text.Substring(0, from) + Text.Substring(to);
-                    CursorPosition = from;
-                    SelectionStart = from;
+                    int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                    int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
+                    Text = Text[..from] + Text[to..];
+                    SelectionStart = CursorPosition = Math.Min(SelectionStart, CursorPosition);
                 }
-                else if (CursorPosition < Text.Length)
+                else if (CursorPosition < _runeTextLength)
                 {
-                    Text = Text.Substring(0, CursorPosition) + Text.Substring(CursorPosition + 1);
+                    int oneRuneMore = FindAbsolute(Text, CursorPosition, CursorPosition + 1, _cursorPositionAbsolute);
+                    Text = Text.Substring(0, _cursorPositionAbsolute) + Text[oneRuneMore..];
                 }
                 args.Handled = true;
             }
@@ -306,7 +329,7 @@ namespace engenious.UI.Controls
             {
                 // Select everything
                 SelectionStart = 0;
-                CursorPosition = Text.Length;
+                CursorPosition = _runeTextLength;
 
                 args.Handled = true;
             }
@@ -314,8 +337,8 @@ namespace engenious.UI.Controls
             // Ctrl+C (Copy)
             if (args.Key == Keys.C && args.Ctrl)
             {
-                int from = Math.Min(SelectionStart, CursorPosition);
-                int to = Math.Max(SelectionStart, CursorPosition);
+                int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
 
                 // Copy selection to clipboard
                 if (from == to) SystemSpecific.ClearClipboard();
@@ -327,16 +350,15 @@ namespace engenious.UI.Controls
             // Ctrl+X (Cut)
             if (args.Key == Keys.X && args.Ctrl)
             {
-                int from = Math.Min(SelectionStart, CursorPosition);
-                int to = Math.Max(SelectionStart, CursorPosition);
+                int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
 
                 // Copy selection to clipboard
                 if (from == to) SystemSpecific.ClearClipboard();
                 else SystemSpecific.SetClipboardText(Text.Substring(from, to - from));
 
-                CursorPosition = from;
-                SelectionStart = from;
-                Text = Text.Substring(0, from) + Text.Substring(to);
+                SelectionStart = CursorPosition = Math.Min(SelectionStart, CursorPosition);
+                Text = Text[..from] + Text[to..];
 
                 args.Handled = true;
             }
@@ -347,19 +369,18 @@ namespace engenious.UI.Controls
                 // Delete currently selected text
                 if (SelectionStart != CursorPosition)
                 {
-                    int from = Math.Min(SelectionStart, CursorPosition);
-                    int to = Math.Max(SelectionStart, CursorPosition);
-                    Text = Text.Substring(0, from) + Text.Substring(to);
-                    CursorPosition = from;
-                    SelectionStart = from;
+                    int from = Math.Min(_selectionStartAbsolute, _cursorPositionAbsolute);
+                    int to = Math.Max(_selectionStartAbsolute, _cursorPositionAbsolute);
+                    Text = Text[..from] + Text[to..];
+                    SelectionStart = CursorPosition = Math.Min(SelectionStart, CursorPosition);
                 }
 
-                // Insert text at current position and advance cursor to lst inserted character
+                // Insert text at current position and advance cursor to last inserted character
                 string? paste = SystemSpecific.GetClipboardText();
                 if (!string.IsNullOrEmpty(paste))
                 {
-                    Text = Text.Substring(0, CursorPosition) + paste + Text.Substring(CursorPosition);
-                    CursorPosition += paste.Length;
+                    Text = Text[.._cursorPositionAbsolute] + paste + Text[_cursorPositionAbsolute..];
+                    CursorPosition += FindRuneLength(paste);
                     SelectionStart = CursorPosition;
                 }
 
@@ -375,21 +396,62 @@ namespace engenious.UI.Controls
             base.OnKeyPress(args);
         }
 
+        private static int FindRuneLength(ReadOnlySpan<char> text)
+        {
+            int relative = 0;
+            foreach (var (_, _) in new CharSpanRuneEnumerable(text))
+            {
+                relative++;
+            }
+
+            return relative;
+        }
+        private static int FindAbsolute(ReadOnlySpan<char> text, int oldPosition, int newPosition, int oldAbsolute)
+        {
+            // TODO: optimizations using relative positions
+            int absolute = 0, relative = 0;
+            foreach (var (rune, _) in new CharSpanRuneEnumerable(text))
+            {
+                if (relative++ == newPosition)
+                {
+                    break;
+                }
+
+                absolute += rune.Utf16SequenceLength;
+            }
+
+            return absolute;
+        }
         private int FindClosestPosition(Point pt)
         {
             if (Font == null) return -1;
             float oldWidth = 0;
-            for (int i = 1; i <= Text.Length; i++)
+            int absolute = 0, rel = 0;
+            foreach (var (rune, _) in new CharSpanRuneEnumerable(Text))
             {
-                var substr = Text.Substring(0, i);
+                absolute += rune.Utf16SequenceLength;
+                var substr = Text[..absolute];
                 var measurement = Font.MeasureString(substr);
                 //oldWidth += (measurement.X - oldWidth) / 2;
                 if (Math.Abs(oldWidth - pt.X) <= Math.Abs(measurement.X - pt.X))
-                    return i - 1;
+                    return rel;
 
                 oldWidth = measurement.X;
+                rel++;
             }
-            return Text.Length;
+
+            return _runeTextLength;
+            // for (int i = 1; i <= Text.Length; i++)
+            // {
+            //     var substr = Text.Substring(0, i);
+            //     var measurement = Font.MeasureString(substr);
+            //     //oldWidth += (measurement.X - oldWidth) / 2;
+            //     if (Math.Abs(oldWidth - pt.X) <= Math.Abs(measurement.X - pt.X))
+            //         return i - 1;
+            //
+            //     oldWidth = measurement.X;
+            // }
+            // return Text.Length;
         }
 
         private bool _mouseDown;

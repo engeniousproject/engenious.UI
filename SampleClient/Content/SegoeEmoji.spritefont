@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <EngeniousFont>
-  <FontName>Arial</FontName>
-  <Size>16</Size>
+  <FontName>Segoe UI Emoji</FontName>
+  <Size>12</Size>
   <Spacing>0</Spacing>
   <UseKerning>True</UseKerning>
-  <Style>Bold</Style>
-  <DefaultCharacter>*</DefaultCharacter>
+  <Style>Regular</Style>
+  <DefaultCharacter>&#x0;</DefaultCharacter>
   <CharacterRegions>
     <CharacterRegion>
       <Start>9</Start>
@@ -42,6 +42,10 @@
     <CharacterRegion>
       <Start>223</Start>
       <End>223</End>
+    </CharacterRegion>
+    <CharacterRegion>
+      <Start>128293</Start>
+      <End>128293</End>
     </CharacterRegion>
   </CharacterRegions>
 </EngeniousFont>

@@ -15,6 +15,12 @@
       </Settings>
     </ContentFile>
     <ContentFile>
+      <Name>SegoeEmoji.spritefont</Name>
+      <Processor>SpriteFontProcessor</Processor>
+      <Importer>SpriteFontImporter</Importer>
+      <Settings />
+    </ContentFile>
+    <ContentFile>
       <Name>click1.wav</Name>
       <Processor>AudioProcessor</Processor>
       <Importer>Wave Importer</Importer>

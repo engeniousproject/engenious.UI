@@ -143,7 +143,8 @@ namespace SampleClient.Screens
              {
                  HorizontalAlignment = HorizontalAlignment.Stretch,          //100% Breite,
                  MaxWidth = 200,
-                 Text = "TEXTBOX!",                                      //Voreingestellter text
+                 Text = "TEXT🔥BOX!",                                      //Voreingestellter text
+                 Font = ScreenManager.Content.Load<SpriteFont>("SegoeEmoji")
              };
 
              Button clearTextbox = new TextButton("Clear Textbox");
