@@ -16,7 +16,7 @@
         /// <param name="title">The title for this page.</param>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public TabPage(string title, string style = "", BaseScreenComponent? manager = null) : base(style, manager)
+        public TabPage(string title, BaseScreenComponent? manager = null, string style = "") : base(manager, style)
         {
             Title = title;
         }

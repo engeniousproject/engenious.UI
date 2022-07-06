@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        internal FlyoutControl(string style = "", BaseScreenComponent? manager = null) : base(style, manager) {
+        internal FlyoutControl(BaseScreenComponent? manager = null, string style = "") : base(manager, style) {
             ApplySkin(typeof(FlyoutControl));
         }
 

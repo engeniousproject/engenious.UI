@@ -19,8 +19,8 @@ namespace engenious.UI.Controls
         /// </summary>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public Image(string style = "", BaseScreenComponent? manager = null)
-            : base(style, manager)
+        public Image(BaseScreenComponent? manager = null, string style = "")
+            : base(manager, style)
         {
             ApplySkin(typeof(Image));
         }

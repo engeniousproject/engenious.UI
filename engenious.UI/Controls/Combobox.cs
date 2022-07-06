@@ -63,8 +63,8 @@ namespace engenious.UI.Controls
         /// </summary>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public Combobox(string style = "", BaseScreenComponent? manager = null)
-            : this(item => DefaultGenerateControl(manager, style, item), style, manager)
+        public Combobox(BaseScreenComponent? manager = null, string style = "")
+            : this(item => DefaultGenerateControl(manager, style, item), manager, style)
         {
             
         }
@@ -74,8 +74,8 @@ namespace engenious.UI.Controls
         /// <param name="templateGenerator">The template generator to use for generating shown controls for items.</param>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public Combobox(GenerateTemplateDelegate<T> templateGenerator, string style = "", BaseScreenComponent? manager = null)
-            : base(templateGenerator, style, manager)
+        public Combobox(GenerateTemplateDelegate<T> templateGenerator, BaseScreenComponent? manager = null, string style = "")
+            : base(templateGenerator, manager, style)
         { 
             _mainControl = new ContentControl(manager: manager)
             {

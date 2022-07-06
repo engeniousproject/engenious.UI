@@ -71,8 +71,8 @@ namespace engenious.UI.Controls
         /// </summary>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public Listbox(string style = "", BaseScreenComponent? manager = null)
-            : base(style, manager)
+        public Listbox(BaseScreenComponent? manager = null, string style = "")
+            : base(manager, style)
         {
             ScrollContainer = new ScrollContainer(manager: manager)
             {

@@ -164,12 +164,12 @@ namespace engenious.UI
         /// <summary>
         /// Initializes a new instance of the <see cref="Control"/> class.
         /// </summary>
-        /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public Control(string style = "", BaseScreenComponent? manager = null)
+        /// <param name="style">The style to use for this control.</param>
+        public Control(BaseScreenComponent? manager = null, string style = "")
         {
-            Style = style;
             ScreenManager = manager ?? _screenManager ?? throw new ArgumentNullException(nameof(manager));
+            Style = style;
 
             _children = new ControlCollection(this);
             _children.OnInserted += ControlCollectionInsert;

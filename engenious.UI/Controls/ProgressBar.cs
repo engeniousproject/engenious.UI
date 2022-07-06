@@ -114,7 +114,7 @@ namespace engenious.UI.Controls
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
         public ProgressBar(string style = "", BaseScreenComponent? manager= null)
-            : base(style, manager)
+            : base(manager, style)
         {
             ApplySkin(typeof(ProgressBar));
         }

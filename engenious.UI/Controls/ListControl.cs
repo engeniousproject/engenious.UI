@@ -69,8 +69,8 @@ namespace engenious.UI.Controls
         /// <param name="templateGenerator">The template generator to use for generating shown controls for items.</param>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public ListControl(GenerateTemplateDelegate<T> templateGenerator, string style = "", BaseScreenComponent? manager = null)
-            : base(style, manager)
+        public ListControl(GenerateTemplateDelegate<T> templateGenerator, BaseScreenComponent? manager = null, string style = "")
+            : base(manager, style)
         {
             CanFocus = true;
             TabStop = true;
@@ -95,7 +95,7 @@ namespace engenious.UI.Controls
         {
             if (item == null) 
                 return null;
-            return new Label(style, component) { Text = item.ToString() ?? string.Empty };
+            return new Label(component, style) { Text = item.ToString() ?? string.Empty };
         }
 
         /// <summary>
@@ -103,8 +103,8 @@ namespace engenious.UI.Controls
         /// </summary>
         /// <param name="style">The style to use for this control.</param>
         /// <param name="manager">The <see cref="BaseScreenComponent"/>.</param>
-        public ListControl(string style = "", BaseScreenComponent? manager = null)
-            : this(item => DefaultGenerateControl(manager, style, item), style, manager)
+        public ListControl(BaseScreenComponent? manager = null, string style = "")
+            : this(item => DefaultGenerateControl(manager, style, item), manager, style)
         {
         }
 
