@@ -23,6 +23,6 @@
         /// <summary>
         /// Gets or sets the <see cref="Brush"/> used to render the dropdown background.
         /// </summary>
-        Brush DropdownBackgroundBrush { get; set; }
+        Brush? DropdownBackgroundBrush { get; set; }
     }
 }

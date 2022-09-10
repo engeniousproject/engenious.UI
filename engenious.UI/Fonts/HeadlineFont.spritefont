@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <EngeniousFont>
   <FontName>Arial</FontName>
+  <FontType>MTSDF</FontType>
   <Size>16</Size>
   <Spacing>0</Spacing>
   <UseKerning>True</UseKerning>

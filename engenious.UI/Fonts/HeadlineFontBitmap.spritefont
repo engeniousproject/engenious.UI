@@ -1,12 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <EngeniousFont>
   <FontName>Arial</FontName>
-  <FontType>MTSDF</FontType>
-  <Size>12</Size>
+  <FontType>BitmapFont</FontType>
+  <Size>16</Size>
   <Spacing>0</Spacing>
   <UseKerning>True</UseKerning>
   <Style>Bold</Style>
-  <DefaultCharacter>&#x0;</DefaultCharacter>
+  <DefaultCharacter>*</DefaultCharacter>
   <CharacterRegions>
     <CharacterRegion>
       <Start>9</Start>

@@ -239,7 +239,7 @@ namespace engenious.UI.Controls
                             break;
                     }
 
-                    batch.DrawString(Font, Text, line.Begin, line.Length, offset, color * alpha);
+                    batch.DrawString(Font, Text.AsSpan(line.Begin, line.Length), offset, color * alpha);
 
                     offset.Y += (int)line.Size.Y;
                 }

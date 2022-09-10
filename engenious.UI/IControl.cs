@@ -26,22 +26,22 @@ namespace engenious.UI
         /// <summary>
         /// Gets or sets the background <see cref="Brush"/> for this control.
         /// </summary>
-        Brush Background { get; set; }
+        Brush? Background { get; set; }
 
         /// <summary>
         /// Gets or sets the background <see cref="Brush"/> for this control when it is in hover state.
         /// </summary>
-        Brush HoveredBackground { get; set; }
+        Brush? HoveredBackground { get; set; }
 
         /// <summary>
         /// Gets or sets the background <see cref="Brush"/> for this control when it is pressed.
         /// </summary>
-        Brush PressedBackground { get; set; }
+        Brush? PressedBackground { get; set; }
 
         /// <summary>
         /// Gets or sets the background <see cref="Brush"/> for this control when it is disabled.
         /// </summary>
-        Brush DisabledBackground { get; set; }
+        Brush? DisabledBackground { get; set; }
 
         /// <summary>
         /// Gets or sets the outer spacing of the control.

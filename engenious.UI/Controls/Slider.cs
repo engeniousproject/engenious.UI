@@ -105,7 +105,7 @@ namespace engenious.UI.Controls
             RecalculateKnob();
 
             // Draw background
-            Background.Draw(batch, contentArea, alpha);
+            Background?.Draw(batch, contentArea, alpha);
 
             KnobBrush.Draw(batch, new Rectangle(_knob.Location + contentArea.Location, _knob.Size), alpha);
         }

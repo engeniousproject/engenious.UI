@@ -13,7 +13,7 @@ namespace engenious.UI
     /// </summary>
     public abstract class Control : IControl
     {
-        private static BaseScreenComponent? _screenManager = null;
+        private static BaseScreenComponent? _screenManager;
         /// <summary>
         /// Set the screen manager once instead of setting 
         /// it in every controls constructor.
@@ -23,21 +23,21 @@ namespace engenious.UI
 
         private bool _invalidDrawing;
 
-        private Brush _background = null!;
+        private Brush? _background;
 
-        private Brush _hoveredBackground = null!;
+        private Brush? _hoveredBackground;
 
-        private Brush _pressedBackground = null!;
+        private Brush? _pressedBackground;
 
-        private Brush _disabledBackground = null!;
+        private Brush? _disabledBackground;
 
         private Border _margin = Border.All(0);
 
         private Border _padding = Border.All(0);
 
-        private SoundEffect? _clickSound = null;
+        private SoundEffect? _clickSound;
 
-        private SoundEffect? _hoverSound = null;
+        private SoundEffect? _hoverSound;
         
         /// <inheritdoc />
         public BaseScreenComponent ScreenManager { get; }
@@ -69,7 +69,7 @@ namespace engenious.UI
         }
 
         /// <inheritdoc />
-        public Brush Background
+        public Brush? Background
         {
             get => _background;
             set
@@ -83,7 +83,7 @@ namespace engenious.UI
         }
         
         /// <inheritdoc />
-        public Brush HoveredBackground
+        public Brush? HoveredBackground
         {
             get => _hoveredBackground;
             set
@@ -97,7 +97,7 @@ namespace engenious.UI
         }
 
         /// <inheritdoc />
-        public Brush PressedBackground
+        public Brush? PressedBackground
         {
             get => _pressedBackground;
             set
@@ -111,7 +111,7 @@ namespace engenious.UI
         }
 
         /// <inheritdoc />
-        public Brush DisabledBackground
+        public Brush? DisabledBackground
         {
             get => _disabledBackground;
             set
@@ -387,7 +387,7 @@ namespace engenious.UI
 
         private bool _visible = true;
 
-        private Control? _parent = null;
+        private Control? _parent;
 
         private readonly ControlCollection _children;
 
@@ -607,17 +607,17 @@ namespace engenious.UI
 
         private Point _actualSize = Point.Zero;
 
-        private int? _minWidth = null;
+        private int? _minWidth;
 
-        private int? _width = null;
+        private int? _width;
 
-        private int? _maxWidth = null;
+        private int? _maxWidth;
 
-        private int? _minHeight = null;
+        private int? _minHeight;
 
-        private int? _height = null;
+        private int? _height;
 
-        private int? _maxHeight = null;
+        private int? _maxHeight;
 
         private Matrix _transformation = Matrix.Identity;
 
@@ -1048,9 +1048,9 @@ namespace engenious.UI
 
         private TreeState _hovered = TreeState.None;
 
-        private bool _dropHovered = false;
+        private bool _dropHovered;
 
-        private bool _pressed = false;
+        private bool _pressed;
 
         private readonly PropertyEventArgs<TreeState> _hoveredChangedEventArgs = new PropertyEventArgs<TreeState>();
 
@@ -1866,15 +1866,15 @@ namespace engenious.UI
 
         #region Tabbing & Fokus
 
-        private bool _focused = false;
+        private bool _focused;
 
-        private bool _tabStop = false;
+        private bool _tabStop;
 
-        private bool _canFocus = false;
+        private bool _canFocus;
 
-        private int _tabOrder = 0;
+        private int _tabOrder;
 
-        private int _zOrder = 0;
+        private int _zOrder;
         /// <summary>
         /// A value indicating whether the <see cref="RootPath"/> is dirty and needs to be recalculated.
         /// </summary>

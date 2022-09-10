@@ -46,7 +46,7 @@ namespace engenious.UI.Controls
         }
 
         /// <inheritdoc />
-        public Brush DropdownBackgroundBrush
+        public Brush? DropdownBackgroundBrush
         {
             get => Selector.Background;
             set => Selector.Background = value;
