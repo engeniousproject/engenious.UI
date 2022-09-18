@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <Description>UI Framework for engenious</Description>
@@ -28,12 +28,12 @@
 	  <DocumentationFile>$(BaseIntermediateOutputPath)/engenious.UI.xml</DocumentationFile>
     </PropertyGroup>
 	<ItemGroup>
-        <PackageReference Include="LiCo" Version="0.1.11.13-alpha" PrivateAssets="all" />
-        <PackageReference Include="TextCopy" Version="4.2.1" />
+        <PackageReference Include="LiCo" Version="0.2.0.3-alpha" PrivateAssets="all" />
+        <PackageReference Include="TextCopy" Version="6.1.0" />
         <ProjectReference Include="..\..\engenious\engenious.csproj" Condition="Exists('..\..\engenious\engenious.csproj')" />
 
-	    <PackageReference Include="engenious" Version="0.6.2.3-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
-        <PackageReference Include="LitGit" Version="0.2.0.55-alpha" PrivateAssets="all" />
+	    <PackageReference Include="engenious" Version="0.7.0.1-alpha" Condition="!Exists('..\..\engenious\engenious.csproj')" />
+        <PackageReference Include="LitGit" Version="0.2.0.56-alpha" PrivateAssets="all" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="Fonts\HeadlineFont.ego" />

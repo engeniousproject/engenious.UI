@@ -1,6 +1,9 @@
 ﻿======================================================================================================================================================
 ==================== Dependent packages textcopy 4.2.1  ==============================================================================================
 ==================== Dependent packages microsoft.extensions.dependencyinjection.abstractions 5.0.0  =================================================
+==================== Dependent packages textcopy 6.1.0  ==============================================================================================
+==================== Dependent packages microsoft.extensions.dependencyinjection.abstractions 6.0.0  =================================================
+==================== Dependent packages microsoft.bcl.asyncinterfaces 6.0.0  =========================================================================
 ======================================================================================================================================================
 
 'MIT' reference 
@@ -18,6 +21,9 @@ MIT License _____ Permission is hereby granted, free of charge, to any person ob
 ======================================================================================================================================================
 ==================== Dependent packages textcopy 4.2.1  ==============================================================================================
 ==================== Dependent packages microsoft.extensions.dependencyinjection.abstractions 5.0.0  =================================================
+==================== Dependent packages textcopy 6.1.0  ==============================================================================================
+==================== Dependent packages microsoft.extensions.dependencyinjection.abstractions 6.0.0  =================================================
+==================== Dependent packages microsoft.bcl.asyncinterfaces 6.0.0  =========================================================================
 ======================================================================================================================================================
 
 MIT License
@@ -52,6 +58,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ==================== Dependent packages runtime.native.system 4.3.0  =================================================================================
 ==================== Dependent packages system.runtime.interopservices 4.3.0  ========================================================================
 ==================== Dependent packages system.runtime.handles 4.3.0  ================================================================================
+==================== Dependent packages system.collections 4.3.0  ====================================================================================
 ======================================================================================================================================================
 
 MICROSOFT SOFTWARE LICENSE TERMS
@@ -142,4 +149,23 @@ It also applies even if Microsoft knew or should have known about the possibilit
 
 
 
+
+======================================================================================================================================================
+==================== Dependent packages system.threading.tasks.extensions 4.5.4  =====================================================================
+==================== Dependent packages system.runtime.compilerservices.unsafe 4.5.3  ================================================================
+======================================================================================================================================================
+
+The MIT License (MIT) Copyright (c) .NET Foundation and Contributors All rights reserved. Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE. 
 

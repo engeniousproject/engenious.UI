@@ -2,7 +2,7 @@
 
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>net5.0</TargetFramework>
+        <TargetFramework>net7.0</TargetFramework>
         <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -24,7 +24,7 @@
       <None Remove="Content\obj\**" />
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="engenious.ContentTool" Version="0.6.2.3-alpha" PrivateAssets="all" />
+      <PackageReference Include="engenious.ContentTool" Version="0.7.0.1-alpha" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\engenious.UI\engenious.UI.csproj" />
